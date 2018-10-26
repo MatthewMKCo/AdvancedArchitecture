@@ -177,7 +177,6 @@ int sra(int reg1, int reg2){
 
 //jump and link
 int jal(){
-  printf("Instruction:Jump and Link\n");
   int originalPC = pc[0] + 4;
   pc[0] = pc[0] + (imm);
   return originalPC;
@@ -185,7 +184,6 @@ int jal(){
 
 //jump and link register
 int jalr(int reg1){
-  printf("Instruction:Jump and Link Register\n");
   int originalPC = pc[0] + 4;
   pc[0] = (imm + reg1) & 0b0;
   return originalPC;
@@ -193,7 +191,6 @@ int jalr(int reg1){
 
 //branch if equal
 void beq(int reg1, int reg2){
-  printf("Instruction:Branch if Equal\n");
   if(reg1 == reg2){
     pc[0] = pc[0] + imm;
   }
@@ -202,7 +199,6 @@ void beq(int reg1, int reg2){
 
 //branch if not equal
 void bne(int reg1, int reg2){
-  printf("Instruction:Branch if Not Equal\n");
   if(reg1 != reg2){
     pc[0] = pc[0] + imm;
   }
@@ -211,7 +207,6 @@ void bne(int reg1, int reg2){
 
 //branch if less than
 void blt(int reg1, int reg2){
-  printf("Instruction:Branch if Less Than\n");
   if(reg1 < reg2){
     pc[0] = pc[0] + imm;
   }
@@ -220,7 +215,6 @@ void blt(int reg1, int reg2){
 
 //branch if less than
 void bltu(int reg1, int reg2){
-  printf("Instruction:Branch if Less Than Unsigned\n");
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u < reg2u){
     pc[0] = pc[0] + imm;
@@ -229,17 +223,14 @@ void bltu(int reg1, int reg2){
 }
 
 //branch if greater than
-void bgt(int reg1, int reg2){
-  printf("Instruction:Branch if Greater Than\n");
+void bge(int reg1, int reg2){
   if(reg1 >= reg2){
     pc[0] = pc[0] + imm;
   }
   return;
 }
 
-//branch if greater than
-void bgtu(int reg1, int reg2){
-  printf("Instruction:Branch if Greater Than Unsigned\n");
+void bgeu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u >= reg2u){
     pc[0] = pc[0] + imm;
@@ -257,7 +248,6 @@ int ld(char* cache, int reg1){
 
 //load 32-bit memory into register
 int lw(char* cache, int reg1){
-  printf("Instruction:Load\n");
   int offset = imm + reg1;
   int* data;
   data = (int*)(cache + offset);
@@ -267,7 +257,6 @@ int lw(char* cache, int reg1){
 
 //load 16-bit memory into register
 int lh(char* cache, int reg1){
-  printf("Instruction:Load\n");
   int offset = imm + reg1;
   int* data;
   data = (int*)(cache + offset);
@@ -280,7 +269,6 @@ int lh(char* cache, int reg1){
 
 //load unsigned 16-bit memory into register
 int lhu(char* cache, int reg1){
-  printf("Instruction:Load\n");
   int offset = imm + reg1;
   int* data;
   data = (int*)(cache + offset);
@@ -290,7 +278,6 @@ int lhu(char* cache, int reg1){
 
 //load 8-bit memory into register
 int lb(char* cache, int reg1){
-  printf("Instruction:Load\n");
   int offset = imm + reg1;
   int* data;
   data = (int*)(cache + offset);
@@ -303,7 +290,6 @@ int lb(char* cache, int reg1){
 
 //load unsigned 8-bit memory into register
 int lbu(char* cache, int reg1){
-  printf("Instruction:Load\n");
   int offset = imm + reg1;
   int* data;
   data = (int*)(cache + offset);
@@ -543,6 +529,14 @@ void execute_iformat(){
         break;
     }
   }
+  else if(opcode == 0b1100111){
+    printf("Instruction:Jump and Link Register\n");
+    registers[rdestination] = jalr(registers[rsource1]);
+  }
+  else{
+    printf("Error\n");
+    exit(1);
+  }
   return;
 }
 
@@ -611,10 +605,38 @@ void execute_rformat(){
 }
 
 void execute_jformat(){
+  printf("Instruction:Jump and Link\n");
+  jal();
   return;
 }
 
 void execute_bformat(){
+  switch(funct3){
+    case(0b000):
+      printf("Instruction:Branch if Equal\n");
+      beq(registers[rsource1], registers[rsource2]);
+      break;
+    case(0b001):
+      printf("Instruction:Branch if Not Equal\n");
+      bne(registers[rsource1], registers[rsource2]);
+      break;
+    case(0b100):
+      printf("Instruction:Branch if Less Than\n");
+      blt(registers[rsource1], registers[rsource2]);
+      break;
+    case(0b101):
+      printf("Instruction:Branch if Greater Than\n");
+      bge(registers[rsource1], registers[rsource2]);
+      break;
+    case(0b110):
+      printf("Instruction:Branch if Less Than Unsigned\n");
+      bltu(registers[rsource1], registers[rsource2]);
+      break;
+    case(0b111):
+      printf("Instruction:Branch if Greater Than Unsigned\n");
+      bgeu(registers[rsource1], registers[rsource2]);
+      break;
+  }
   return;
 }
 
