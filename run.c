@@ -116,7 +116,7 @@ int slli(int reg1){
 
 //Logical Right Shift Immediate
 int srli(int reg1){
-  return (reg1 >> shamt)
+  return (reg1 >> shamt);
 }
 
 //Arithmetic Right Shift Immediate
@@ -253,9 +253,9 @@ void bgeu(int reg1, int reg2){
   return;
 }
 
-//load memory into register
+//load memory into register for instructions cache
 int ld(char* cache, int reg1){
-  int offset = imm + reg1;
+  int offset = reg1;
   int* data;
   data = (int*)(cache + offset);
   return *data;
@@ -387,8 +387,9 @@ void mov(uint32_t* reg, uint32_t val){
 }
 
 void fetch(){
+  printf("Current PC:%d\n",pc[0]);
   instruction = ld(Icache, pc[0]);
-  // printf("Current Instruction:%x\n", instruction);
+  printf("Current Instruction:%x\n", instruction);
 }
 
 void decode(){
@@ -437,7 +438,7 @@ void decode(){
     rdestination = (instruction & 0x00000F80) >> 7;
     funct3 = (instruction & 0x00007000) >> 12;
     rsource1 = (instruction & 0x000F8000) >> 15;
-    if(funct3 == (0b001 || 0b101)){
+    if(funct3 == 0b101 || funct3 == 0b001){
       shamt = (instruction & 0x01F00000) >> 20;
       imm = (instruction & 0xFE000000) >> 25;
     }
@@ -494,30 +495,46 @@ void execute_iformat(){
   if(opcode == 0b0010011){
     switch(funct3){
       case(0b000):
-      printf("Instruction:Add Immediate\n");
-      registers[rdestination] = addi(registers[rsource1]);
-      break;
+        printf("Instruction:Add Immediate\n");
+        registers[rdestination] = addi(registers[rsource1]);
+        break;
       case(0b111):
-      printf("Instruction:And Immediate\n");
-      registers[rdestination] = andi(registers[rsource1]);
-      break;
+        printf("Instruction:And Immediate\n");
+        registers[rdestination] = andi(registers[rsource1]);
+        break;
       case(0b110):
-      printf("Instruction:Or Immediate\n");
-      registers[rdestination] = ori(registers[rsource1]);
-      break;
+        printf("Instruction:Or Immediate\n");
+        registers[rdestination] = ori(registers[rsource1]);
+        break;
       case(0b100):
-      printf("Instruction:Xor Immediate\n");
-      registers[rdestination] = xori(registers[rsource1]);
-      break;
+        printf("Instruction:Xor Immediate\n");
+        registers[rdestination] = xori(registers[rsource1]);
+        break;
       case(0b010):
-      printf("Instruction:STLI\n");
-      registers[rdestination] = slti(registers[rsource1]);
-      break;
+        printf("Instruction:STLI\n");
+        registers[rdestination] = slti(registers[rsource1]);
+        break;
       case(0b011):
-      printf("Instruction:STLIU\n");
-      registers[rdestination] = sltiu(registers[rsource1]);
-      break;
-      //TODO:still have shift functions to create
+        printf("Instruction:STLIU\n");
+        registers[rdestination] = sltiu(registers[rsource1]);
+        break;
+      case(0b001):
+        printf("Instruction:Logical Left Shift Immediate\n");
+        registers[rdestination] = slli(registers[rsource1]);
+        break;
+      case(0b101):
+        if(imm == 0b0000000){
+          printf("Instruction:Logical Right Shift Immediate\n");
+          registers[rdestination] = srli(registers[rsource1]);
+          break;
+        }
+        else if(imm == 0b0100000){
+          printf("Instruction:Arithmetic Right Shift Immediate\n");
+          registers[rdestination] = srai(registers[rsource1]);
+          break;
+        }
+
+
     }
   }
   else if(opcode == 0b0000011){
@@ -733,8 +750,9 @@ void run(){
 
     //Print all register values
     for(int i = 0; i < 31; i++){
-      printf("r%d:%d\t", i, registers[i]);
-      if(i % 10 == 0 && i != 0)printf("\n");
+      if(i == 15)printf("pc:%d\t", registers[i]);
+      else printf("r%d:%d\t", i, registers[i]);
+      if((i+1) % 5 == 0)printf("\n");
     }
       printf("r31:%d\n", registers[31]);
       printf("Rsources:%d\t%d\n",rsource1, rsource2);
@@ -787,19 +805,10 @@ int main(int argc, char** argv){
   separator;
   printf("Loading Program\n");
   load_program(argv[1]);
-  // for(int i = 0; i < 20; i++){
-  //   printf("%x\n", Icache[i]);
-  // }
-  printf("%x\n",Icache[0]);
+
   separator;
 
   run();
-
-  // printf("HELLO:%u\n", y);
-  // unsigned short int x = 65529U;
-  // short int y = *(short int*)&x;
-  //
-  // printf("%d\n", y);
 
   return 0;
 }
