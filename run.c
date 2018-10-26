@@ -109,6 +109,21 @@ int sltiu(int reg1){
   else return 0;
 }
 
+//Logical Left Shift Immediate
+int slli(int reg1){
+  return (reg1 << shamt);
+}
+
+//Logical Right Shift Immediate
+int srli(int reg1){
+  return (reg1 >> shamt)
+}
+
+//Arithmetic Right Shift Immediate
+int srai(int reg1){
+  return (reg1 >> shamt);
+}
+
 //Load Upper Immediate
 int lui(){
   return (imm & 0xFFFFF000);
