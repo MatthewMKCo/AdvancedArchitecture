@@ -68,50 +68,173 @@ uint32_t addr;
 //   return 2^32
 // }
 
-//add two registers
-int add(int reg1, int reg2){
-  return reg1 + reg2;
-}
 
 //add register and immediate
 int addi(int reg1){
+  printf("Instruction:Add Immediate\n");
   return reg1 + imm;
-}
-
-//set less than immediate
-// int slti(){
-//   // if(signedfunc(registers))
-// }
-
-//subtract two registers
-int sub(uint32_t reg1, uint32_t reg2){
-  return reg1 - reg2;
 }
 
 //subtract register and immediate
 int subi(uint32_t reg1, uint32_t immOperand){
+  printf("Instruction:Subtract Immediates\n");
   return reg1 - immOperand;
 }
 
-//multiply two registers
-int mul(uint32_t reg1, uint32_t reg2){
-  return reg1 * reg2;
+//bit wise and on register and immediate
+int andi(int reg1){
+  printf("Instruction:And Immediate\n");
+  return (reg1 & imm);
 }
 
-//multiply register and immediate
-int muli(uint32_t reg1, uint32_t immOperand){
-  return reg1 * immOperand;
+//bit wise or on register and immediate
+int ori(int reg1){
+  printf("Instruction:Or Immediate\n");
+  return (reg1 | imm);
 }
 
-//divide two registers
-int divide(uint32_t reg1, uint32_t reg2){
-  return reg1 * reg2;
+//bit wise xor on register and immediate
+int xori(int reg1){
+  printf("Instruction:Xor Immediate\n");
+  return (reg1 ^ imm);
 }
 
-//divide register and immediate
-int dividei(uint32_t reg1, uint32_t immOperand){
-  return reg1 * immOperand;
+//set less than immediate
+int slti(int reg1){
+  printf("Instruction:STLI\n");
+  if(reg1 < imm)return 1;
+  else return 0;
 }
+
+//set less than immediate unsigned
+int sltiu(int reg1){
+  printf("Instruction:STLIU\n");
+  unsigned int reg1u = reg1;
+  unsigned int immu = imm;
+  if(reg1u < immu)return 1;
+  else return 0;
+}
+
+//Load Upper Immediate
+int lui(){
+  printf("Instruction:Load Upper Immediate\n");
+  return (imm & 0xFFFFF000);
+}
+
+//Add Upper Immediate to PC
+int auipc(){
+  printf("Instruction:Add Upper Immediate to PC\n");
+  return((imm & 0xFFFFF000) + pc[0]);
+}
+
+//Add two registers
+int add(int reg1, int reg2){
+  printf("Instruction:Add\n");
+  return (reg1 + reg2);
+}
+
+//Subtract two registers
+int sub(int reg1, int reg2){
+  printf("Instruction:Subtract\n");
+  return (reg1 - reg2);
+}
+
+//Set if Less Than
+int slt(int reg1, int reg2){
+  printf("Instruction:SLT\n");
+  if(reg1 < reg2)return 1;
+  else return 0;
+}
+
+//Set if Less Than Unsigned
+int sltu(int reg1, int reg2){
+  printf("Instruction:SLTU\n");
+  unsigned int reg2u = reg2;
+  if(reg2u != 0)return 1;
+  else return 0;
+}
+
+//bit wise and on two registers
+int and(int reg1, int reg2){
+  printf("Instruction:And\n");
+  return(reg1 & reg2);
+}
+
+//bit wise or on two registers
+int or(int reg1, int reg2){
+  printf("Instruction:Or\n");
+  return(reg1 | reg2);
+}
+
+//bit wise xor on two registers
+int xor(int reg1, int reg2){
+  printf("Instruction:Xor\n");
+  return(reg1 ^ reg2);
+}
+
+//logical left shift
+int sll(int reg1, int reg2){
+  printf("Instruction:Logical Left Shift\n");
+  int shift = (reg2 & 0x1F);
+  return(reg1 << shift);
+}
+
+//logical rigth shift
+int srl(int reg1, int reg2){
+  printf("Instruction:Logical Right Shift\n");
+  int shift = (reg2 & 0x1F);
+  return(reg1 >> shift);
+}
+
+//arithmetic roght shift
+int sra(int reg1, int reg2){
+  printf("Instruction:Logical Right Shift\n");
+  int shift = (reg2 & 0x1F);
+  return(reg1 >> shift);
+}
+
+//jump and link
+int jal(){
+  printf("Instruction:Jump and Link\n");
+  int originalPC = pc[0] + 4;
+  int jimm = (jimm1 + jimm2 + signedjimm1 + signedjimm2);
+  if((jimm & 0x00080000)){
+    jimm += 0xFFF00000;
+  }
+  pc[0] = pc[0] + (jimm);
+  return originalPC;
+}
+
+//jump and link register
+int jalr(){
+  
+}
+
+//branch if equal
+int beq(int reg1, int reg2){
+  printf("Instruction:Branch if Equal\n");
+
+}
+
+// //multiply two registers
+// int mul(uint32_t reg1, uint32_t reg2){
+//   return reg1 * reg2;
+// }
+//
+// //multiply register and immediate
+// int muli(uint32_t reg1, uint32_t immOperand){
+//   return reg1 * immOperand;
+// }
+//
+// //divide two registers
+// int divide(uint32_t reg1, uint32_t reg2){
+//   return reg1 * reg2;
+// }
+//
+// //divide register and immediate
+// int dividei(uint32_t reg1, uint32_t immOperand){
+//   return reg1 * immOperand;
+// }
 
 
 
@@ -155,24 +278,31 @@ void fetch(){
 void decode(){
   opcode = (instruction & 0x0000007F);
   printf("Opcode:%d\n",opcode);
-
   switch(opcode){
     case 0b0010011:
       instruction_type = 1;
+      break;
     case 0b0000011:
       instruction_type = 1;
+      break;
     case 0b0110111:
       instruction_type = 2;
+      break;
     case 0b0010111:
       instruction_type = 2;
+      break;
     case 0b0110011:
       instruction_type = 3;
+      break;
     case 0b1101111:
       instruction_type = 4;
+      break;
     case 0b1100011:
       instruction_type = 5;
+      break;
     case 0b0100011:
       instruction_type = 6;
+      break;
   }
 
   //I type instructions
@@ -191,6 +321,7 @@ void decode(){
     else{
       imm = (instruction & 0xFFF00000) >> 20;
       if((imm & 0x00000800)){
+        printf("Sign Extension\n");
         imm += 0xFFFFF000;
       }
     }
@@ -211,10 +342,10 @@ void decode(){
   //J type instructions
   else if(instruction_type == 4){
     rdestination = (instruction & 0x00000F80) >> 7;
-    jimm1 = (instruction & 0x000FF000) >> 12;
-    signedjimm1 = (instruction & 0x001FF000) >> 20;
-    jimm2 = (instruction & 0x7FE00000) >> 21;
-    signedjimm2 = (instruction & 0x80000000) >> 31;
+    jimm1 = (instruction & 0x000FF000) >> 12 << 12;
+    signedjimm1 = (instruction & 0x001FF000) >> 20 << 11;
+    jimm2 = (instruction & 0x7FE00000) >> 21 << 1;
+    signedjimm2 = (instruction & 0x80000000) >> 31 << 20;
   }
   //B type instructions
   else if(instruction_type == 5){
@@ -352,11 +483,34 @@ void decode(){
 //   }
 // }
 
-// void execute(){
-//   if(instruction_type == 1){
-//     execute_rformat();
-//   }
-// }
+//execute I format instructions
+void execute_iformat(){
+  switch(funct3){
+    case(0b000):
+      registers[rdestination] = addi(registers[rsource1]);
+  }
+}
+
+void execute_sj(){
+  return;
+}
+
+void execute(){
+  printf("Instruction Type:%d\n", instruction_type);
+  if(instruction_type == 5 || instruction_type == 6){
+    execute_sj();
+    return;
+  }
+
+  if(rdestination == 0){
+    printf("Error, register destination cannot be written into");
+    exit(1);
+  }
+  if(instruction_type == 1){
+    execute_iformat();
+  }
+  return;
+}
 
 //runs the simulation
 void run(){
@@ -374,14 +528,22 @@ void run(){
 
     decode();
 
-    // execute();
+    execute();
+
+    //Print all register values
+    for(int i = 0; i < 31; i++){
+      printf("r%d:%d\t", i, registers[i]);
+      if(i % 10 == 0 && i != 0)printf("\n");
+    }
+      printf("r31:%d\n", registers[31]);
+      printf("Rsources:%d\t%d\n",rsource1, rsource2);
+      printf("rdestination:%d\n", rdestination);
+
 
     pc[0] = pc[0] + 4;
     cycle++;
     separator;
 }
-  imm = (instruction & 0xFFFFF000);
-  printf("%x\n", imm);
 }
 
 //sets registers to 0
@@ -423,6 +585,12 @@ int main(int argc, char** argv){
   load_program(argv[1]);
 
   run();
+
+  // printf("HELLO:%u\n", y);
+  // unsigned short int x = 65529U;
+  // short int y = *(short int*)&x;
+  //
+  // printf("%d\n", y);
 
   return 0;
 }
