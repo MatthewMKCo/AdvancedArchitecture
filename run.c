@@ -111,17 +111,23 @@ int sltiu(int reg1){
 
 //Logical Left Shift Immediate
 int slli(int reg1){
-  return (reg1 << shamt);
+  unsigned int reg1u = reg1;
+  reg1u = (reg1u << shamt);
+  reg1 = (int)reg1u;
+  return (reg1 & 0xFFFFFFFF);
 }
 
 //Logical Right Shift Immediate
 int srli(int reg1){
-  return (reg1 >> shamt);
+  unsigned int reg1u = reg1;
+  reg1u = (reg1u >> shamt);
+  reg1 = (int)reg1u;
+  return (reg1 & 0xFFFFFFFF);
 }
 
 //Arithmetic Right Shift Immediate
 int srai(int reg1){
-  return (reg1 >> shamt);
+  return ((reg1 >> shamt) & 0xFFFFFFFF);
 }
 
 //Load Upper Immediate
@@ -136,12 +142,12 @@ int auipc(){
 
 //Add two registers
 int add(int reg1, int reg2){
-  return (reg1 + reg2);
+  return ((reg1 + reg2) & 0xFFFFFFFF);
 }
 
 //Subtract two registers
 int sub(int reg1, int reg2){
-  return (reg1 - reg2);
+  return ((reg1 - reg2) & 0xFFFFFFFF);
 }
 
 //Set if Less Than
@@ -222,6 +228,7 @@ void bne(int reg1, int reg2){
 
 //branch if less than
 void blt(int reg1, int reg2){
+  printf("offset:%d\n",imm);
   if(reg1 < reg2){
     pc[0] = pc[0] + imm;
   }
@@ -576,7 +583,7 @@ void execute_uformat(){
   switch(opcode){
     case(0b0110111):
       printf("Instruction:Load Upper Immediate\n");
-      lui();
+      registers[rdestination] = lui();
       break;
     case(0b0010111):
       printf("Instruction:Add Upper Immediate to PC\n");
@@ -591,46 +598,46 @@ void execute_rformat(){
     case(0b000):
       if(funct7 == 0b0000000){
         printf("Instruction:Add\n");
-        add(registers[rsource1], registers[rsource2]);
+        registers[rdestination] = add(registers[rsource1], registers[rsource2]);
       }
       else if(funct7 == 0b0100000){
         printf("Instruction:Subtract\n");
-        sub(registers[rsource1], registers[rsource2]);
+        registers[rdestination] = sub(registers[rsource1], registers[rsource2]);
       }
       break;
     case(0b001):
       printf("Instruction:Logical Left Shift\n");
-      sll(registers[rsource1], registers[rsource2]);
+      registers[rdestination] = sll(registers[rsource1], registers[rsource2]);
       break;
     case(0b010):
       printf("Instruction:SLT\n");
-      slt(registers[rsource1], registers[rsource2]);
+      registers[rdestination] = slt(registers[rsource1], registers[rsource2]);
       break;
     case(0b011):
       printf("Instruction:SLTU\n");
-      sltu(registers[rsource1], registers[rsource2]);
+      registers[rdestination] = sltu(registers[rsource1], registers[rsource2]);
       break;
     case(0b100):
       printf("Instruction:Xor\n");
-      xor(registers[rsource1], registers[rsource2]);
+      registers[rdestination] = xor(registers[rsource1], registers[rsource2]);
       break;
     case(0b101):
       if(funct7 == 0b0000000){
         printf("Instruction:Logical Right Shift\n");
-        srl(registers[rsource1], registers[rsource2]);
+        registers[rdestination] = srl(registers[rsource1], registers[rsource2]);
       }
       else if(funct7 == 0b0100000){
         printf("Instruction:Logical Right Shift\n");
-        sra(registers[rsource1], registers[rsource2]);
+        registers[rdestination] = sra(registers[rsource1], registers[rsource2]);
       }
       break;
     case(0b110):
       printf("Instruction:Or\n");
-      or(registers[rsource1], registers[rsource2]);
+      registers[rdestination] = or(registers[rsource1], registers[rsource2]);
       break;
     case(0b111):
       printf("Instruction:And\n");
-      and(registers[rsource1], registers[rsource2]);
+      registers[rdestination] = and(registers[rsource1], registers[rsource2]);
       break;
   }
   return;
@@ -643,6 +650,7 @@ void execute_jformat(){
 }
 
 void execute_bformat(){
+  printf("FUNCT3:%d\n",funct3);
   switch(funct3){
     case(0b000):
       printf("Instruction:Branch if Equal\n");

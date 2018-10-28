@@ -60,7 +60,30 @@ dict_op = {
     "andi": "0010011",
     "slli": "0010011",
     "srli": "0010011",
-    "srai": "0010011"
+    "srai": "0010011",
+    "lui": "0110111",
+    "auipc": "0010111",
+    "add": "0110011",
+    "sub": "0110011",
+    "sll": "0110011",
+    "slt": "0110011",
+    "sltu": "0110011",
+    "xor": "0110011",
+    "srl": "0110011",
+    "sra": "0110011",
+    "or": "0110011",
+    "and": "0110011",
+    "jal": "1101111",
+    "beq": "1100011",
+    "bne": "1100011",
+    "blt": "1100011",
+    "bge": "1100011",
+    "bltu": "1100011",
+    "bgeu": "1100011",
+    "sb": "0100011",
+    "sh": "0100011",
+    "sw": "0100011"
+
 }
 
 dict_funct3 = {
@@ -77,31 +100,84 @@ dict_funct3 = {
     "andi": "111",
     "slli": "001",
     "srli": "101",
-    "srai": "101"
+    "srai": "101",
+    "add": "000",
+    "sub": "000",
+    "sll": "001",
+    "slt": "010",
+    "sltu": "011",
+    "xor": "100",
+    "srl": "101",
+    "sra": "101",
+    "or": "110",
+    "and": "111",
+    "beq": "000",
+    "bne": "001",
+    "blt": "100",
+    "bge": "101",
+    "bltu": "110",
+    "bgeu": "111",
+    "sb": "000",
+    "sh": "001",
+    "sw": "010"
+
 }
 
 dict_funct7 = {
     "slli": "0000000",
     "srli": "0000000",
-    "srai": "0100000"
+    "srai": "0100000",
+    "add": "0000000",
+    "sub": "0100000",
+    "sll": "0000000",
+    "slt": "0000000",
+    "sltu": "0000000",
+    "xor": "0000000",
+    "srl": "0000000",
+    "sra": "0100000",
+    "or": "0000000",
+    "and": "0000000",
+    "add": "0000000",
+    "sub": "0100000",
+    "sll": "0000000",
+    "slt": "0000000",
+    "sltu": "0000000",
+    "xor": "0000000",
+    "srl": "0000000",
+    "sra": "0100000",
+    "or": "0000000",
+    "and": "0000000",
 }
 
 
 
-def Itype(x):
+def Itype(x, linenumber, f2, check):
+    if(len(x) != 4):
+        print("Error wrong number of arguments on line " + str(linenumber))
+        exit()
+
+    if(int(x[3]) > 2047 or int(x[3]) < -2048):
+        if(x[0] == "addi"):
+            if(check == 0):
+                complicated_procedure(x, f2)
+                return
+
     funct7 = dict_funct7.get(x[0], -1)
     opcode = dict_op[x[0]]
     funct3 = dict_funct3[x[0]]
+
     rd = bin(int(x[1]))
     newrd = rd[2:len(rd)]
     while(len(newrd) != 5):
         newrd = '0' + newrd
     rd = newrd
+
     rs1 = bin(int(x[2]))
     newrs1 = rs1[2:len(rs1)]
     while(len(newrs1) != 5):
         newrs1 = '0' + newrs1
     rs1 = newrs1
+
     if(funct7 == -1):
         imm = bin(int(x[3]) & 0b111111111111)
         newimm = imm[2:len(imm)]
@@ -110,19 +186,211 @@ def Itype(x):
         imm = newimm
         instruction = imm + rs1 + funct3 + rd + opcode
         instruction = '{:0{}X}'.format(int(instruction, 2), len(instruction) // 4)
-        return instruction
     else:
         imm = bin(int(x[3]) & 0b11111)
         newimm = imm[2:len(imm)]
         while(len(newimm) != 5):
             newimm = '0' + newimm
         imm = newimm
-        print(funct7)
         instruction = funct7 + imm + rs1 + funct3 + rd + opcode
         instruction = '{:0{}X}'.format(int(instruction, 2), len(instruction) // 4)
-        return instruction
+
+    f2.write("0x")
+    f2.write(instruction)
+    f2.write("\n")
+
+    return
+
+def complicated_procedure(x, f2):
+    utypeimm = str((int(x[3]) & 0b11111111111111111111000000000000))
+    x2 = ["lui", "14", utypeimm]
+    Utype(x2, -1, f2)
+    x3 = ["addi", "13", "0", x[3]]
+    Itype(x3, -1, f2, 1)
+    x4 = ["slli", "13", "13", "20"]
+    Itype(x4, -1, f2, 1)
+    x5 = ["srli", "13", "13", "20"]
+    Itype(x5, -1, f2, 1)
+    x6 = ["add", "14", "13", "14"]
+    Rtype(x6, -1, f2)
+    x7 = ["add", x[1], x[2], "14"]
+    Rtype(x7, -1, f2)
 
 
+    return
+
+def Utype(x, linenumber, f2):
+    opcode = dict_op[x[0]]
+
+    rd = bin(int(x[1]))
+    newrd = rd[2:len(rd)]
+    while(len(newrd) != 5):
+        newrd = '0' + newrd
+    rd = newrd
+
+    imm = bin((int(x[2]) >> 12) & 0b11111111111111111111)
+    newimm = imm[2:len(imm)]
+    while(len(newimm) != 20):
+        newimm = '0' + newimm
+    imm = newimm
+
+    instruction = imm + rd + opcode
+    instruction = '{:0{}X}'.format(int(instruction, 2), len(instruction) // 4)
+
+    f2.write("0x")
+    f2.write(instruction)
+    f2.write("\n")
+
+
+
+
+
+def Rtype(x, linenumber, f2):
+    funct7 = dict_funct7[x[0]]
+    opcode = dict_op[x[0]]
+    funct3 = dict_funct3[x[0]]
+
+    rd = bin(int(x[1]))
+    newrd = rd[2:len(rd)]
+    while(len(newrd) != 5):
+        newrd = '0' + newrd
+    rd = newrd
+
+    rs1 = bin(int(x[2]))
+    newrs1 = rs1[2:len(rs1)]
+    while(len(newrs1) != 5):
+        newrs1 = '0' + newrs1
+    rs1 = newrs1
+
+    rs2 = bin(int(x[3]))
+    newrs2 = rs2[2:len(rs2)]
+    while(len(newrs2) != 5):
+        newrs2 = '0' + newrs2
+    rs2 = newrs2
+
+    instruction = funct7 + rs2 + rs1 + funct3 + rd + opcode
+    instruction = '{:0{}X}'.format(int(instruction, 2), len(instruction) // 4)
+
+    f2.write("0x")
+    f2.write(instruction)
+    f2.write("\n")
+
+    return
+
+def Jtype(x, linenumber, f2):
+    opcode = dict_op[x[0]]
+
+    rd = bin(int(x[1]))
+    newrd = rd[2:len(rd)]
+    while(len(newrd) != 5):
+        newrd = '0' + newrd
+    rd = newrd
+
+    imm1 = bin(int(x[2]) & 0b10000000000000000000)
+    newimm1 = imm1[2:len(imm1)]
+    imm1 = newimm1
+
+    imm2 = bin(int(x[2]) & 0b11111111110)
+    newimm2 = imm2[2:len(imm2)]
+    while(len(newimm2) != 10):
+        newimm2 = '0' + newimm2
+    imm2 = newimm2
+
+    imm3 = bin(int(x[2]) & 0b100000000000)
+    newimm3 = imm3[2:len(imm3)]
+    imm3 = newimm3
+
+    imm4 = bin(int(x[2]) & 0b01111111100000000000)
+    newimm4 = imm4[2:len(imm4)]
+    while(len(newimm4) != 8):
+        newimm4 = '0' + newimm4
+    imm4 = newimm4
+
+    imm = imm + imm2 + imm3 + imm4
+
+    instruction = imm + rd + opcode
+    instruction = '{:0{}X}'.format(int(instruction, 2), len(instruction) // 4)
+
+    f2.write("0x")
+    f2.write(instruction)
+    f2.write("\n")
+
+    return
+
+def Stype(x, linenumber, f2):
+    opcode = dict_op[x[0]]
+    funct3 = dict_funct3[x[0]]
+
+    rs1 = bin(int(x[1]))
+    newrs1 = rs1[2:len(rs1)]
+    while(len(newrs1) != 5):
+        newrs1 = '0' + newrs1
+    rs1 = newrs1
+
+    rs2 = bin(int(x[2]))
+    newrs2 = rs2[2:len(rs2)]
+    while(len(newrs2) != 5):
+        newrs2 = '0' + newrs2
+    rs2 = newrs2
+
+    offset = bin(int(x[3]) & 0b111111111111)
+    offset = offset[2:len(offset)]
+    while(len(offset) != 12):
+        offset = '0' + offset
+
+    imm = offset[0:4]
+
+    imm2 = offset[5:11]
+
+    instruction = imm2 + rs2 + rs1 + funct3 + imm + opcode
+    instruction = '{:0{}X}'.format(int(instruction, 2), len(instruction) // 4)
+
+    f2.write("0x")
+    f2.write(instruction)
+    f2.write("\n")
+
+    return
+
+def Btype(x, linenumber, f2):
+    print("Linenumber:" + str(linenumber))
+    opcode = dict_op[x[0]]
+    funct3 = dict_funct3[x[0]]
+
+    rs1 = bin(int(x[1]))
+    newrs1 = rs1[2:len(rs1)]
+    while(len(newrs1) != 5):
+        newrs1 = '0' + newrs1
+    rs1 = newrs1
+
+    rs2 = bin(int(x[2]))
+    newrs2 = rs2[2:len(rs2)]
+    while(len(newrs2) != 5):
+        newrs2 = '0' + newrs2
+    rs2 = newrs2
+
+    offset = bin(int(x[3]) & 0b111111111111)
+    offset = offset[2:len(offset)]
+    while(len(offset) != 12):
+        offset = '0' + offset
+
+    print(offset)
+
+    imm1 = offset[0]
+    imm2 = offset[2:8]
+    imm3 = offset[8:12]
+    imm4 = offset[1]
+
+    print(imm1 + imm2 + imm3 + imm4)
+
+    instruction = imm1 + imm2 + rs2 + rs1 + funct3 + imm3 + imm4 + opcode
+    print(instruction)
+    instruction = '{:0{}X}'.format(int(instruction, 2), len(instruction) // 4)
+
+    f2.write("0x")
+    f2.write(instruction)
+    f2.write("\n")
+
+    return
 
 
 def main():
@@ -136,10 +404,16 @@ def main():
                 x[-1] = x[-1].strip('\n')
             opcode = dict[x[0]]
             if(opcode == 1):
-                instruction = Itype(x)
-            f2.write("0x")
-            f2.write(instruction)
-            f2.write("\n")
-
+                Itype(x, (i+1), f2, 0)
+            elif(opcode == 2):
+                Utype(x, (i+1), f2)
+            elif(opcode == 3):
+                Rtype(x, (i+1), f2)
+            elif(opcode == 4):
+                Jtype(x, (i+1), f2)
+            elif(opcode == 5):
+                Btype(x, (i+1), f2)
+            elif(opcode == 6):
+                Stype(x, (i+1), f2)
 
 main()
