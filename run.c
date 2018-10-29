@@ -228,7 +228,7 @@ void bne(int reg1, int reg2){
 
 //branch if less than
 void blt(int reg1, int reg2){
-  printf("offset:%d\n",imm);
+  printf("offset:%x\n",imm);
   if(reg1 < reg2){
     pc[0] = pc[0] + imm;
   }
@@ -487,6 +487,9 @@ void decode(){
     rsource1 = (instruction & 0x000F8000) >> 15;
     rsource2 = (instruction & 0x01F00000) >> 20;
     imm = (((instruction & 0x00000080) >> 7 << 11) | ((instruction & 0x00000F00) >> 8 << 1) | ((instruction & 0x7E000000) >> 25 << 5) | ((instruction & 0x10000000) >> 31 << 5));
+    if((imm & 0x00000800)){
+      imm = (imm | 0xFFFFF000);
+    }
   }
   //S type instructions
   else if(instruction_type == 6){
