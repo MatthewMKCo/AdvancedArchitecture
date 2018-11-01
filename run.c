@@ -17,8 +17,8 @@ static char Dcache[SIZE];
 //Registers
 int registers[32];
 //Program Counter
-int* pc = &registers[15];
-
+int pc[1] = {0};
+int* sp = &registers[2];
 //Source Registers
 int rsource1;
 int rsource2;
@@ -176,6 +176,16 @@ int or(int reg1, int reg2){
 //bit wise xor on two registers
 int xor(int reg1, int reg2){
   return(reg1 ^ reg2);
+}
+
+//multiply two registers
+int mul(int reg1, int reg2){
+  return((reg1 * reg2) & 0xFFFFFFFF);
+}
+
+//divide two registers
+int divide(int reg1, int reg2){
+  return((reg1 / reg2) & 0xFFFFFFFF);
 }
 
 //logical left shift
@@ -497,6 +507,9 @@ void decode(){
     rsource1 = (instruction & 0x000F8000) >> 15;
     rsource2 = (instruction & 0x01F00000) >> 20;
     imm = (((instruction & 0x00000F80) >> 7) | ((instruction & 0xFE000000) >> 25 << 5));
+    if((imm & 0x00000800)){
+      imm = (imm | 0xFFFFF000);
+    }
   }
 }
 
@@ -607,6 +620,10 @@ void execute_rformat(){
         printf("Instruction:Subtract\n");
         registers[rdestination] = sub(registers[rsource1], registers[rsource2]);
       }
+      else if(funct7 == 0b0000001){
+        printf("Instruction:Multiply\n");
+        registers[rdestination] = mul(registers[rsource1], registers[rsource2]);
+      }
       break;
     case(0b001):
       printf("Instruction:Logical Left Shift\n");
@@ -621,9 +638,16 @@ void execute_rformat(){
       registers[rdestination] = sltu(registers[rsource1], registers[rsource2]);
       break;
     case(0b100):
-      printf("Instruction:Xor\n");
-      registers[rdestination] = xor(registers[rsource1], registers[rsource2]);
-      break;
+      if(funct7 == 0b0000001){
+        printf("Instruction:Divide\n");
+        registers[rdestination] = divide(registers[rsource1], registers[rsource2]);
+        break;
+      }
+      else if(funct7 == 0b0000000){
+        printf("Instruction:Xor\n");
+        registers[rdestination] = xor(registers[rsource1], registers[rsource2]);
+        break;
+      }
     case(0b101):
       if(funct7 == 0b0000000){
         printf("Instruction:Logical Right Shift\n");
@@ -705,7 +729,7 @@ void execute_sj(){
   if(instruction_type == 4){
     execute_jformat();
   }
-  else if(instruction_type == 7){
+  else if(instruction_type == 6){
     execute_sformat();
   }
   return;
@@ -761,8 +785,104 @@ void run(){
 
     //Print all register values
     for(int i = 0; i < 31; i++){
-      if(i == 15)printf("pc:%d\t", registers[i]);
-      else printf("r%d:%d\t", i, registers[i]);
+      switch(i){
+        case(0):
+          printf("zero:%d\t", registers[i]);
+          break;
+        case(1):
+          printf("ra:%d\t", registers[i]);
+          break;
+        case(2):
+          printf("sp:%d\t", registers[i]);
+          break;
+        case(3):
+          printf("gp:%d\t", registers[i]);
+          break;
+        case(4):
+          printf("tp:%d\t", registers[i]);
+          break;
+        case(5):
+          printf("t0:%d\t", registers[i]);
+          break;
+        case(6):
+          printf("t1:%d\t", registers[i]);
+          break;
+        case(7):
+          printf("t2:%d\t", registers[i]);
+          break;
+        case(8):
+          printf("s0:%d\t", registers[i]);
+          break;
+        case(9):
+          printf("s1:%d\t", registers[i]);
+          break;
+        case(10):
+          printf("a0:%d\t", registers[i]);
+          break;
+        case(11):
+          printf("a1:%d\t", registers[i]);
+          break;
+        case(12):
+          printf("a2:%d\t", registers[i]);
+          break;
+        case(13):
+          printf("a3:%d\t", registers[i]);
+          break;
+        case(14):
+          printf("a4:%d\t", registers[i]);
+          break;
+        case(15):
+          printf("a5:%d\t", registers[i]);
+          break;
+        case(16):
+          printf("a6:%d\t", registers[i]);
+          break;
+        case(17):
+          printf("a7:%d\t", registers[i]);
+          break;
+        case(18):
+          printf("s2:%d\t", registers[i]);
+          break;
+        case(19):
+          printf("s3:%d\t", registers[i]);
+          break;
+        case(20):
+          printf("s4:%d\t", registers[i]);
+          break;
+        case(21):
+          printf("s5:%d\t", registers[i]);
+          break;
+        case(22):
+          printf("s6:%d\t", registers[i]);
+          break;
+        case(23):
+          printf("s7:%d\t", registers[i]);
+          break;
+        case(24):
+          printf("s8:%d\t", registers[i]);
+          break;
+        case(25):
+          printf("s9:%d\t", registers[i]);
+          break;
+        case(26):
+          printf("s10:%d\t", registers[i]);
+          break;
+        case(27):
+          printf("s11:%d\t", registers[i]);
+          break;
+        case(28):
+          printf("t3:%d\t", registers[i]);
+          break;
+        case(29):
+          printf("t4:%d\t", registers[i]);
+          break;
+        case(30):
+          printf("t5:%d\t", registers[i]);
+          break;
+        case(31):
+          printf("t6:%d\t", registers[i]);
+          break;
+      }
       if((i+1) % 5 == 0)printf("\n");
     }
       printf("r31:%d\n", registers[31]);
@@ -785,6 +905,7 @@ void set_register(){
   for(int i = 0; i < SIZE; i++){
     st(Icache, i, -1);
   }
+  sp[0] = SIZE;
 }
 
 void load_program(char* file){

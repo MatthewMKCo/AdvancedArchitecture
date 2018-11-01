@@ -15,6 +15,8 @@ dict = {
     "srai": 1,
     "lui": 2,
     "auipc": 2,
+    "mul": 3,
+    "div": 3,
     "add": 3,
     "sub": 3,
     "sll": 3,
@@ -63,6 +65,8 @@ dict_op = {
     "srai": "0010011",
     "lui": "0110111",
     "auipc": "0010111",
+    "mul": "0110011",
+    "div": "0110011",
     "add": "0110011",
     "sub": "0110011",
     "sll": "0110011",
@@ -101,6 +105,8 @@ dict_funct3 = {
     "slli": "001",
     "srli": "101",
     "srai": "101",
+    "mul": "000",
+    "div": "100",
     "add": "000",
     "sub": "000",
     "sll": "001",
@@ -137,6 +143,8 @@ dict_funct7 = {
     "sra": "0100000",
     "or": "0000000",
     "and": "0000000",
+    "mul": "0000001",
+    "div": "0000001",
     "add": "0000000",
     "sub": "0100000",
     "sll": "0000000",
@@ -149,6 +157,41 @@ dict_funct7 = {
     "and": "0000000",
 }
 
+dict_reg = {
+    "zero": "00000",
+    "ra": "00001",
+    "sp": "00010",
+    "gp": "00011",
+    "tp": "00100",
+    "t0": "00101",
+    "t1": "00110",
+    "t2": "00111",
+    "s0": "01000",
+    "fp": "01000",
+    "s1": "01001",
+    "a0": "01010",
+    "a1": "01011",
+    "a2": "01100",
+    "a3": "01101",
+    "a4": "01110",
+    "a5": "01111",
+    "a6": "10000",
+    "a7": "10001",
+    "s2": "10010",
+    "s3": "10011",
+    "s4": "10100",
+    "s5": "10101",
+    "s6": "10110",
+    "s7": "10111",
+    "s8": "11000",
+    "s9": "11001",
+    "s10": "11010",
+    "s11": "11011",
+    "t3": "11100",
+    "t4": "11101",
+    "t5": "11110",
+    "t6": "11111"
+}
 
 
 def Itype(x, linenumber, f2, check):
@@ -166,17 +209,21 @@ def Itype(x, linenumber, f2, check):
     opcode = dict_op[x[0]]
     funct3 = dict_funct3[x[0]]
 
-    rd = bin(int(x[1]))
-    newrd = rd[2:len(rd)]
-    while(len(newrd) != 5):
-        newrd = '0' + newrd
-    rd = newrd
+    rd = dict_reg.get(x[1], -1)
+    if(rd == -1):
+        rd = bin(int(x[1]))
+        newrd = rd[2:len(rd)]
+        while(len(newrd) != 5):
+            newrd = '0' + newrd
+        rd = newrd
 
-    rs1 = bin(int(x[2]))
-    newrs1 = rs1[2:len(rs1)]
-    while(len(newrs1) != 5):
-        newrs1 = '0' + newrs1
-    rs1 = newrs1
+    rs1 = dict_reg.get(x[2], -1)
+    if(rs1 == -1):
+        rs1 = bin(int(x[2]))
+        newrs1 = rs1[2:len(rs1)]
+        while(len(newrs1) != 5):
+            newrs1 = '0' + newrs1
+        rs1 = newrs1
 
     if(funct7 == -1):
         imm = bin(int(x[3]) & 0b111111111111)
@@ -202,33 +249,35 @@ def Itype(x, linenumber, f2, check):
     return
 
 def complicated_procedure(x, f2):
-    utypeimm = str((int(x[3]) & 0b11111111111111111111000000000000))
+    utypeimm = str((int(x[3]) & 0b11111111111111111111000000000000) >> 12)
+    imm = str((int(x[3]) & 0b00000000000000000000111111111111))
+    newimm = bin(int(imm))
+    newimm = newimm[2:len(newimm)]
+    while(len(newimm) != 12):
+        newimm = '0' + newimm
+
+    if(newimm[0] == "1"):
+        utypeimm = str(int(utypeimm) + 1)
+
     x2 = ["lui", "14", utypeimm]
     Utype(x2, -1, f2)
-    x3 = ["addi", "13", "0", x[3]]
+    x3 = ["addi", x[1], "14", imm]
     Itype(x3, -1, f2, 1)
-    x4 = ["slli", "13", "13", "20"]
-    Itype(x4, -1, f2, 1)
-    x5 = ["srli", "13", "13", "20"]
-    Itype(x5, -1, f2, 1)
-    x6 = ["add", "14", "13", "14"]
-    Rtype(x6, -1, f2)
-    x7 = ["add", x[1], x[2], "14"]
-    Rtype(x7, -1, f2)
-
 
     return
 
 def Utype(x, linenumber, f2):
     opcode = dict_op[x[0]]
 
-    rd = bin(int(x[1]))
-    newrd = rd[2:len(rd)]
-    while(len(newrd) != 5):
-        newrd = '0' + newrd
-    rd = newrd
+    rd = dict_reg.get(x[1], -1)
+    if(rd == -1):
+        rd = bin(int(x[1]))
+        newrd = rd[2:len(rd)]
+        while(len(newrd) != 5):
+            newrd = '0' + newrd
+        rd = newrd
 
-    imm = bin((int(x[2]) >> 12) & 0b11111111111111111111)
+    imm = bin(int(x[2]) & 0b11111111111111111111)
     newimm = imm[2:len(imm)]
     while(len(newimm) != 20):
         newimm = '0' + newimm
@@ -250,23 +299,29 @@ def Rtype(x, linenumber, f2):
     opcode = dict_op[x[0]]
     funct3 = dict_funct3[x[0]]
 
-    rd = bin(int(x[1]))
-    newrd = rd[2:len(rd)]
-    while(len(newrd) != 5):
-        newrd = '0' + newrd
-    rd = newrd
+    rd = dict_reg.get(x[1], -1)
+    if(rd == -1):
+        rd = bin(int(x[1]))
+        newrd = rd[2:len(rd)]
+        while(len(newrd) != 5):
+            newrd = '0' + newrd
+        rd = newrd
 
-    rs1 = bin(int(x[2]))
-    newrs1 = rs1[2:len(rs1)]
-    while(len(newrs1) != 5):
-        newrs1 = '0' + newrs1
-    rs1 = newrs1
+    rs1 = dict_reg.get(x[2], -1)
+    if(rs1 == -1):
+        rs1 = bin(int(x[2]))
+        newrs1 = rs1[2:len(rs1)]
+        while(len(newrs1) != 5):
+            newrs1 = '0' + newrs1
+        rs1 = newrs1
 
-    rs2 = bin(int(x[3]))
-    newrs2 = rs2[2:len(rs2)]
-    while(len(newrs2) != 5):
-        newrs2 = '0' + newrs2
-    rs2 = newrs2
+    rs2 = dict_reg.get(x[3], -1)
+    if(rs2 == -1):
+        rs2 = bin(int(x[3]))
+        newrs2 = rs2[2:len(rs2)]
+        while(len(newrs2) != 5):
+            newrs2 = '0' + newrs2
+        rs2 = newrs2
 
     instruction = funct7 + rs2 + rs1 + funct3 + rd + opcode
     instruction = '{:0{}X}'.format(int(instruction, 2), len(instruction) // 4)
@@ -321,26 +376,30 @@ def Stype(x, linenumber, f2):
     opcode = dict_op[x[0]]
     funct3 = dict_funct3[x[0]]
 
-    rs1 = bin(int(x[1]))
-    newrs1 = rs1[2:len(rs1)]
-    while(len(newrs1) != 5):
-        newrs1 = '0' + newrs1
-    rs1 = newrs1
+    rs1 = dict_reg.get(x[1], -1)
+    if(rs1 == -1):
+        rs1 = bin(int(x[1]))
+        newrs1 = rs1[2:len(rs1)]
+        while(len(newrs1) != 5):
+            newrs1 = '0' + newrs1
+        rs1 = newrs1
 
-    rs2 = bin(int(x[2]))
-    newrs2 = rs2[2:len(rs2)]
-    while(len(newrs2) != 5):
-        newrs2 = '0' + newrs2
-    rs2 = newrs2
+    rs2 = dict_reg.get(x[2], -1)
+    if(rs2 == -1):
+        rs2 = bin(int(x[2]))
+        newrs2 = rs2[2:len(rs2)]
+        while(len(newrs2) != 5):
+            newrs2 = '0' + newrs2
+        rs2 = newrs2
 
     offset = bin(int(x[3]) & 0b111111111111)
     offset = offset[2:len(offset)]
     while(len(offset) != 12):
         offset = '0' + offset
 
-    imm = offset[0:4]
+    imm = offset[7:len(offset)]
 
-    imm2 = offset[5:11]
+    imm2 = offset[0:7]
 
     instruction = imm2 + rs2 + rs1 + funct3 + imm + opcode
     instruction = '{:0{}X}'.format(int(instruction, 2), len(instruction) // 4)
