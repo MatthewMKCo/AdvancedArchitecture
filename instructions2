@@ -1,0 +1,6 @@
+addi 3 0 10
+blt 2 3 2
+bge 2 2 4
+addi 2 2 1
+blt 2 3 -4
+lw 5 3 28
