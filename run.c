@@ -17,6 +17,9 @@ int current_cycle = 1;
 //Instructions executed
 int instructions_executed = 0;
 
+//Branched
+int branch_flag = 0;
+
 //Instruction cache
 static char Icache[SIZE];
 //Data cache
@@ -26,6 +29,7 @@ static char Dcache[SIZE];
 int registers[32];
 //Program Counter
 int pc[1] = {0};
+int currentpc, nextpc, executepc;
 int* sp = &registers[2];
 //Source Registers
 int next_rsource1, current_rsource1;
@@ -139,6 +143,7 @@ int auipc(){
 
 //Add two registers
 int add(int reg1, int reg2){
+  printf("%d,%d\n",current_rsource1,current_rsource2);
   return ((reg1 + reg2) & 0xFFFFFFFF);
 }
 
@@ -220,7 +225,12 @@ int jalr(int reg1){
 //branch if equal
 void beq(int reg1, int reg2){
   if(reg1 == reg2){
-    pc[0] = pc[0] + current_imm;
+    printf("offset:%d\n",current_imm);
+    printf("actual pc:%d\n", executepc);
+    printf("actual pc:%d\n", currentpc);
+
+    pc[0] = executepc + current_imm - 8;
+    branch_flag = 1;
   }
   return;
 }
@@ -228,16 +238,19 @@ void beq(int reg1, int reg2){
 //branch if not equal
 void bne(int reg1, int reg2){
   if(reg1 != reg2){
-    pc[0] = pc[0] + current_imm;
+    pc[0] = executepc + current_imm - 8;
+    branch_flag = 1;
   }
   return;
 }
 
 //branch if less than
 void blt(int reg1, int reg2){
-  printf("offset:%x\n",current_imm);
+  printf("please\n");
+  printf("%d\t%d\n",reg1,reg2);
   if(reg1 < reg2){
-    pc[0] = pc[0] + current_imm;
+    pc[0] = executepc + current_imm - 8;
+    branch_flag = 1;
   }
   return;
 }
@@ -246,7 +259,8 @@ void blt(int reg1, int reg2){
 void bltu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u < reg2u){
-    pc[0] = pc[0] + current_imm;
+    pc[0] = executepc + current_imm - 8;
+    branch_flag = 1;
   }
   return;
 }
@@ -254,7 +268,8 @@ void bltu(int reg1, int reg2){
 //branch if greater than
 void bge(int reg1, int reg2){
   if(reg1 >= reg2){
-    pc[0] = pc[0] + current_imm;
+    pc[0] = executepc + current_imm - 8;
+    branch_flag = 1;
   }
   return;
 }
@@ -262,7 +277,8 @@ void bge(int reg1, int reg2){
 void bgeu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u >= reg2u){
-    pc[0] = pc[0] + current_imm;
+    pc[0] = executepc + current_imm - 8;
+    branch_flag = 1;
   }
   return;
 }
@@ -382,6 +398,9 @@ void fetch(){
   printf("Current PC:%d\n",pc[0]);
   if(last_instruction == 1)return;
   fetch_next_instruction = ld(Icache, pc[0]);
+  nextpc = pc[0];
+  printf("fetchinstruction:%x\n",fetch_next_instruction);
+
   if(first_fetch < 2){
     first_fetch = first_fetch + 1;
   }
@@ -389,7 +408,6 @@ void fetch(){
     last_instruction = 1;
     last_instruction_cycle = current_cycle - 1;
   }
-  printf("Current Instruction:%x\n", fetch_next_instruction);
 }
 
 void decode(){
@@ -401,6 +419,7 @@ void decode(){
     first_decode = first_decode + 1;
   }
 
+  printf("instruction:%x\n",fetch_current_instruction);
 
   next_opcode = (fetch_current_instruction & 0x0000007F);
   printf("Opcode:%d\n",next_opcode);
@@ -729,7 +748,7 @@ void execute_sj(){
 void execute(){
 
   if(first_decode < 2)return;
-
+  if(first_execute == 0)first_execute++;
   if(last_instruction == 1){
     if(current_cycle > last_instruction_cycle + 2)return;
   }
@@ -738,7 +757,6 @@ void execute(){
     printf("End of Program\n");
     exit(1);
   }
-
   instructions_executed++;
 
   printf("Instruction Type:%c\n", instruction_type_char);
@@ -747,10 +765,6 @@ void execute(){
     return;
   }
 
-  if(current_rdestination == 0){
-    printf("Error, register destination cannot be written into\n");
-    exit(1);
-  }
   if(current_instruction_type == 1){
     execute_iformat();
   }
@@ -769,6 +783,8 @@ void execute(){
 void move_next_to_current(){
   //fetch
   fetch_current_instruction = fetch_next_instruction;
+  executepc = nextpc;
+  currentpc = nextpc;
 
   //decode
   current_rsource1 = next_rsource1;
@@ -787,6 +803,13 @@ void move_next_to_current(){
 
   //write-back
   return;
+}
+
+void pipeline_flush(){
+  first_fetch = 0;
+  first_decode = 0;
+  first_execute = 0;
+  branch_flag = 0;
 }
 
 //runs the simulation
@@ -819,7 +842,11 @@ void run(){
 
     execute();
 
-    registers[current_rdestination] = next_val;
+    if(current_rdestination != 0 && first_execute == 1){
+      registers[current_rdestination] = next_val;
+      printf("desitnation:%d\n",current_rdestination);
+      printf("total:%d\n", next_val);
+    }
 
     //Print all register values
     for(int i = 0; i < 31; i++){
@@ -924,11 +951,18 @@ void run(){
       if((i+1) % 5 == 0)printf("\n");
     }
     printf("\n");
+
+    if(branch_flag == 1){
+      pipeline_flush();
+    }
+
     move_next_to_current();
 
     pc[0] = pc[0] + 4;
     current_cycle++;
     separator;
+
+    // if(current_cycle == 60) exit(1);
 }
 }
 
@@ -960,6 +994,8 @@ void load_program(char* file){
 
   fclose(fp);
 }
+
+
 
 int main(int argc, char** argv){
 

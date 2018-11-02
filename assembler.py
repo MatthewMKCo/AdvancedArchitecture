@@ -192,6 +192,10 @@ dict_reg = {
     "t6": "11111"
 }
 
+dict_jump = {
+
+}
+
 
 def Itype(x, linenumber, f2, check):
     if(len(x) != 4):
@@ -410,24 +414,41 @@ def Stype(x, linenumber, f2):
     return
 
 def Btype(x, linenumber, f2):
-    print("Linenumber:" + str(linenumber))
+    # print("Linenumber:" + str(linenumber))
     opcode = dict_op[x[0]]
     funct3 = dict_funct3[x[0]]
 
-    rs1 = bin(int(x[1]))
-    newrs1 = rs1[2:len(rs1)]
-    while(len(newrs1) != 5):
-        newrs1 = '0' + newrs1
-    rs1 = newrs1
+    rs1 = dict_reg.get(x[1], -1)
+    if(rs1 == -1):
+        rs1 = bin(int(x[1]))
+        newrs1 = rs1[2:len(rs1)]
+        while(len(newrs1) != 5):
+            newrs1 = '0' + newrs1
+        rs1 = newrs1
 
-    rs2 = bin(int(x[2]))
-    newrs2 = rs2[2:len(rs2)]
-    while(len(newrs2) != 5):
-        newrs2 = '0' + newrs2
-    rs2 = newrs2
+    rs2 = dict_reg.get(x[2], -1)
+    if(rs2 == -1):
+        rs2 = bin(int(x[2]))
+        newrs2 = rs2[2:len(rs2)]
+        while(len(newrs2) != 5):
+            newrs2 = '0' + newrs2
+        rs2 = newrs2
 
-    offset = bin(int(x[3]) & 0b111111111111)
-    offset = offset[2:len(offset)]
+    if(x[3][0] == '.'):
+        jump = dict_jump[x[3]]
+        offset = (int(jump) - linenumber) * 2
+        print("===")
+        print(jump)
+        print(linenumber)
+        print(offset)
+        print("===")
+        offset = bin((offset) & 0b111111111111)
+        offset = offset[2:len(offset)]
+
+    else:
+        offset = bin(int(x[3]) & 0b111111111111)
+        offset = offset[2:len(offset)]
+
     while(len(offset) != 12):
         offset = '0' + offset
 
@@ -437,6 +458,7 @@ def Btype(x, linenumber, f2):
     imm2 = offset[2:8]
     imm3 = offset[8:12]
     imm4 = offset[1]
+
 
     print(imm1 + imm2 + imm3 + imm4)
 
@@ -454,10 +476,31 @@ def Btype(x, linenumber, f2):
 def main():
     with open('instructions') as f:
         lines = f.readlines()
-        f2 = open("simple2", "w")
+        f2 = open("simple", "w")
         instruction = []
+        lines2 = []
+        lines3 = []
         for i in range(0, len(lines)):
-            x = lines[i].split(" ")
+            if(lines[i] == '\n'):
+                continue
+            lines2.append(lines[i])
+
+        count = 0
+        for i in range(0, len(lines2)):
+            if(lines2[i][0] == '.'):
+                addr = lines2[i]
+                x = [(i + 1 - count), addr[:-2]]
+                count = count + 1
+                dict_jump[str(x[1])] = str(x[0])
+                continue
+            lines3.append(lines2[i])
+
+        for i in range(0, len(lines3)):
+            x = lines3[i].split(" ")
+            if(x[0] == '\n'):
+                continue
+            if(x[0][0] == '.'):
+                continue
             for char in x[-1]:
                 x[-1] = x[-1].strip('\n')
             opcode = dict[x[0]]
