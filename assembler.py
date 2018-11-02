@@ -153,8 +153,7 @@ dict_funct7 = {
     "xor": "0000000",
     "srl": "0000000",
     "sra": "0100000",
-    "or": "0000000",
-    "and": "0000000",
+    "or": "0000000"
 }
 
 dict_reg = {
@@ -259,9 +258,9 @@ def complicated_procedure(x, f2):
     if(newimm[0] == "1"):
         utypeimm = str(int(utypeimm) + 1)
 
-    x2 = ["lui", "14", utypeimm]
+    x2 = ["lui", x[1], utypeimm]
     Utype(x2, -1, f2)
-    x3 = ["addi", x[1], "14", imm]
+    x3 = ["addi", x[1], x[1], imm]
     Itype(x3, -1, f2, 1)
 
     return
