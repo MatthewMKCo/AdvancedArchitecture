@@ -20,6 +20,12 @@ addi a0 zero 8
 sw s0 a0 -40
 addi a0 zero 9
 sw s0 a0 -44
+addi a0 zero 5
+sw s0 a0 -48
+addi a0 zero 2
+sw s0 a0 -52
+addi a0 zero 1
+sw s0 a0 -56
 addi t5 zero 0
 sw s0 t5 -60
 sw s0 t5 -64
@@ -51,6 +57,11 @@ mul a0 a4 a7
 sub a1 a1 a0
 lw a1 a1 0
 add a5 zero a1
+addi a2 s0 -48
+mul a1 a4 a7
+sub a1 a2 a1
+lw a1 a1 0
+mul a5 a5 a1
 addi a2 s0 -60
 mul a1 a3 a7
 sub a1 a2 a1

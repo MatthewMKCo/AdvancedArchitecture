@@ -40,6 +40,7 @@ int next_rdestination, current_rdestination;
 //Current Instruction
 uint32_t fetch_current_instruction;
 uint32_t fetch_next_instruction;
+uint32_t executed_instruction;
 
 
 //Current Instruction Type
@@ -143,7 +144,6 @@ int auipc(){
 
 //Add two registers
 int add(int reg1, int reg2){
-  printf("%d,%d\n",current_rsource1,current_rsource2);
   return ((reg1 + reg2) & 0xFFFFFFFF);
 }
 
@@ -225,11 +225,11 @@ int jalr(int reg1){
 //branch if equal
 void beq(int reg1, int reg2){
   if(reg1 == reg2){
-    printf("offset:%d\n",current_imm);
-    printf("actual pc:%d\n", executepc);
-    printf("actual pc:%d\n", currentpc);
+    // printf("offset:%d\n",current_imm);
+    // printf("actual pc:%d\n", executepc);
+    // printf("actual pc:%d\n", currentpc);
 
-    pc[0] = executepc + current_imm - 8;
+    pc[0] = executepc + current_imm;
     branch_flag = 1;
   }
   return;
@@ -238,7 +238,7 @@ void beq(int reg1, int reg2){
 //branch if not equal
 void bne(int reg1, int reg2){
   if(reg1 != reg2){
-    pc[0] = executepc + current_imm - 8;
+    pc[0] = executepc + current_imm;
     branch_flag = 1;
   }
   return;
@@ -246,10 +246,10 @@ void bne(int reg1, int reg2){
 
 //branch if less than
 void blt(int reg1, int reg2){
-  printf("please\n");
-  printf("%d\t%d\n",reg1,reg2);
+  // printf("please\n");
+  // printf("%d\t%d\n",reg1,reg2);
   if(reg1 < reg2){
-    pc[0] = executepc + current_imm - 8;
+    pc[0] = executepc + current_imm;
     branch_flag = 1;
   }
   return;
@@ -259,7 +259,7 @@ void blt(int reg1, int reg2){
 void bltu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u < reg2u){
-    pc[0] = executepc + current_imm - 8;
+    pc[0] = executepc + current_imm;
     branch_flag = 1;
   }
   return;
@@ -268,7 +268,7 @@ void bltu(int reg1, int reg2){
 //branch if greater than
 void bge(int reg1, int reg2){
   if(reg1 >= reg2){
-    pc[0] = executepc + current_imm - 8;
+    pc[0] = executepc + current_imm;
     branch_flag = 1;
   }
   return;
@@ -277,7 +277,7 @@ void bge(int reg1, int reg2){
 void bgeu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u >= reg2u){
-    pc[0] = executepc + current_imm - 8;
+    pc[0] = executepc + current_imm;
     branch_flag = 1;
   }
   return;
@@ -399,7 +399,8 @@ void fetch(){
   if(last_instruction == 1)return;
   fetch_next_instruction = ld(Icache, pc[0]);
   nextpc = pc[0];
-  printf("fetchinstruction:%x\n",fetch_next_instruction);
+  pc[0] = pc[0] + 4;
+  // printf("fetchinstruction:%x\n",fetch_next_instruction);
 
   if(first_fetch < 2){
     first_fetch = first_fetch + 1;
@@ -760,6 +761,7 @@ void execute(){
   instructions_executed++;
 
   printf("Instruction Type:%c\n", instruction_type_char);
+  printf("Instruction Executed:0x%.8X\n", executed_instruction);
   if(current_instruction_type == 4 || current_instruction_type == 6){
     execute_sj();
     return;
@@ -782,8 +784,9 @@ void execute(){
 
 void move_next_to_current(){
   //fetch
+  executed_instruction = fetch_current_instruction;
   fetch_current_instruction = fetch_next_instruction;
-  executepc = nextpc;
+  executepc = currentpc;
   currentpc = nextpc;
 
   //decode
@@ -819,7 +822,7 @@ void run(){
     printf("Cycle:%d\n", current_cycle);
 
     if(last_instruction == 1){
-      printf("LASTINSTRUCTION:%d\n",last_instruction_cycle);
+      // printf("LASTINSTRUCTION:%d\n",last_instruction_cycle);
       if(current_cycle > last_instruction_cycle + (NUM_STAGES - 1)){
           printf("End of program\n");
           printf("Number of Cycles to complete:%d\n",current_cycle - 1);
@@ -844,8 +847,8 @@ void run(){
 
     if(current_rdestination != 0 && first_execute == 1){
       registers[current_rdestination] = next_val;
-      printf("desitnation:%d\n",current_rdestination);
-      printf("total:%d\n", next_val);
+      // printf("desitnation:%d\n",current_rdestination);
+      // printf("total:%d\n", next_val);
     }
 
     //Print all register values
@@ -958,7 +961,6 @@ void run(){
 
     move_next_to_current();
 
-    pc[0] = pc[0] + 4;
     current_cycle++;
     separator;
 
