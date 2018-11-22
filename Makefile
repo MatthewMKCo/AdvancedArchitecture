@@ -9,10 +9,12 @@
  # the build target executable:
  TARGET = run
 
+ FILES = code/run.c code/fetch.c code/decode.c code/execute.c code/operations.c
+
  all: $(TARGET)
 
- $(TARGET): $(TARGET).c
-	 $(CC) $(CFLAGS) -o $(TARGET) $(TARGET).c
+ $(TARGET): code/$(TARGET).c
+	 $(CC) $(CFLAGS) -o $(TARGET) $(FILES)
 
  clean:
 	 $(RM) $(TARGET)

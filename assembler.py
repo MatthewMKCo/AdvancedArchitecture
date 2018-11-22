@@ -1,3 +1,5 @@
+import sys
+
 dict = {
     "lb": 1,
     "lh": 1,
@@ -474,9 +476,15 @@ def Btype(x, linenumber, f2):
 
 
 def main():
-    with open('instructions') as f:
+    if(len(sys.argv) < 3):
+        print("Missing arguments")
+        exit()
+    if(len(sys.argv) > 3):
+        print("Too many arguments")
+        exit()
+    with open(sys.argv[1]) as f:
         lines = f.readlines()
-        f2 = open("simple", "w")
+        f2 = open(sys.argv[2], "w")
         instruction = []
         lines2 = []
         lines3 = []
