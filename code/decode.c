@@ -87,7 +87,7 @@ void decode(){
   //J type instructions
   else if(next_instruction_type == 4){
     next_rdestination = (fetch_current_instruction & 0x00000F80) >> 7;
-    next_imm = (((fetch_current_instruction & 0x000FF000) >> 12 << 12) | ((fetch_current_instruction & 0x001FF000) >> 20 << 11) | ((fetch_current_instruction & 0x7FE00000) >> 21 << 1) | ((fetch_current_instruction & 0x80000000) >> 31 << 20));
+    next_imm = (((fetch_current_instruction & 0x000FF000) >> 12 << 12) | ((fetch_current_instruction & 0x00100000) >> 20 << 11) | ((fetch_current_instruction & 0x7FE00000) >> 21 << 1) | ((fetch_current_instruction & 0x80000000) >> 31 << 20));
     if((next_imm & 0x00080000)){
       next_imm = (next_imm | 0xFFF00000);
     }

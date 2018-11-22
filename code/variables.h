@@ -15,6 +15,9 @@ extern int instructions_executed;
 //Branched
 extern int branch_flag;
 
+//Jumped
+extern int jump_flag;
+
 //Instruction cache
 extern char Icache[SIZE];
 //Data cache

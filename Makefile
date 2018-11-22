@@ -13,7 +13,7 @@
 
  all: $(TARGET)
 
- $(TARGET): code/$(TARGET).c
+ $(TARGET): $(FILES)
 	 $(CC) $(CFLAGS) -o $(TARGET) $(FILES)
 
  clean:

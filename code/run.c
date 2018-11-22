@@ -21,6 +21,9 @@ int instructions_executed = 0;
 //Branched
 int branch_flag = 0;
 
+//Jumped
+int jump_flag = 0;
+
 //Instruction cache
 char Icache[SIZE];
 //Data cache
@@ -104,6 +107,7 @@ void pipeline_flush(){
   first_decode = 0;
   first_execute = 0;
   branch_flag = 0;
+  jump_flag = 0;
 }
 
 //runs the simulation
@@ -250,12 +254,17 @@ void run(){
       pipeline_flush();
     }
 
+    if(jump_flag == 1){
+      pipeline_flush();
+      // exit(1);
+    }
+
     move_next_to_current();
 
     current_cycle++;
     separator;
 
-    // if(current_cycle == 60) exit(1);
+    // if(current_cycle == 75) exit(1);
 }
 }
 

@@ -340,33 +340,36 @@ def Rtype(x, linenumber, f2):
 def Jtype(x, linenumber, f2):
     opcode = dict_op[x[0]]
 
-    rd = bin(int(x[1]))
-    newrd = rd[2:len(rd)]
-    while(len(newrd) != 5):
-        newrd = '0' + newrd
-    rd = newrd
+    rd = dict_reg.get(x[1], -1)
+    if(rd == -1):
+        rd = bin(int(x[1]))
+        newrd = rd[2:len(rd)]
+        while(len(newrd) != 5):
+            newrd = '0' + newrd
+        rd = newrd
 
-    imm1 = bin(int(x[2]) & 0b10000000000000000000)
-    newimm1 = imm1[2:len(imm1)]
-    imm1 = newimm1
 
-    imm2 = bin(int(x[2]) & 0b11111111110)
-    newimm2 = imm2[2:len(imm2)]
-    while(len(newimm2) != 10):
-        newimm2 = '0' + newimm2
-    imm2 = newimm2
+    if(x[2][0] == '.'):
+        jump = dict_jump[x[2]]
+        offset = (int(jump) - linenumber) * 2
+        offset = bin(offset & 0b11111111111111111111)
+        offset = offset[2:len(offset)]
+        while(len(offset) != 20):
+            offset = '0' + offset
 
-    imm3 = bin(int(x[2]) & 0b100000000000)
-    newimm3 = imm3[2:len(imm3)]
-    imm3 = newimm3
+    else:
+        offset = bin(int(x[2]) & 0b11111111111111111111)
+        offset = offset[2:len(offset)]
+        while(len(offset) != 20):
+            offset = '0' + offset
 
-    imm4 = bin(int(x[2]) & 0b01111111100000000000)
-    newimm4 = imm4[2:len(imm4)]
-    while(len(newimm4) != 8):
-        newimm4 = '0' + newimm4
-    imm4 = newimm4
+    imm1 = offset[0]
+    imm2 = offset[10:20]
+    imm3 = offset[9]
+    imm4 = offset[1:9]
 
-    imm = imm + imm2 + imm3 + imm4
+    imm = imm1 + imm2 + imm3 + imm4
+
 
     instruction = imm + rd + opcode
     instruction = '{:0{}X}'.format(int(instruction, 2), len(instruction) // 4)
@@ -439,11 +442,6 @@ def Btype(x, linenumber, f2):
     if(x[3][0] == '.'):
         jump = dict_jump[x[3]]
         offset = (int(jump) - linenumber) * 2
-        print("===")
-        print(jump)
-        print(linenumber)
-        print(offset)
-        print("===")
         offset = bin((offset) & 0b111111111111)
         offset = offset[2:len(offset)]
 
@@ -454,18 +452,13 @@ def Btype(x, linenumber, f2):
     while(len(offset) != 12):
         offset = '0' + offset
 
-    print(offset)
-
     imm1 = offset[0]
     imm2 = offset[2:8]
     imm3 = offset[8:12]
     imm4 = offset[1]
 
 
-    print(imm1 + imm2 + imm3 + imm4)
-
     instruction = imm1 + imm2 + rs2 + rs1 + funct3 + imm3 + imm4 + opcode
-    print(instruction)
     instruction = '{:0{}X}'.format(int(instruction, 2), len(instruction) // 4)
 
     f2.write("0x")

@@ -138,15 +138,18 @@ int sra(int reg1, int reg2){
 
 //jump and link
 int jal(){
-  int originalPC = pc[0] + 4;
-  pc[0] = pc[0] + (current_imm);
+  int originalPC = executepc + 4;
+  pc[0] = executepc + current_imm;
+  printf("%d\n",current_imm);
+  jump_flag = 1;
   return originalPC;
 }
 
 //jump and link register
 int jalr(int reg1){
-  int originalPC = pc[0] + 4;
+  int originalPC = executepc + 4;
   pc[0] = (current_imm + reg1) & 0b0;
+  jump_flag = 1;
   return originalPC;
 }
 
@@ -156,7 +159,7 @@ void beq(int reg1, int reg2){
     // printf("offset:%d\n",current_imm);
     // printf("actual pc:%d\n", executepc);
     // printf("actual pc:%d\n", currentpc);
-
+    printf("%d\n",current_imm);
     pc[0] = executepc + current_imm;
     branch_flag = 1;
   }
