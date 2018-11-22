@@ -75,7 +75,7 @@ jal zero .LBB0_3
 
 .LBB0_6:
 addi a3 a3 1
-beq zero zero .LBB0_1
+jal zero .LBB0_1
 
 .LBB0_7:
 lw t0 s0 -60
