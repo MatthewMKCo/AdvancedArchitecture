@@ -1,20 +1,15 @@
 #include <stdio.h>
 #include "run.h"
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #define SIZE 1024
 
 #define XLEN 32
 
-#define NUM_STAGES 3
+#define NUM_STAGES 4
 
 #define separator printf("====================================================\n");
-
-int input;
-int stop_while_cycle;
-int next_cycle_step = 0;
 
 //Current Cycle
 int current_cycle = 1;
@@ -40,8 +35,8 @@ int pc[1] = {0};
 int decodepc, fetchpc, executepc;
 int* sp = &registers[2];
 //Source Registers
-int decode_rsource1, execute_rsource1;
-int decode_rsource2, execute_rsource2;
+int decode_rsource1, execute_rsource1, mem_rsource1;
+int decode_rsource2, execute_rsource2, mem_rsource2;
 //Destination register
 int decode_rdestination, execute_rdestination, mem_rdestination, writeback_rdestination;
 
@@ -54,6 +49,9 @@ uint32_t executed_instruction;
 //Current Instruction Type
 //-1 = End, 1 = Immediate, 2 = Unsigned, 3 = Register, 4 = Jump, 5 = Branch, 6 = Store
 int decode_instruction_type, execute_instruction_type;
+
+int execute_load, execute_store, mem_load, mem_store;
+
 char instruction_type_char;
 
 //first x
@@ -67,7 +65,7 @@ int last_instruction_cycle;
 int execute_opcode, decode_opcode;
 
 //Current Funct3
-int execute_funct3, decode_funct3;
+int execute_funct3, decode_funct3, mem_funct3;
 
 //Current Funct7
 int execute_funct7, decode_funct7;
@@ -82,13 +80,17 @@ int mem_acc_val, execute_val, writeback_val;
 
 int mem_access, execute_access;
 
+int execute_offset, mem_offset;
+
 
 void pipeline_flush(){
   first_fetch = 0;
   first_decode = 0;
   first_execute = 0;
+  first_mem_access = 0;
   branch_flag = 0;
   jump_flag = 0;
+  mem_access = 0;
 }
 
 //runs the simulation
@@ -121,11 +123,12 @@ void run(){
 
     execute();
 
-    if(execute_rdestination != 0 && first_execute == 1){
-      registers[execute_rdestination] = execute_val;
-      // printf("desitnation:%d\n",execute_rdestination);
-      // printf("total:%d\n", execute_val);
-    }
+    // if(execute_rdestination != 0 && first_execute == 1){
+    //   registers[execute_rdestination] = execute_val;
+    //   // printf("desitnation:%d\n",execute_rdestination);
+    //   // printf("total:%d\n", execute_val);
+    // }
+    mem_acc();
 
     print_reg_summary();
 
@@ -143,7 +146,7 @@ void run(){
     current_cycle++;
     separator;
 
-    // if(current_cycle == 75) exit(1);
+    if(current_cycle == 75) exit(1);
 }
 }
 

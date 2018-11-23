@@ -223,8 +223,7 @@ int ld(char* cache, int reg1){
 }
 
 //load 32-bit memory into register
-int lw(char* cache, int reg1){
-  int offset = execute_imm + reg1;
+int lw(char* cache, int offset){
   int* data;
   data = (int*)(cache + offset);
   int data2 = ((*data) & 0xFFFFFFFF);
@@ -232,8 +231,7 @@ int lw(char* cache, int reg1){
 }
 
 //load 16-bit memory into register
-int lh(char* cache, int reg1){
-  int offset = execute_imm + reg1;
+int lh(char* cache, int offset){
   int* data;
   data = (int*)(cache + offset);
   int data2 = ((*data) & 0x0000FFFF);
@@ -244,8 +242,7 @@ int lh(char* cache, int reg1){
 }
 
 //load unsigned 16-bit memory into register
-int lhu(char* cache, int reg1){
-  int offset = execute_imm + reg1;
+int lhu(char* cache, int offset){
   int* data;
   data = (int*)(cache + offset);
   int data2 = ((*data) & 0x0000FFFF);
@@ -253,8 +250,7 @@ int lhu(char* cache, int reg1){
 }
 
 //load 8-bit memory into register
-int lb(char* cache, int reg1){
-  int offset = execute_imm + reg1;
+int lb(char* cache, int offset){
   int* data;
   data = (int*)(cache + offset);
   int data2 = ((*data) & 0x000000FF);
@@ -265,8 +261,7 @@ int lb(char* cache, int reg1){
 }
 
 //load unsigned 8-bit memory into register
-int lbu(char* cache, int reg1){
-  int offset = execute_imm + reg1;
+int lbu(char* cache, int offset){
   int* data;
   data = (int*)(cache + offset);
   int data2 = ((*data) & 0x000000FF);
@@ -274,24 +269,21 @@ int lbu(char* cache, int reg1){
 }
 
 //store contents of register into memory
-void st(char* cache, int reg1, int reg2){
-  int offset = execute_imm + reg1;
+void st(char* cache, int offset, int reg2){
   int* data;
   data = (int*)(cache + offset);
   *data = reg2;
 }
 
 //store 32-bit value from low bits of register into memory
-void sw(char* cache, int reg1, int reg2){
-  int offset = execute_imm + reg1;
+void sw(char* cache, int offset, int reg2){
   int* data;
   data = (int*)(cache + offset);
   *data = reg2;
 }
 
 //store 16-bit value from low bits of register into memory
-void sh(char* cache, int reg1, int reg2){
-  int offset = execute_imm + reg1;
+void sh(char* cache, int offset, int reg2){
   int* data;
   data = (int*)(cache + offset);
   int reg16bit = (reg2 & 0x0000FFFF);
@@ -299,8 +291,7 @@ void sh(char* cache, int reg1, int reg2){
 }
 
 //store 8-bit value from low bits of register into memory
-void sb(char* cache, int reg1, int reg2){
-  int offset = execute_imm + reg1;
+void sb(char* cache, int offset, int reg2){
   int* data;
   data = (int*)(cache + offset);
   int reg8bit = (reg2 & 0x000000FF);

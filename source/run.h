@@ -11,6 +11,8 @@ void execute_rformat();
 void execute_jformat();
 void execute_bformat();
 void execute_sformat();
+void memory_sformat();
+void memory_iformat();
 void execute_sj();
 void execute();
 
@@ -58,3 +60,4 @@ void sb(char* cache, int reg1, int reg2);
 
 void print_reg_summary();
 void move_next_to_current();
+void mem_acc();

@@ -113,6 +113,20 @@ void move_next_to_current(){
   executepc = decodepc;
   decodepc = fetchpc;
 
+  mem_rdestination = execute_rdestination;
+  mem_rsource1 = execute_rsource1;
+  mem_rsource2 = execute_rsource2;
+  mem_funct3 = execute_funct3;
+
+  mem_offset = execute_offset;
+  mem_access = execute_access;
+  execute_access = 0;
+
+  mem_store = execute_store;
+  execute_store = 0;
+  mem_load = execute_load;
+  execute_load = 0;
+
   //decode
   execute_rsource1 = decode_rsource1;
   execute_rsource2 = decode_rsource2;
@@ -126,6 +140,7 @@ void move_next_to_current(){
 
   //execute
   mem_acc_val = execute_val;
+
   //memory access
 
   //write-back

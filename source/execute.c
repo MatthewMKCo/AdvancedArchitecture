@@ -43,33 +43,16 @@ void execute_iformat(){
           execute_val = srai(registers[execute_rsource1]);
           break;
         }
-
-
     }
   }
   else if(execute_opcode == 0b0000011){
-    switch(execute_funct3){
-      case(0b000):
-        printf("Instruction:Load 8-bit\n");
-        execute_val = lb(Dcache, registers[execute_rsource1]);
-        break;
-      case(0b001):
-        printf("Instruction:Load 16-bit\n");
-        execute_val = lh(Dcache, registers[execute_rsource1]);
-        break;
-      case(0b010):
-        printf("Instruction:Load 32-bit\n");
-        execute_val = lw(Dcache, registers[execute_rsource1]);
-        break;
-      case(0b100):
-        printf("Instruction:Load 8-bit Unsigned\n");
-        execute_val = lbu(Dcache, registers[execute_rsource1]);
-        break;
-      case(0b101):
-        printf("Instruction:Load 16-bit Unsigned\n");
-        execute_val = lhu(Dcache, registers[execute_rsource1]);
-        break;
-    }
+    printf("Instruction:Offset Calculated for Load\n");
+    execute_offset = execute_imm + registers[execute_rsource1];
+    // printf("execute_imm:%d\n", execute_imm);
+    // printf("register_imm:%d\n", registers[execute_rsource1]);
+
+    execute_access = 1;
+    execute_load = 1;
   }
   else if(execute_opcode == 0b1100111){
     printf("Instruction:Jump and Link Register\n");
@@ -193,22 +176,57 @@ void execute_bformat(){
   return;
 }
 
-void execute_sformat(){
-  switch(execute_funct3){
+void memory_iformat(){
+  printf("load offset:%d\n",mem_offset);
+    switch(mem_funct3){
+      case(0b000):
+        printf("Instruction:Load 8-bit\n");
+        execute_val = lb(Dcache, mem_offset);
+        break;
+      case(0b001):
+        printf("Instruction:Load 16-bit\n");
+        execute_val = lh(Dcache, mem_offset);
+        break;
+      case(0b010):
+        printf("Instruction:Load 32-bit\n");
+        execute_val = lw(Dcache, mem_offset);
+        break;
+      case(0b100):
+        printf("Instruction:Load 8-bit Unsigned\n");
+        execute_val = lbu(Dcache, mem_offset);
+        break;
+      case(0b101):
+        printf("Instruction:Load 16-bit Unsigned\n");
+        execute_val = lhu(Dcache, mem_offset);
+        break;
+    }
+  return;
+}
+
+void memory_sformat(){
+  printf("s offset:%d\n",mem_offset);
+  switch(mem_funct3){
     case(0b000):
       printf("Instruction:Store 8-bit\n");
-      sb(Dcache, registers[execute_rsource1], registers[execute_rsource2]);
+      sb(Dcache, mem_offset, registers[mem_rsource2]);
       break;
     case(0b001):
       printf("Instruction:Store 16-bit\n");
-      sh(Dcache, registers[execute_rsource1], registers[execute_rsource2]);
+      sh(Dcache, mem_offset, registers[mem_rsource2]);
       break;
     case(0b010):
       printf("Instruction:Store 32-bit\n");
-      sw(Dcache, registers[execute_rsource1], registers[execute_rsource2]);
+      sw(Dcache, mem_offset, registers[mem_rsource2]);
       break;
   }
   return;
+}
+
+void execute_sformat(){
+  printf("Instruction:Offset Calculated for Store\n");
+  execute_offset = execute_imm + registers[execute_rsource1];
+  execute_store = 1;
+  execute_access = 1;
 }
 
 void execute_sj(){
@@ -224,10 +242,10 @@ void execute_sj(){
 void execute(){
 
   if(first_decode < 2)return;
-  if(first_execute == 0)first_execute++;
   if(last_instruction == 1){
     if(current_cycle > last_instruction_cycle + 2)return;
   }
+  if(first_execute < 2)first_execute++;
 
   if(execute_instruction_type == -1){
     printf("End of Program\n");
