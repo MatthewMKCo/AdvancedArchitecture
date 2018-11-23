@@ -108,8 +108,8 @@ void print_reg_summary(){
 
 void move_next_to_current(){
   //fetch
-  executed_instruction = fetch_current_instruction;
-  fetch_current_instruction = fetch_next_instruction;
+  executed_instruction = decode_instruction;
+  decode_instruction = fetch_instruction;
   executepc = decodepc;
   decodepc = fetchpc;
 
@@ -117,15 +117,15 @@ void move_next_to_current(){
   execute_rsource1 = decode_rsource1;
   execute_rsource2 = decode_rsource2;
   execute_rdestination = decode_rdestination;
-  current_instruction_type = next_instruction_type;
+  execute_instruction_type = decode_instruction_type;
   execute_opcode = decode_opcode;
-  current_funct3 = decode_funct3;
-  current_funct7 = next_funct7;
-  current_shamt = next_shamt;
-  current_imm = next_imm;
+  execute_funct3 = decode_funct3;
+  execute_funct7 = decode_funct7;
+  execute_shamt = decode_shamt;
+  execute_imm = decode_imm;
 
   //execute
-  current_val = next_val;
+  mem_acc_val = execute_val;
   //memory access
 
   //write-back

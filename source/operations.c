@@ -2,7 +2,7 @@
 
 //add register and immediate
 int addi(int reg1){
-  return reg1 + current_imm;
+  return reg1 + execute_imm;
 }
 
 //subtract register and immediate
@@ -12,29 +12,29 @@ int addi(int reg1){
 
 //bit wise and on register and immediate
 int andi(int reg1){
-  return (reg1 & current_imm);
+  return (reg1 & execute_imm);
 }
 
 //bit wise or on register and immediate
 int ori(int reg1){
-  return (reg1 | current_imm);
+  return (reg1 | execute_imm);
 }
 
 //bit wise xor on register and immediate
 int xori(int reg1){
-  return (reg1 ^ current_imm);
+  return (reg1 ^ execute_imm);
 }
 
 //set less than immediate
 int slti(int reg1){
-  if(reg1 < current_imm)return 1;
+  if(reg1 < execute_imm)return 1;
   else return 0;
 }
 
 //set less than immediate unsigned
 int sltiu(int reg1){
   unsigned int reg1u = reg1;
-  unsigned int immu = current_imm;
+  unsigned int immu = execute_imm;
   if(reg1u < immu)return 1;
   else return 0;
 }
@@ -42,7 +42,7 @@ int sltiu(int reg1){
 //Logical Left Shift Immediate
 int slli(int reg1){
   unsigned int reg1u = reg1;
-  reg1u = (reg1u << current_shamt);
+  reg1u = (reg1u << execute_shamt);
   reg1 = (int)reg1u;
   return (reg1 & 0xFFFFFFFF);
 }
@@ -50,24 +50,24 @@ int slli(int reg1){
 //Logical Right Shift Immediate
 int srli(int reg1){
   unsigned int reg1u = reg1;
-  reg1u = (reg1u >> current_shamt);
+  reg1u = (reg1u >> execute_shamt);
   reg1 = (int)reg1u;
   return (reg1 & 0xFFFFFFFF);
 }
 
 //Arithmetic Right Shift Immediate
 int srai(int reg1){
-  return ((reg1 >> current_shamt) & 0xFFFFFFFF);
+  return ((reg1 >> execute_shamt) & 0xFFFFFFFF);
 }
 
 //Load Upper Immediate
 int lui(){
-  return (current_imm & 0xFFFFF000);
+  return (execute_imm & 0xFFFFF000);
 }
 
 //Add Upper Immediate to PC
 int auipc(){
-  return((current_imm & 0xFFFFF000) + pc[0]);
+  return((execute_imm & 0xFFFFF000) + pc[0]);
 }
 
 //Add two registers
@@ -139,8 +139,8 @@ int sra(int reg1, int reg2){
 //jump and link
 int jal(){
   int originalPC = executepc + 4;
-  pc[0] = executepc + current_imm;
-  printf("%d\n",current_imm);
+  pc[0] = executepc + execute_imm;
+  printf("%d\n",execute_imm);
   jump_flag = 1;
   return originalPC;
 }
@@ -148,7 +148,7 @@ int jal(){
 //jump and link register
 int jalr(int reg1){
   int originalPC = executepc + 4;
-  pc[0] = (current_imm + reg1) & 0b0;
+  pc[0] = (execute_imm + reg1) & 0b0;
   jump_flag = 1;
   return originalPC;
 }
@@ -156,11 +156,11 @@ int jalr(int reg1){
 //branch if equal
 void beq(int reg1, int reg2){
   if(reg1 == reg2){
-    // printf("offset:%d\n",current_imm);
+    // printf("offset:%d\n",execute_imm);
     // printf("actual pc:%d\n", executepc);
     // printf("actual pc:%d\n", currentpc);
-    printf("%d\n",current_imm);
-    pc[0] = executepc + current_imm;
+    printf("%d\n",execute_imm);
+    pc[0] = executepc + execute_imm;
     branch_flag = 1;
   }
   return;
@@ -169,7 +169,7 @@ void beq(int reg1, int reg2){
 //branch if not equal
 void bne(int reg1, int reg2){
   if(reg1 != reg2){
-    pc[0] = executepc + current_imm;
+    pc[0] = executepc + execute_imm;
     branch_flag = 1;
   }
   return;
@@ -180,7 +180,7 @@ void blt(int reg1, int reg2){
   // printf("please\n");
   // printf("%d\t%d\n",reg1,reg2);
   if(reg1 < reg2){
-    pc[0] = executepc + current_imm;
+    pc[0] = executepc + execute_imm;
     branch_flag = 1;
   }
   return;
@@ -190,7 +190,7 @@ void blt(int reg1, int reg2){
 void bltu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u < reg2u){
-    pc[0] = executepc + current_imm;
+    pc[0] = executepc + execute_imm;
     branch_flag = 1;
   }
   return;
@@ -199,7 +199,7 @@ void bltu(int reg1, int reg2){
 //branch if greater than
 void bge(int reg1, int reg2){
   if(reg1 >= reg2){
-    pc[0] = executepc + current_imm;
+    pc[0] = executepc + execute_imm;
     branch_flag = 1;
   }
   return;
@@ -208,7 +208,7 @@ void bge(int reg1, int reg2){
 void bgeu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u >= reg2u){
-    pc[0] = executepc + current_imm;
+    pc[0] = executepc + execute_imm;
     branch_flag = 1;
   }
   return;
@@ -224,7 +224,7 @@ int ld(char* cache, int reg1){
 
 //load 32-bit memory into register
 int lw(char* cache, int reg1){
-  int offset = current_imm + reg1;
+  int offset = execute_imm + reg1;
   int* data;
   data = (int*)(cache + offset);
   int data2 = ((*data) & 0xFFFFFFFF);
@@ -233,7 +233,7 @@ int lw(char* cache, int reg1){
 
 //load 16-bit memory into register
 int lh(char* cache, int reg1){
-  int offset = current_imm + reg1;
+  int offset = execute_imm + reg1;
   int* data;
   data = (int*)(cache + offset);
   int data2 = ((*data) & 0x0000FFFF);
@@ -245,7 +245,7 @@ int lh(char* cache, int reg1){
 
 //load unsigned 16-bit memory into register
 int lhu(char* cache, int reg1){
-  int offset = current_imm + reg1;
+  int offset = execute_imm + reg1;
   int* data;
   data = (int*)(cache + offset);
   int data2 = ((*data) & 0x0000FFFF);
@@ -254,7 +254,7 @@ int lhu(char* cache, int reg1){
 
 //load 8-bit memory into register
 int lb(char* cache, int reg1){
-  int offset = current_imm + reg1;
+  int offset = execute_imm + reg1;
   int* data;
   data = (int*)(cache + offset);
   int data2 = ((*data) & 0x000000FF);
@@ -266,7 +266,7 @@ int lb(char* cache, int reg1){
 
 //load unsigned 8-bit memory into register
 int lbu(char* cache, int reg1){
-  int offset = current_imm + reg1;
+  int offset = execute_imm + reg1;
   int* data;
   data = (int*)(cache + offset);
   int data2 = ((*data) & 0x000000FF);
@@ -275,7 +275,7 @@ int lbu(char* cache, int reg1){
 
 //store contents of register into memory
 void st(char* cache, int reg1, int reg2){
-  int offset = current_imm + reg1;
+  int offset = execute_imm + reg1;
   int* data;
   data = (int*)(cache + offset);
   *data = reg2;
@@ -283,7 +283,7 @@ void st(char* cache, int reg1, int reg2){
 
 //store 32-bit value from low bits of register into memory
 void sw(char* cache, int reg1, int reg2){
-  int offset = current_imm + reg1;
+  int offset = execute_imm + reg1;
   int* data;
   data = (int*)(cache + offset);
   *data = reg2;
@@ -291,7 +291,7 @@ void sw(char* cache, int reg1, int reg2){
 
 //store 16-bit value from low bits of register into memory
 void sh(char* cache, int reg1, int reg2){
-  int offset = current_imm + reg1;
+  int offset = execute_imm + reg1;
   int* data;
   data = (int*)(cache + offset);
   int reg16bit = (reg2 & 0x0000FFFF);
@@ -300,7 +300,7 @@ void sh(char* cache, int reg1, int reg2){
 
 //store 8-bit value from low bits of register into memory
 void sb(char* cache, int reg1, int reg2){
-  int offset = current_imm + reg1;
+  int offset = execute_imm + reg1;
   int* data;
   data = (int*)(cache + offset);
   int reg8bit = (reg2 & 0x000000FF);

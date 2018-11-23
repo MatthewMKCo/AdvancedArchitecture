@@ -9,7 +9,7 @@
  # the build target executable:
  TARGET = run
 
- FILES = source/run.c source/fetch.c source/decode.c source/execute.c source/operations.c source/utils.c
+ FILES = source/run.c source/fetch.c source/decode.c source/execute.c source/operations.c source/utils.c source/memacc.c source/writeback.c
 
  all: $(TARGET)
 

@@ -33,17 +33,17 @@ extern int* sp;
 extern int decode_rsource1, execute_rsource1;
 extern int decode_rsource2, execute_rsource2;
 //Destination register
-extern int decode_rdestination, execute_rdestination;
+extern int decode_rdestination, execute_rdestination, mem_rdestination, writeback_rdestination;
 
 //Current Instruction
-extern uint32_t fetch_current_instruction;
-extern uint32_t fetch_next_instruction;
+extern uint32_t decode_instruction;
+extern uint32_t fetch_instruction;
 extern uint32_t executed_instruction;
 
 
 //Current Instruction Type
 //-1 = End, 1 = Immediate, 2 = Unsigned, 3 = Register, 4 = Jump, 5 = Branch, 6 = Store
-extern int next_instruction_type, current_instruction_type;
+extern int decode_instruction_type, execute_instruction_type;
 extern char instruction_type_char;
 
 //first x
@@ -57,15 +57,17 @@ extern int last_instruction_cycle;
 extern int execute_opcode, decode_opcode;
 
 //Current Funct3
-extern int current_funct3, decode_funct3;
+extern int execute_funct3, decode_funct3;
 
 //Current Funct7
-extern int current_funct7, next_funct7;
+extern int execute_funct7, decode_funct7;
 
 //Current Shift Amount
-extern int current_shamt, next_shamt;
+extern int execute_shamt, decode_shamt;
 
 //Current Immediate Value
-extern int current_imm, next_imm;
+extern int execute_imm, decode_imm;
 
-extern int current_val, next_val;
+extern int mem_acc_val, execute_val, writeback_val;
+
+extern int mem_access, execute_access;
