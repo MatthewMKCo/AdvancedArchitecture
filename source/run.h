@@ -55,3 +55,5 @@ void st(char* cache, int reg1, int reg2);
 void sw(char* cache, int reg1, int reg2);
 void sh(char* cache, int reg1, int reg2);
 void sb(char* cache, int reg1, int reg2);
+
+void print_reg_summary();
