@@ -57,3 +57,4 @@ void sh(char* cache, int reg1, int reg2);
 void sb(char* cache, int reg1, int reg2);
 
 void print_reg_summary();
+void move_next_to_current();

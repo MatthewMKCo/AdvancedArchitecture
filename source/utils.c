@@ -105,3 +105,29 @@ void print_reg_summary(){
   }
   printf("\n");
 }
+
+void move_next_to_current(){
+  //fetch
+  executed_instruction = fetch_current_instruction;
+  fetch_current_instruction = fetch_next_instruction;
+  executepc = decodepc;
+  decodepc = fetchpc;
+
+  //decode
+  execute_rsource1 = decode_rsource1;
+  execute_rsource2 = decode_rsource2;
+  execute_rdestination = decode_rdestination;
+  current_instruction_type = next_instruction_type;
+  execute_opcode = decode_opcode;
+  current_funct3 = next_funct3;
+  current_funct7 = next_funct7;
+  current_shamt = next_shamt;
+  current_imm = next_imm;
+
+  //execute
+  current_val = next_val;
+  //memory access
+
+  //write-back
+  return;
+}

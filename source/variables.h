@@ -27,13 +27,13 @@ extern char Dcache[SIZE];
 int registers[32];
 //Program Counter
 extern int pc[1];
-extern int currentpc, nextpc, executepc;
+extern int decodepc, fetchpc, executepc;
 extern int* sp;
 //Source Registers
-extern int next_rsource1, current_rsource1;
-extern int next_rsource2, current_rsource2;
+extern int decode_rsource1, execute_rsource1;
+extern int decode_rsource2, execute_rsource2;
 //Destination register
-extern int next_rdestination, current_rdestination;
+extern int decode_rdestination, execute_rdestination;
 
 //Current Instruction
 extern uint32_t fetch_current_instruction;
@@ -47,14 +47,14 @@ extern int next_instruction_type, current_instruction_type;
 extern char instruction_type_char;
 
 //first x
-extern int first_fetch, first_decode, first_execute;
+extern int first_fetch, first_decode, first_execute, first_mem_access;
 
 //last instruction
 extern int last_instruction;
 extern int last_instruction_cycle;
 
 //Current current_opcode
-extern int current_opcode, next_opcode;
+extern int execute_opcode, decode_opcode;
 
 //Current Funct3
 extern int current_funct3, next_funct3;

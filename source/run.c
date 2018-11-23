@@ -37,13 +37,13 @@ char Dcache[SIZE];
 int registers[32];
 //Program Counter
 int pc[1] = {0};
-int currentpc, nextpc, executepc;
+int decodepc, fetchpc, executepc;
 int* sp = &registers[2];
 //Source Registers
-int next_rsource1, current_rsource1;
-int next_rsource2, current_rsource2;
+int decode_rsource1, execute_rsource1;
+int decode_rsource2, execute_rsource2;
 //Destination register
-int next_rdestination, current_rdestination;
+int decode_rdestination, execute_rdestination;
 
 //Current Instruction
 uint32_t fetch_current_instruction;
@@ -57,14 +57,14 @@ int next_instruction_type, current_instruction_type;
 char instruction_type_char;
 
 //first x
-int first_fetch = 0, first_decode = 0, first_execute = 0;
+int first_fetch = 0, first_decode = 0, first_execute = 0, first_mem_access = 0;
 
 //last instruction
 int last_instruction = 0;
 int last_instruction_cycle;
 
 //Current current_opcode
-int current_opcode, next_opcode;
+int execute_opcode, decode_opcode;
 
 //Current Funct3
 int current_funct3, next_funct3;
@@ -80,31 +80,6 @@ int current_imm, next_imm;
 
 int current_val, next_val;
 
-void move_next_to_current(){
-  //fetch
-  executed_instruction = fetch_current_instruction;
-  fetch_current_instruction = fetch_next_instruction;
-  executepc = currentpc;
-  currentpc = nextpc;
-
-  //decode
-  current_rsource1 = next_rsource1;
-  current_rsource2 = next_rsource2;
-  current_rdestination = next_rdestination;
-  current_instruction_type = next_instruction_type;
-  current_opcode = next_opcode;
-  current_funct3 = next_funct3;
-  current_funct7 = next_funct7;
-  current_shamt = next_shamt;
-  current_imm = next_imm;
-
-  //execute
-  current_val = next_val;
-  //memory access
-
-  //write-back
-  return;
-}
 
 void pipeline_flush(){
   first_fetch = 0;
@@ -144,9 +119,9 @@ void run(){
 
     execute();
 
-    if(current_rdestination != 0 && first_execute == 1){
-      registers[current_rdestination] = next_val;
-      // printf("desitnation:%d\n",current_rdestination);
+    if(execute_rdestination != 0 && first_execute == 1){
+      registers[execute_rdestination] = next_val;
+      // printf("desitnation:%d\n",execute_rdestination);
       // printf("total:%d\n", next_val);
     }
 
