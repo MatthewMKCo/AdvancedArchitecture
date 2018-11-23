@@ -54,13 +54,13 @@ void decode(){
   //I type instructions
   if(next_instruction_type == 1){
     decode_rdestination = (fetch_current_instruction & 0x00000F80) >> 7;
-    next_funct3 = (fetch_current_instruction & 0x00007000) >> 12;
+    decode_funct3 = (fetch_current_instruction & 0x00007000) >> 12;
     decode_rsource1 = (fetch_current_instruction & 0x000F8000) >> 15;
-    if(next_funct3 == 0b101 || next_funct3 == 0b001){
+    if(decode_funct3 == 0b101 || decode_funct3 == 0b001){
       next_shamt = (fetch_current_instruction & 0x01F00000) >> 20;
       next_imm = (fetch_current_instruction & 0xFE000000) >> 25;
     }
-    else if(decode_opcode == 0b1100111 && next_funct3 == 0b000){
+    else if(decode_opcode == 0b1100111 && decode_funct3 == 0b000){
       next_imm = (fetch_current_instruction & 0xFFF00000) >> 20;
       next_imm = (next_imm & 0x00000001);
     }
@@ -79,7 +79,7 @@ void decode(){
   //R type instructions
   else if(next_instruction_type == 3){
     decode_rdestination = (fetch_current_instruction & 0x00000F80) >> 7;
-    next_funct3 = (fetch_current_instruction & 0x00007000) >> 12;
+    decode_funct3 = (fetch_current_instruction & 0x00007000) >> 12;
     decode_rsource1 = (fetch_current_instruction & 0x000F8000) >> 15;
     decode_rsource2 = (fetch_current_instruction & 0x01F00000) >> 20;
     next_funct7 = (fetch_current_instruction & 0xFE000000) >> 25;
@@ -94,7 +94,7 @@ void decode(){
   }
   //B type instructions
   else if(next_instruction_type == 5){
-    next_funct3 = (fetch_current_instruction & 0x00007000) >> 12;
+    decode_funct3 = (fetch_current_instruction & 0x00007000) >> 12;
     decode_rsource1 = (fetch_current_instruction & 0x000F8000) >> 15;
     decode_rsource2 = (fetch_current_instruction & 0x01F00000) >> 20;
     next_imm = (((fetch_current_instruction & 0x00000080) >> 7 << 11) | ((fetch_current_instruction & 0x00000F00) >> 8 << 1) | ((fetch_current_instruction & 0x7E000000) >> 25 << 5) | ((fetch_current_instruction & 0x10000000) >> 31 << 5));
@@ -104,7 +104,7 @@ void decode(){
   }
   //S type instructions
   else if(next_instruction_type == 6){
-    next_funct3 = (fetch_current_instruction & 0x00007000) >> 12;
+    decode_funct3 = (fetch_current_instruction & 0x00007000) >> 12;
     decode_rsource1 = (fetch_current_instruction & 0x000F8000) >> 15;
     decode_rsource2 = (fetch_current_instruction & 0x01F00000) >> 20;
     next_imm = (((fetch_current_instruction & 0x00000F80) >> 7) | ((fetch_current_instruction & 0xFE000000) >> 25 << 5));

@@ -67,7 +67,7 @@ int last_instruction_cycle;
 int execute_opcode, decode_opcode;
 
 //Current Funct3
-int current_funct3, next_funct3;
+int current_funct3, decode_funct3;
 
 //Current Funct7
 int current_funct7, next_funct7;

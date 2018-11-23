@@ -119,7 +119,7 @@ void move_next_to_current(){
   execute_rdestination = decode_rdestination;
   current_instruction_type = next_instruction_type;
   execute_opcode = decode_opcode;
-  current_funct3 = next_funct3;
+  current_funct3 = decode_funct3;
   current_funct7 = next_funct7;
   current_shamt = next_shamt;
   current_imm = next_imm;

@@ -57,7 +57,7 @@ extern int last_instruction_cycle;
 extern int execute_opcode, decode_opcode;
 
 //Current Funct3
-extern int current_funct3, next_funct3;
+extern int current_funct3, decode_funct3;
 
 //Current Funct7
 extern int current_funct7, next_funct7;
