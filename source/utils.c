@@ -1,6 +1,20 @@
 #include "run.h"
 
 void print_reg_summary(){
+  printf("Cycle:%d\n", current_cycle);
+  if(last_instruction != 1){
+    printf("Current PC in Fetch:%d\n",fetchpc);
+  }
+  if(print_decode_summary){
+    printf("Decode Instruction:%x\n",decode_instruction);
+    // printf("Decode Opcode:%d\n",decode_opcode);
+  }
+  if(print_execute_summary){
+    printf("Executed Instruction Type:%c\n", instruction_type_char);
+    printf("Instruction Executed:0x%.8X\n", executed_instruction);
+    printf("Instruction Executed:%s\n", executed_instruction_name);
+  }
+
   //Print all register values
   for(int i = 0; i < 31; i++){
     switch(i){
@@ -107,27 +121,20 @@ void print_reg_summary(){
 }
 
 void move_next_to_current(){
-  //fetch
-  executed_instruction = decode_instruction;
-  decode_instruction = fetch_instruction;
-  executepc = decodepc;
-  decodepc = fetchpc;
-
   mem_rdestination = execute_rdestination;
   mem_rsource1 = execute_rsource1;
   mem_rsource2 = execute_rsource2;
   mem_funct3 = execute_funct3;
-
   mem_offset = execute_offset;
   mem_access = execute_access;
-  execute_access = 0;
-
   mem_store = execute_store;
-  execute_store = 0;
   mem_load = execute_load;
-  execute_load = 0;
+  printf("EXECUTE VALUE IN UTILS:%d\n",execute_val);
+  mem_acc_val = execute_val;
+  printf("MEMORY VALUE IN UTILS:%d\n",mem_acc_val);
 
-  //decode
+  //fetch
+  executed_instruction = decode_instruction;
   execute_rsource1 = decode_rsource1;
   execute_rsource2 = decode_rsource2;
   execute_rdestination = decode_rdestination;
@@ -137,9 +144,18 @@ void move_next_to_current(){
   execute_funct7 = decode_funct7;
   execute_shamt = decode_shamt;
   execute_imm = decode_imm;
+  executepc = decodepc;
+  execute_access = 0;
+  execute_store = 0;
+  execute_load = 0;
+
+  decode_instruction = fetch_instruction;
+  decodepc = fetchpc;
+
+
+
 
   //execute
-  mem_acc_val = execute_val;
 
   //memory access
 

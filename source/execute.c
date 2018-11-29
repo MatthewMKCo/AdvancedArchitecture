@@ -5,58 +5,70 @@ void execute_iformat(){
   if(execute_opcode == 0b0010011){
     switch(execute_funct3){
       case(0b000):
-        printf("Instruction:Add Immediate\n");
-        execute_val = addi(registers[execute_rsource1]);
+        // printf("Instruction:Add Immediate\n");
+        executed_instruction_name = "Add Immediate";
+        execute_val = addi(execute_rsource1);
         break;
       case(0b111):
-        printf("Instruction:And Immediate\n");
-        execute_val = andi(registers[execute_rsource1]);
+        // printf("Instruction:And Immediate\n");
+        executed_instruction_name = "And Immediate";
+        execute_val = andi(execute_rsource1);
         break;
       case(0b110):
-        printf("Instruction:Or Immediate\n");
-        execute_val = ori(registers[execute_rsource1]);
+        // printf("Instruction:Or Immediate\n");
+        executed_instruction_name = "Or Immediate";
+        execute_val = ori(execute_rsource1);
         break;
       case(0b100):
-        printf("Instruction:Xor Immediate\n");
-        execute_val = xori(registers[execute_rsource1]);
+        // printf("Instruction:Xor Immediate\n");
+        executed_instruction_name = "Xor Immediate";
+        execute_val = xori(execute_rsource1);
         break;
       case(0b010):
-        printf("Instruction:STLI\n");
-        execute_val = slti(registers[execute_rsource1]);
+        // printf("Instruction:STLI\n");
+        executed_instruction_name = "STLI";
+        execute_val = slti(execute_rsource1);
         break;
       case(0b011):
-        printf("Instruction:STLIU\n");
-        execute_val = sltiu(registers[execute_rsource1]);
+        // printf("Instruction:STLIU\n");
+        executed_instruction_name = "STLIU";
+        execute_val = sltiu(execute_rsource1);
         break;
       case(0b001):
-        printf("Instruction:Logical Left Shift Immediate\n");
-        execute_val = slli(registers[execute_rsource1]);
+        // printf("Instruction:Logical Left Shift Immediate\n");
+        executed_instruction_name = "Logical Left Shift Immediate";
+        execute_val = slli(execute_rsource1);
         break;
       case(0b101):
         if(execute_imm == 0b0000000){
-          printf("Instruction:Logical Right Shift Immediate\n");
-          execute_val = srli(registers[execute_rsource1]);
+          // printf("Instruction:Logical Right Shift Immediate\n");
+          executed_instruction_name = "Logical Right Shift Immediate";
+          execute_val = srli(execute_rsource1);
           break;
         }
         else if(execute_imm == 0b0100000){
-          printf("Instruction:Arithmetic Right Shift Immediate\n");
-          execute_val = srai(registers[execute_rsource1]);
+          // printf("Instruction:Arithmetic Right Shift Immediate\n");
+          executed_instruction_name = "Arithmetic Right Shift Immediate";
+          execute_val = srai(execute_rsource1);
           break;
         }
     }
   }
   else if(execute_opcode == 0b0000011){
-    printf("Instruction:Offset Calculated for Load\n");
-    execute_offset = execute_imm + registers[execute_rsource1];
+    // printf("Instruction:Offset Calculated for Load\n");
+    // executed_instruction_name
+    execute_offset = execute_imm + execute_rsource1;
+    execute_iformat2();
     // printf("execute_imm:%d\n", execute_imm);
-    // printf("register_imm:%d\n", registers[execute_rsource1]);
+    // printf("register_imm:%d\n", execute_rsource1);
 
     execute_access = 1;
     execute_load = 1;
   }
   else if(execute_opcode == 0b1100111){
-    printf("Instruction:Jump and Link Register\n");
-    execute_val = jalr(registers[execute_rsource1]);
+    // printf("Instruction:Jump and Link Register\n");
+    executed_instruction_name = "Jump and Link Register";
+    execute_val = jalr(execute_rsource1);
   }
   else{
     printf("Error\n");
@@ -68,11 +80,13 @@ void execute_iformat(){
 void execute_uformat(){
   switch(execute_opcode){
     case(0b0110111):
-      printf("Instruction:Load Upper Immediate\n");
+      // printf("Instruction:Load Upper Immediate\n");
+      executed_instruction_name = "Load Upper Immediate";
       execute_val = lui();
       break;
     case(0b0010111):
-      printf("Instruction:Add Upper Immediate to PC\n");
+      // printf("Instruction:Add Upper Immediate to PC\n");
+      executed_instruction_name = "Add Upper Immediate to PC";
       auipc();
       break;
   }
@@ -83,65 +97,78 @@ void execute_rformat(){
   switch(execute_funct3){
     case(0b000):
       if(execute_funct7 == 0b0000000){
-        printf("Instruction:Add\n");
-        execute_val = add(registers[execute_rsource1], registers[execute_rsource2]);
+        // printf("Instruction:Add\n");
+        executed_instruction_name = "Add";
+        execute_val = add(execute_rsource1, execute_rsource2);
       }
       else if(execute_funct7 == 0b0100000){
-        printf("Instruction:Subtract\n");
-        execute_val = sub(registers[execute_rsource1], registers[execute_rsource2]);
+        // printf("Instruction:Subtract\n");
+        executed_instruction_name = "Subtract";
+        execute_val = sub(execute_rsource1, execute_rsource2);
       }
       else if(execute_funct7 == 0b0000001){
-        printf("Instruction:Multiply\n");
-        execute_val = mul(registers[execute_rsource1], registers[execute_rsource2]);
+        // printf("Instruction:Multiply\n");
+        executed_instruction_name = "Multiply";
+        execute_val = mul(execute_rsource1, execute_rsource2);
       }
       break;
     case(0b001):
-      printf("Instruction:Logical Left Shift\n");
-      execute_val = sll(registers[execute_rsource1], registers[execute_rsource2]);
+      // printf("Instruction:Logical Left Shift\n");
+      executed_instruction_name = "Logical Left Shift";
+      execute_val = sll(execute_rsource1, execute_rsource2);
       break;
     case(0b010):
-      printf("Instruction:SLT\n");
-      execute_val = slt(registers[execute_rsource1], registers[execute_rsource2]);
+      // printf("Instruction:SLT\n");
+      executed_instruction_name = "SLT";
+      execute_val = slt(execute_rsource1, execute_rsource2);
       break;
     case(0b011):
-      printf("Instruction:SLTU\n");
-      execute_val = sltu(registers[execute_rsource1], registers[execute_rsource2]);
+      // printf("Instruction:SLTU\n");
+      executed_instruction_name = "SLTU";
+      execute_val = sltu(execute_rsource1, execute_rsource2);
       break;
     case(0b100):
       if(execute_funct7 == 0b0000001){
-        printf("Instruction:Divide\n");
-        execute_val = divide(registers[execute_rsource1], registers[execute_rsource2]);
+        // printf("Instruction:Divide\n");
+        executed_instruction_name = "Divide";
+        execute_val = divide(execute_rsource1, execute_rsource2);
         break;
       }
       else if(execute_funct7 == 0b0000000){
-        printf("Instruction:Xor\n");
-        execute_val = xor(registers[execute_rsource1], registers[execute_rsource2]);
+        // printf("Instruction:Xor\n");
+        executed_instruction_name = "Xor";
+        execute_val = xor(execute_rsource1, execute_rsource2);
         break;
       }
     case(0b101):
       if(execute_funct7 == 0b0000000){
-        printf("Instruction:Logical Right Shift\n");
-        execute_val = srl(registers[execute_rsource1], registers[execute_rsource2]);
+        // printf("Instruction:Logical Right Shift\n");
+        executed_instruction_name = "Logical Right Shift";
+        execute_val = srl(execute_rsource1, execute_rsource2);
       }
       else if(execute_funct7 == 0b0100000){
-        printf("Instruction:Logical Right Shift\n");
-        execute_val = sra(registers[execute_rsource1], registers[execute_rsource2]);
+        // printf("Instruction:Logical Right Shift\n");
+        executed_instruction_name = "Logical Right Shift";
+        execute_val = sra(execute_rsource1, execute_rsource2);
       }
       break;
     case(0b110):
-      printf("Instruction:Or\n");
-      execute_val = or(registers[execute_rsource1], registers[execute_rsource2]);
+      // printf("Instruction:Or\n");
+      executed_instruction_name = "Or";
+      execute_val = or(execute_rsource1, execute_rsource2);
       break;
     case(0b111):
-      printf("Instruction:And\n");
-      execute_val = and(registers[execute_rsource1], registers[execute_rsource2]);
+      // printf("Instruction:And\n");
+      executed_instruction_name = "And";
+      execute_val = and(execute_rsource1, execute_rsource2);
       break;
   }
   return;
 }
 
 void execute_jformat(){
-  printf("Instruction:Jump and Link\n");
+  // printf("Instruction:Jump and Link\n");
+  executed_instruction_name = "Jump and Link";
   jal();
   return;
 }
@@ -149,84 +176,96 @@ void execute_jformat(){
 void execute_bformat(){
   switch(execute_funct3){
     case(0b000):
-      printf("Instruction:Branch if Equal\n");
-      beq(registers[execute_rsource1], registers[execute_rsource2]);
+      // printf("Instruction:Branch if Equal\n");
+      executed_instruction_name = "Branch if Equal";
+      beq(execute_rsource1, execute_rsource2);
       break;
     case(0b001):
-      printf("Instruction:Branch if Not Equal\n");
-      bne(registers[execute_rsource1], registers[execute_rsource2]);
+      // printf("Instruction:Branch if Not Equal\n");
+      executed_instruction_name = "Branch if Not Equal";
+      bne(execute_rsource1, execute_rsource2);
       break;
     case(0b100):
-      printf("Instruction:Branch if Less Than\n");
-      blt(registers[execute_rsource1], registers[execute_rsource2]);
+      // printf("Instruction:Branch if Less Than\n");
+      executed_instruction_name = "Branch if Less Than";
+      blt(execute_rsource1, execute_rsource2);
       break;
     case(0b101):
-      printf("Instruction:Branch if Greater Than\n");
-      bge(registers[execute_rsource1], registers[execute_rsource2]);
+      // printf("Instruction:Branch if Greater Than\n");
+      executed_instruction_name = "Branch if Greater Than";
+      bge(execute_rsource1, execute_rsource2);
       break;
     case(0b110):
-      printf("Instruction:Branch if Less Than Unsigned\n");
-      bltu(registers[execute_rsource1], registers[execute_rsource2]);
+      // printf("Instruction:Branch if Less Than Unsigned\n");
+      executed_instruction_name = "Branch if Less Than Unsigned";
+      bltu(execute_rsource1, execute_rsource2);
       break;
     case(0b111):
-      printf("Instruction:Branch if Greater Than Unsigned\n");
-      bgeu(registers[execute_rsource1], registers[execute_rsource2]);
+      // printf("Instruction:Branch if Greater Than Unsigned\n");
+      executed_instruction_name = "Branch if Greater Than Unsigned";
+      bgeu(execute_rsource1, execute_rsource2);
       break;
   }
   return;
 }
 
-void memory_iformat(){
-  printf("load offset:%d\n",mem_offset);
-    switch(mem_funct3){
+void execute_iformat2(){
+  // printf("load offset:%d\n",execute_offset);
+    switch(execute_funct3){
       case(0b000):
-        printf("Instruction:Load 8-bit\n");
-        execute_val = lb(Dcache, mem_offset);
+        // printf("Instruction:Load 8-bit\n");
+        executed_instruction_name = "Load 8-bit";
+        execute_val = lb(Dcache, execute_offset);
         break;
       case(0b001):
-        printf("Instruction:Load 16-bit\n");
-        execute_val = lh(Dcache, mem_offset);
+        // printf("Instruction:Load 16-bit\n");
+        executed_instruction_name = "Load 16-bit";
+        execute_val = lh(Dcache, execute_offset);
         break;
       case(0b010):
-        printf("Instruction:Load 32-bit\n");
-        execute_val = lw(Dcache, mem_offset);
+        // printf("Instruction:Load 32-bit\n");
+        executed_instruction_name = "Load 32-bit";
+        execute_val = lw(Dcache, execute_offset);
         break;
       case(0b100):
-        printf("Instruction:Load 8-bit Unsigned\n");
-        execute_val = lbu(Dcache, mem_offset);
+        // printf("Instruction:Load 8-bit Unsigned\n");
+        executed_instruction_name = "Load 8-bit Unsigned";
+        execute_val = lbu(Dcache, execute_offset);
         break;
       case(0b101):
-        printf("Instruction:Load 16-bit Unsigned\n");
-        execute_val = lhu(Dcache, mem_offset);
+        // printf("Instruction:Load 16-bit Unsigned\n");
+        executed_instruction_name = "Load 16-bit Unsigned";
+        execute_val = lhu(Dcache, execute_offset);
         break;
     }
   return;
 }
 
-void memory_sformat(){
-  printf("s offset:%d\n",mem_offset);
-  switch(mem_funct3){
+void execute_sformat2(){
+  switch(execute_funct3){
     case(0b000):
       printf("Instruction:Store 8-bit\n");
-      sb(Dcache, mem_offset, registers[mem_rsource2]);
+      executed_instruction_name = "Store 8-bit";
+      sb(Dcache, execute_offset, execute_rsource2);
       break;
     case(0b001):
-      printf("Instruction:Store 16-bit\n");
-      sh(Dcache, mem_offset, registers[mem_rsource2]);
+      // printf("Instruction:Store 16-bit\n");
+      executed_instruction_name = "Store 16-bit";
+      sh(Dcache, execute_offset, execute_rsource2);
       break;
     case(0b010):
-      printf("Instruction:Store 32-bit\n");
-      sw(Dcache, mem_offset, registers[mem_rsource2]);
+      // printf("Instruction:Store 32-bit\n");
+      executed_instruction_name = "Store 32-bit";
+      sw(Dcache, execute_offset, execute_rsource2);
       break;
   }
   return;
 }
 
 void execute_sformat(){
-  printf("Instruction:Offset Calculated for Store\n");
-  execute_offset = execute_imm + registers[execute_rsource1];
-  execute_store = 1;
-  execute_access = 1;
+  // printf("Instruction:Offset Calculated for Store\n");
+  execute_offset = execute_imm + execute_rsource1;
+  execute_sformat2();
 }
 
 void execute_sj(){
@@ -241,11 +280,18 @@ void execute_sj(){
 
 void execute(){
 
-  if(first_decode < 2)return;
-  if(last_instruction == 1){
-    if(current_cycle > last_instruction_cycle + 2)return;
+  if(first_decode < 2){
+    print_execute_summary = 0;
+    return;
   }
   if(first_execute < 2)first_execute++;
+  if(last_instruction == 1){
+    if(current_cycle > last_instruction_cycle + 2){
+      print_execute_summary = 0;
+      return;
+    }
+  }
+  print_execute_summary = 1;
 
   if(execute_instruction_type == -1){
     printf("End of Program\n");
@@ -253,8 +299,6 @@ void execute(){
   }
   instructions_executed++;
 
-  printf("Instruction Type:%c\n", instruction_type_char);
-  printf("Instruction Executed:0x%.8X\n", executed_instruction);
   if(execute_instruction_type == 4 || execute_instruction_type == 6){
     execute_sj();
     return;

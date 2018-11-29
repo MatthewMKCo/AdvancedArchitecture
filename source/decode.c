@@ -1,18 +1,22 @@
 #include "run.h"
 
 void decode(){
-  if(first_fetch < 2)return;
-  if(last_instruction == 1){
-    if(current_cycle > last_instruction_cycle + 1)return;
+  if(first_fetch < 2){
+    print_decode_summary = 0;
+    return;
   }
   if(first_decode < 2){
     first_decode = first_decode + 1;
   }
-
-  printf("instruction:%x\n",decode_instruction);
+  if(last_instruction == 1){
+    if(current_cycle > last_instruction_cycle + 1){
+      print_decode_summary = 0;
+      return;
+    }
+  }
+  print_decode_summary = 1;
 
   decode_opcode = (decode_instruction & 0x0000007F);
-  printf("Opcode:%d\n",decode_opcode);
   switch(decode_opcode){
     case 0b0010011:
       decode_instruction_type = 1;
@@ -55,7 +59,7 @@ void decode(){
   if(decode_instruction_type == 1){
     decode_rdestination = (decode_instruction & 0x00000F80) >> 7;
     decode_funct3 = (decode_instruction & 0x00007000) >> 12;
-    decode_rsource1 = (decode_instruction & 0x000F8000) >> 15;
+    decode_rsource1 = registers[(decode_instruction & 0x000F8000) >> 15];
     if(decode_funct3 == 0b101 || decode_funct3 == 0b001){
       decode_shamt = (decode_instruction & 0x01F00000) >> 20;
       decode_imm = (decode_instruction & 0xFE000000) >> 25;
@@ -80,8 +84,8 @@ void decode(){
   else if(decode_instruction_type == 3){
     decode_rdestination = (decode_instruction & 0x00000F80) >> 7;
     decode_funct3 = (decode_instruction & 0x00007000) >> 12;
-    decode_rsource1 = (decode_instruction & 0x000F8000) >> 15;
-    decode_rsource2 = (decode_instruction & 0x01F00000) >> 20;
+    decode_rsource1 = registers[(decode_instruction & 0x000F8000) >> 15];
+    decode_rsource2 = registers[(decode_instruction & 0x01F00000) >> 20];
     decode_funct7 = (decode_instruction & 0xFE000000) >> 25;
   }
   //J type instructions
@@ -95,8 +99,8 @@ void decode(){
   //B type instructions
   else if(decode_instruction_type == 5){
     decode_funct3 = (decode_instruction & 0x00007000) >> 12;
-    decode_rsource1 = (decode_instruction & 0x000F8000) >> 15;
-    decode_rsource2 = (decode_instruction & 0x01F00000) >> 20;
+    decode_rsource1 = registers[(decode_instruction & 0x000F8000) >> 15];
+    decode_rsource2 = registers[(decode_instruction & 0x01F00000) >> 20];
     decode_imm = (((decode_instruction & 0x00000080) >> 7 << 11) | ((decode_instruction & 0x00000F00) >> 8 << 1) | ((decode_instruction & 0x7E000000) >> 25 << 5) | ((decode_instruction & 0x10000000) >> 31 << 5));
     if((decode_imm & 0x00000800)){
       decode_imm = (decode_imm | 0xFFFFF000);
@@ -105,8 +109,8 @@ void decode(){
   //S type instructions
   else if(decode_instruction_type == 6){
     decode_funct3 = (decode_instruction & 0x00007000) >> 12;
-    decode_rsource1 = (decode_instruction & 0x000F8000) >> 15;
-    decode_rsource2 = (decode_instruction & 0x01F00000) >> 20;
+    decode_rsource1 = registers[(decode_instruction & 0x000F8000) >> 15];
+    decode_rsource2 = registers[(decode_instruction & 0x01F00000) >> 20];
     decode_imm = (((decode_instruction & 0x00000F80) >> 7) | ((decode_instruction & 0xFE000000) >> 25 << 5));
     if((decode_imm & 0x00000800)){
       decode_imm = (decode_imm | 0xFFFFF000);

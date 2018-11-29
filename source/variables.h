@@ -76,3 +76,7 @@ extern int mem_acc_val, execute_val, writeback_val;
 extern int mem_access, execute_access;
 
 extern int execute_offset, mem_offset;
+
+extern char* executed_instruction_name;
+
+extern int print_decode_summary, print_execute_summary;

@@ -11,8 +11,8 @@ void execute_rformat();
 void execute_jformat();
 void execute_bformat();
 void execute_sformat();
-void memory_sformat();
-void memory_iformat();
+void execute_sformat2();
+void execute_iformat2();
 void execute_sj();
 void execute();
 

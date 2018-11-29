@@ -82,6 +82,10 @@ int mem_access, execute_access;
 
 int execute_offset, mem_offset;
 
+char* executed_instruction_name;
+
+int print_decode_summary = 0, print_execute_summary = 0;
+
 
 void pipeline_flush(){
   first_fetch = 0;
@@ -97,7 +101,6 @@ void pipeline_flush(){
 void run(){
   while(1){
     separator;
-    printf("Cycle:%d\n", current_cycle);
 
     if(last_instruction == 1){
       // printf("LASTINSTRUCTION:%d\n",last_instruction_cycle);
