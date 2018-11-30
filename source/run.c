@@ -3,10 +3,16 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+//execute units
 execute_unit alu[ALU_NUM];
 execute_unit lsu[LSU_NUM];
 execute_unit agu[AGU_NUM];
 execute_unit bru[BRU_NUM];
+
+//reservation station
+reserve reservationalu[RESERVATION_WIDTH];
+reserve reservationlsu[RESERVATION_WIDTH];
+reserve reservationbru[RESERVATION_WIDTH];
 
 //Current Cycle
 int current_cycle = 1;
@@ -29,16 +35,20 @@ char Dcache[SIZE];
 int registers[REG_NUM];
 //Physical registers
 reg physRegisters[PHYSREG_NUM];
+//Tag array
+tag tags[TAG_NUM];
 
 //Program Counter
 int pc[1] = {0};
-int decodepc, fetchpc, executepc;
+int decodepc, issuepc, fetchpc, executepc;
 int* sp = &registers[2];
 //Source Registers
-int decode_rsource1, execute_rsource1, mem_rsource1;
-int decode_rsource2, execute_rsource2, mem_rsource2;
+int decode_rsource1, issue_rsource1, execute_rsource1, mem_rsource1;
+int decode_rsource2, issue_rsource2, execute_rsource2, mem_rsource2;
 //Destination register
-int decode_rdestination, execute_rdestination, mem_rdestination, writeback_rdestination;
+int decode_rdestination, issue_rdestination, execute_rdestination, mem_rdestination, writeback_rdestination;
+//Execute unit type, 1 = ALU, 2 = LSU, 3 = BRU
+int decode_unit_type, issue_unit_type;
 
 //Current Instruction
 uint32_t decode_instruction;
@@ -48,33 +58,33 @@ uint32_t executed_instruction;
 
 //Current Instruction Type
 //-1 = End, 1 = Immediate, 2 = Unsigned, 3 = Register, 4 = Jump, 5 = Branch, 6 = Store
-int decode_instruction_type, execute_instruction_type;
+int decode_instruction_type, issue_instruction_type, execute_instruction_type;
 
 int execute_load, execute_store, mem_load, mem_store;
 
 char instruction_type_char;
 
 //first x
-int first_fetch = 0, first_decode = 0, first_execute = 0, first_mem_access = 0;
+int first_fetch = 0, first_issue = 0, first_decode = 0, first_execute = 0, first_mem_access = 0;
 
 //last instruction
 int last_instruction = 0;
 int last_instruction_cycle;
 
 //Current current_opcode
-int execute_opcode, decode_opcode;
+int execute_opcode, issue_opcode, decode_opcode;
 
 //Current Funct3
-int execute_funct3, decode_funct3, mem_funct3;
+int execute_funct3, issue_funct3, decode_funct3, mem_funct3;
 
 //Current Funct7
-int execute_funct7, decode_funct7;
+int execute_funct7, issue_funct7, decode_funct7;
 
 //Current Shift Amount
-int execute_shamt, decode_shamt;
+int execute_shamt, issue_shamt, decode_shamt;
 
 //Current Immediate Value
-int execute_imm, decode_imm, next_imm;
+int execute_imm, issue_imm, decode_imm, next_imm;
 
 int mem_acc_val, execute_val, writeback_val;
 
@@ -84,12 +94,13 @@ int execute_offset, mem_offset;
 
 char* executed_instruction_name;
 
-int print_decode_summary = 0, print_execute_summary = 0;
+int print_decode_summary = 0, print_execute_summary = 0, print_issue_summary = 0;
 
 
 void pipeline_flush(){
   first_fetch = 0;
   first_decode = 0;
+  first_issue = 0;
   first_execute = 0;
   first_mem_access = 0;
   branch_flag = 0;
@@ -123,6 +134,8 @@ void run(){
     // }
 
     decode();
+
+    issue();
 
     execute();
 

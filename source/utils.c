@@ -175,17 +175,17 @@ void print_reg_summary(){
 }
 
 void move_next_to_current(){
-  mem_rdestination = execute_rdestination;
-  mem_rsource1 = execute_rsource1;
-  mem_rsource2 = execute_rsource2;
-  mem_funct3 = execute_funct3;
-  mem_offset = execute_offset;
-  mem_access = execute_access;
-  mem_store = execute_store;
-  mem_load = execute_load;
-  printf("EXECUTE VALUE IN UTILS:%d\n",execute_val);
-  mem_acc_val = execute_val;
-  printf("MEMORY VALUE IN UTILS:%d\n",mem_acc_val);
+  // mem_rdestination = execute_rdestination;
+  // mem_rsource1 = execute_rsource1;
+  // mem_rsource2 = execute_rsource2;
+  // mem_funct3 = execute_funct3;
+  // mem_offset = execute_offset;
+  // mem_access = execute_access;
+  // mem_store = execute_store;
+  // mem_load = execute_load;
+  // printf("EXECUTE VALUE IN UTILS:%d\n",execute_val);
+  // mem_acc_val = execute_val;
+  // printf("MEMORY VALUE IN UTILS:%d\n",mem_acc_val);
 
   //fetch
   executed_instruction = decode_instruction;

@@ -3,8 +3,18 @@
 #include <stdio.h>
 #include "variables.h"
 
+
+//fetch functions
 void fetch();
+
+//decode functions
 void decode();
+
+//issue functions
+void issue();
+
+//execute functions
+//execute.c functions
 void execute_iformat();
 void execute_uformat();
 void execute_rformat();
@@ -15,7 +25,11 @@ void execute_sformat2();
 void execute_iformat2();
 void execute_sj();
 void execute();
-
+int find_available_agu();
+availNum find_available_alu();
+int find_available_bru();
+int find_available_lsu();
+//operations.c functions
 int addi(int reg1);
 int andi(int reg1);
 int ori(int reg1);
@@ -58,6 +72,10 @@ void sw(char* cache, int reg1, int reg2);
 void sh(char* cache, int reg1, int reg2);
 void sb(char* cache, int reg1, int reg2);
 
+//writeback functions
+void writeback();
+
+//utility functions
 void set_register();
 void load_program();
 void print_reg_summary();

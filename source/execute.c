@@ -1,9 +1,10 @@
 #include "run.h"
 
+availNum available;
+
 //execute I format instructions
-void execute_iformat(){
+void execute_iformat(int number){
   if(execute_opcode == 0b0010011){
-    int number = find_available_alu();
     switch(execute_funct3){
       case(0b000):
         // printf("Instruction:Add Immediate\n");
@@ -96,18 +97,20 @@ void execute_uformat(){
   return;
 }
 
-void execute_rformat(){
+void execute_rformat(int number){
   switch(execute_funct3){
     case(0b000):
       if(execute_funct7 == 0b0000000){
         // printf("Instruction:Add\n");
         executed_instruction_name = "Add";
         execute_val = add(execute_rsource1, execute_rsource2);
+        alu[number].cyclesNeeded = 2;
       }
       else if(execute_funct7 == 0b0100000){
         // printf("Instruction:Subtract\n");
         executed_instruction_name = "Subtract";
         execute_val = sub(execute_rsource1, execute_rsource2);
+        alu[number].cyclesNeeded = 2;
       }
       else if(execute_funct7 == 0b0000001){
         // printf("Instruction:Multiply\n");
@@ -166,6 +169,7 @@ void execute_rformat(){
       execute_val = and(execute_rsource1, execute_rsource2);
       break;
   }
+  alu[number].valueInside = execute_val;
   return;
 }
 
@@ -222,11 +226,13 @@ void execute_iformat2(){
   // if(lsu[number].ready != 1){
   //   return;
   // }
+  int number = find_available_lsu();
   switch(execute_funct3){
     case(0b000):
       // printf("Instruction:Load 8-bit\n");
       executed_instruction_name = "Load 8-bit";
       execute_val = lb(Dcache, execute_offset);
+      lsu[number].cyclesNeeded = 2;
       break;
     case(0b001):
       // printf("Instruction:Load 16-bit\n");
@@ -249,6 +255,8 @@ void execute_iformat2(){
       execute_val = lhu(Dcache, execute_offset);
       break;
   }
+  lsu[number].shouldWriteback = 1;
+  lsu[number].valueInside = execute_val;
   return;
 }
 
@@ -291,85 +299,100 @@ void execute_sj(){
 
 void increment_units(){
   for(int i = 0; i < ALU_NUM; i++){
-    if(alu[ALU_NUM].ready == 0){
-      alu[ALU_NUM].currentCycles++;
-      if(alu[ALU_NUM].currentCycles == alu[ALU_NUM].cyclesNeeded){
-        alu[ALU_NUM].ready = 1;
-        alu[ALU_NUM].readyForWriteback = 1;
+    if(alu[i].ready == 0){
+      alu[i].currentCycles++;
+      if(alu[i].currentCycles == alu[i].cyclesNeeded){
+        alu[i].ready = 1;
+        alu[i].readyForWriteback = 1;
+        alu[i].wbValueInside = alu[i].valueInside;
+        alu[i].wbDestinationRegister = alu[i].destinationRegister;
       }
     }
   }
   for(int i = 0; i < LSU_NUM; i++){
-    if(lsu[LSU_NUM].ready == 0){
-      lsu[LSU_NUM].currentCycles++;
-      if(lsu[LSU_NUM].currentCycles == lsu[LSU_NUM].cyclesNeeded){
-        lsu[LSU_NUM].ready = 1;
-        lsu[LSU_NUM].readyForWriteback = 1;
+    if(lsu[i].ready == 0){
+      lsu[i].currentCycles++;
+      if(lsu[i].currentCycles == lsu[i].cyclesNeeded){
+        lsu[i].ready = 1;
+        lsu[i].readyForWriteback = 1;
       }
     }
   }
   for(int i = 0; i < AGU_NUM; i++){
-    if(agu[AGU_NUM].ready == 0){
-      agu[AGU_NUM].currentCycles++;
-      if(agu[AGU_NUM].currentCycles == agu[AGU_NUM].cyclesNeeded){
-        agu[AGU_NUM].readyForWriteback = 1;
+    if(agu[i].ready == 0){
+      agu[i].currentCycles++;
+      if(agu[i].currentCycles == agu[i].cyclesNeeded){
+        agu[i].readyForWriteback = 1;
       }
     }
   }
   for(int i = 0; i < BRU_NUM; i++){
-    if(bru[BRU_NUM].ready == 0){
-      bru[BRU_NUM].currentCycles++;
-      if(bru[BRU_NUM].currentCycles == bru[BRU_NUM].cyclesNeeded){
-        bru[BRU_NUM].ready = 1;
-        bru[BRU_NUM].readyForWriteback = 1;
+    if(bru[i].ready == 0){
+      bru[i].currentCycles++;
+      if(bru[i].currentCycles == bru[i].cyclesNeeded){
+        bru[i].ready = 1;
+        bru[i].readyForWriteback = 1;
       }
     }
   }
   return;
 }
 
-void send_for_writeback(){
-  for(int i = 0; i < ALU_NUM; i++){
-    if(alu[ALU_NUM].readyForWriteback == 1){
-      alu[ALU_NUM].readyForWriteback = 2;
-    }
-  }
-  for(int i = 0; i < LSU_NUM; i++){
-    if(lsu[LSU_NUM].readyForWriteback == 1){
-      lsu[LSU_NUM].readyForWriteback = 2;
-    }
-  }
-  for(int i = 0; i < AGU_NUM; i++){
-    if(agu[AGU_NUM].readyForWriteback == 1){
-      agu[AGU_NUM].readyForWriteback = 2;
-    }
-  }
-  for(int i = 0; i < BRU_NUM; i++){
-    if(bru[BRU_NUM].readyForWriteback == 1){
-      bru[BRU_NUM].readyForWriteback = 2;
+void forward_reservation_stations(int tagPassed, int value, int unit_type){
+  if(unit_type == 1){
+    for(int i = 0; i < reservationIteratorALU; i++){
+      if(reservationalu[i].rsource1ready == 0 && reservationalu[i].rsource1 == tagPassed){
+        reservationalu[i].rsource1value = value;
+        reservationalu[i].rsource1ready = 1;
+      }
+      if(reservationalu[i].rsource2ready == 0 && reservationalu[i].rsource1 == tagPassed){
+        reservationalu[i].rsource2value = value;
+        reservationalu[i].rsource2ready = 1;
+      }
     }
   }
 }
 
-int find_available_alu(){
-  int i;
-  for(i = 0; i < ALU_NUM; i++){
-    if(alu[ALU_NUM].ready == 1){
-      break;
+void send_for_writeback(){
+  for(int i = 0; i < ALU_NUM; i++){
+    if(alu[i].readyForWriteback == 1){
+      alu[i].readyForWriteback = 2;
+      forward_reservation_stations(alu[i].wbDestinationRegister, alu[i].wbValueInside, 1);
     }
   }
-  if(i == ALU_NUM){
-    return -1;
+  for(int i = 0; i < LSU_NUM; i++){
+    if(lsu[i].readyForWriteback == 1){
+      lsu[i].readyForWriteback = 2;
+    }
   }
-  else{
-    return i;
+  for(int i = 0; i < AGU_NUM; i++){
+    if(agu[i].readyForWriteback == 1){
+      agu[i].readyForWriteback = 2;
+    }
   }
+  for(int i = 0; i < BRU_NUM; i++){
+    if(bru[i].readyForWriteback == 1){
+      bru[i].readyForWriteback = 2;
+    }
+  }
+}
+
+availNum find_available_alu(){
+  int i;
+  available.number = 0;
+  for(i = 0; i < ALU_NUM; i++){
+    if(alu[i].ready == 1){
+      available.unitNumber[available.number] = i;
+      available.number++;
+    }
+  }
+  return available;
 }
 
 int find_available_lsu(){
   int i;
   for(i = 0; i < LSU_NUM; i++){
-    if(lsu[LSU_NUM].ready == 1){
+    if(lsu[i].ready == 1){
       break;
     }
   }
@@ -384,7 +407,7 @@ int find_available_lsu(){
 int find_available_agu(){
   int i;
   for(i = 0; i < AGU_NUM; i++){
-    if(agu[AGU_NUM].ready == 1){
+    if(agu[i].ready == 1){
       break;
     }
   }
@@ -399,7 +422,7 @@ int find_available_agu(){
 int find_available_bru(){
   int i;
   for(i = 0; i < BRU_NUM; i++){
-    if(bru[BRU_NUM].ready == 1){
+    if(bru[i].ready == 1){
       break;
     }
   }
@@ -411,44 +434,83 @@ int find_available_bru(){
   }
 }
 
+instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
+  instructionwrapper wrappedListofInstructions;
+  wrappedListofInstructions.foundInstructions = 0;
+  for(int i = 0; i < RESERVATION_WIDTH; i++){
+    if(reservationalu[i].rsource1ready && reservationalu[i].rsource2ready){
+      instruction newInstruction;
+      newInstruction.rdestination = reservationalu[i].rdestination;
+      newInstruction.rsource1value = reservationalu[i].rsource1value;
+      newInstruction.rsource2value = reservationalu[i].rsource2value;
+      newInstruction.opcode = reservationalu[i].opcode;
+      newInstruction.funct3 = reservationalu[i].funct3;
+      newInstruction.funct7 = reservationalu[i].funct7;
+      newInstruction.shamt = reservationalu[i].shamt;
+      newInstruction.imm = reservationalu[i].imm;
+      newInstruction.pc = reservationalu[i].pc;
+      newInstruction.instruction_type = reservationalu[i].instruction_type;
+      wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
+      wrappedListofInstructions.foundInstructions++;
+      reservationalu[i].inuse = 0;
+    }
+    if(wrappedListofInstructions.foundInstructions == numberOfAvailableUnits){
+      return wrappedListofInstructions;
+    }
+
+  }
+  return wrappedListofInstructions;
+}
+
 void execute(){
 
-  if(first_decode < 2){
+  if(first_issue < 2){
     print_execute_summary = 0;
     return;
   }
   if(first_execute < 2)first_execute++;
   if(last_instruction == 1){
-    if(current_cycle > last_instruction_cycle + 2){
+    if(current_cycle > last_instruction_cycle + 3){
       print_execute_summary = 0;
       return;
     }
   }
   print_execute_summary = 1;
 
-  if(execute_instruction_type == -1){
-    printf("End of Program\n");
-    exit(1);
-  }
-  instructions_executed++;
+  availNum currentAvailable = find_available_alu();
+  instructionwrapper currentInstructions = check_reservation_alu(currentAvailable.number);
 
-  if(execute_instruction_type == 4 || execute_instruction_type == 6){
-    execute_sj();
-    return;
+  for(int i = 0; i < currentInstructions.foundInstructions; i++){
+    int alu_unit_number = currentAvailable.unitNumber[i];
+    instruction currentInstruction = currentInstructions.instruction[i];
+
+    if(currentInstruction.instruction_type == 1){
+      execute_iformat(alu_unit_number);
+    }
+    else if(currentInstruction.instruction_type == 3){
+      execute_rformat(alu_unit_number);
+    }
+    instructions_executed++;
   }
 
-  if(execute_instruction_type == 1){
-    execute_iformat();
-  }
-  else if(execute_instruction_type == 2){
-    execute_uformat();
-  }
-  else if(execute_instruction_type == 3){
-    execute_rformat();
-  }
-  else if(execute_instruction_type == 5){
-    execute_bformat();
-  }
+
+  // if(execute_instruction_type == 4 || execute_instruction_type == 6){
+  //   execute_sj();
+  //   return;
+  // }
+  //
+  // if(execute_instruction_type == 1){
+  //   // execute_iformat();
+  // }
+  // else if(execute_instruction_type == 2){
+  //   execute_uformat();
+  // }
+  // else if(execute_instruction_type == 3){
+  //   // execute_rformat();
+  // }
+  // else if(execute_instruction_type == 5){
+  //   execute_bformat();
+  // }
 
   send_for_writeback();
 
