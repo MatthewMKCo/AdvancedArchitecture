@@ -3,11 +3,13 @@
 //execute I format instructions
 void execute_iformat(){
   if(execute_opcode == 0b0010011){
+    int number = find_available_alu();
     switch(execute_funct3){
       case(0b000):
         // printf("Instruction:Add Immediate\n");
         executed_instruction_name = "Add Immediate";
         execute_val = addi(execute_rsource1);
+        alu[number].cyclesNeeded = 2;
         break;
       case(0b111):
         // printf("Instruction:And Immediate\n");
@@ -53,6 +55,7 @@ void execute_iformat(){
           break;
         }
     }
+    alu[number].valueInside = execute_val;
   }
   else if(execute_opcode == 0b0000011){
     // printf("Instruction:Offset Calculated for Load\n");
@@ -211,33 +214,41 @@ void execute_bformat(){
 
 void execute_iformat2(){
   // printf("load offset:%d\n",execute_offset);
-    switch(execute_funct3){
-      case(0b000):
-        // printf("Instruction:Load 8-bit\n");
-        executed_instruction_name = "Load 8-bit";
-        execute_val = lb(Dcache, execute_offset);
-        break;
-      case(0b001):
-        // printf("Instruction:Load 16-bit\n");
-        executed_instruction_name = "Load 16-bit";
-        execute_val = lh(Dcache, execute_offset);
-        break;
-      case(0b010):
-        // printf("Instruction:Load 32-bit\n");
-        executed_instruction_name = "Load 32-bit";
-        execute_val = lw(Dcache, execute_offset);
-        break;
-      case(0b100):
-        // printf("Instruction:Load 8-bit Unsigned\n");
-        executed_instruction_name = "Load 8-bit Unsigned";
-        execute_val = lbu(Dcache, execute_offset);
-        break;
-      case(0b101):
-        // printf("Instruction:Load 16-bit Unsigned\n");
-        executed_instruction_name = "Load 16-bit Unsigned";
-        execute_val = lhu(Dcache, execute_offset);
-        break;
-    }
+  // if(lsu[number].currentCycles != 0 && lsu[number].cyclesNeeded != 0){
+  //   if(lsu[number].currentCycles == lsu[number].cyclesNeeded){
+  //     lsu[number].ready = 1;
+  //   }
+  // }
+  // if(lsu[number].ready != 1){
+  //   return;
+  // }
+  switch(execute_funct3){
+    case(0b000):
+      // printf("Instruction:Load 8-bit\n");
+      executed_instruction_name = "Load 8-bit";
+      execute_val = lb(Dcache, execute_offset);
+      break;
+    case(0b001):
+      // printf("Instruction:Load 16-bit\n");
+      executed_instruction_name = "Load 16-bit";
+      execute_val = lh(Dcache, execute_offset);
+      break;
+    case(0b010):
+      // printf("Instruction:Load 32-bit\n");
+      executed_instruction_name = "Load 32-bit";
+      execute_val = lw(Dcache, execute_offset);
+      break;
+    case(0b100):
+      // printf("Instruction:Load 8-bit Unsigned\n");
+      executed_instruction_name = "Load 8-bit Unsigned";
+      execute_val = lbu(Dcache, execute_offset);
+      break;
+    case(0b101):
+      // printf("Instruction:Load 16-bit Unsigned\n");
+      executed_instruction_name = "Load 16-bit Unsigned";
+      execute_val = lhu(Dcache, execute_offset);
+      break;
+  }
   return;
 }
 
@@ -278,6 +289,128 @@ void execute_sj(){
   return;
 }
 
+void increment_units(){
+  for(int i = 0; i < ALU_NUM; i++){
+    if(alu[ALU_NUM].ready == 0){
+      alu[ALU_NUM].currentCycles++;
+      if(alu[ALU_NUM].currentCycles == alu[ALU_NUM].cyclesNeeded){
+        alu[ALU_NUM].ready = 1;
+        alu[ALU_NUM].readyForWriteback = 1;
+      }
+    }
+  }
+  for(int i = 0; i < LSU_NUM; i++){
+    if(lsu[LSU_NUM].ready == 0){
+      lsu[LSU_NUM].currentCycles++;
+      if(lsu[LSU_NUM].currentCycles == lsu[LSU_NUM].cyclesNeeded){
+        lsu[LSU_NUM].ready = 1;
+        lsu[LSU_NUM].readyForWriteback = 1;
+      }
+    }
+  }
+  for(int i = 0; i < AGU_NUM; i++){
+    if(agu[AGU_NUM].ready == 0){
+      agu[AGU_NUM].currentCycles++;
+      if(agu[AGU_NUM].currentCycles == agu[AGU_NUM].cyclesNeeded){
+        agu[AGU_NUM].readyForWriteback = 1;
+      }
+    }
+  }
+  for(int i = 0; i < BRU_NUM; i++){
+    if(bru[BRU_NUM].ready == 0){
+      bru[BRU_NUM].currentCycles++;
+      if(bru[BRU_NUM].currentCycles == bru[BRU_NUM].cyclesNeeded){
+        bru[BRU_NUM].ready = 1;
+        bru[BRU_NUM].readyForWriteback = 1;
+      }
+    }
+  }
+  return;
+}
+
+void send_for_writeback(){
+  for(int i = 0; i < ALU_NUM; i++){
+    if(alu[ALU_NUM].readyForWriteback == 1){
+      alu[ALU_NUM].readyForWriteback = 2;
+    }
+  }
+  for(int i = 0; i < LSU_NUM; i++){
+    if(lsu[LSU_NUM].readyForWriteback == 1){
+      lsu[LSU_NUM].readyForWriteback = 2;
+    }
+  }
+  for(int i = 0; i < AGU_NUM; i++){
+    if(agu[AGU_NUM].readyForWriteback == 1){
+      agu[AGU_NUM].readyForWriteback = 2;
+    }
+  }
+  for(int i = 0; i < BRU_NUM; i++){
+    if(bru[BRU_NUM].readyForWriteback == 1){
+      bru[BRU_NUM].readyForWriteback = 2;
+    }
+  }
+}
+
+int find_available_alu(){
+  int i;
+  for(i = 0; i < ALU_NUM; i++){
+    if(alu[ALU_NUM].ready == 1){
+      break;
+    }
+  }
+  if(i == ALU_NUM){
+    return -1;
+  }
+  else{
+    return i;
+  }
+}
+
+int find_available_lsu(){
+  int i;
+  for(i = 0; i < LSU_NUM; i++){
+    if(lsu[LSU_NUM].ready == 1){
+      break;
+    }
+  }
+  if(i == LSU_NUM){
+    return -1;
+  }
+  else{
+    return i;
+  }
+}
+
+int find_available_agu(){
+  int i;
+  for(i = 0; i < AGU_NUM; i++){
+    if(agu[AGU_NUM].ready == 1){
+      break;
+    }
+  }
+  if(i == AGU_NUM){
+    return -1;
+  }
+  else{
+    return i;
+  }
+}
+
+int find_available_bru(){
+  int i;
+  for(i = 0; i < BRU_NUM; i++){
+    if(bru[BRU_NUM].ready == 1){
+      break;
+    }
+  }
+  if(i == BRU_NUM){
+    return -1;
+  }
+  else{
+    return i;
+  }
+}
+
 void execute(){
 
   if(first_decode < 2){
@@ -316,5 +449,10 @@ void execute(){
   else if(execute_instruction_type == 5){
     execute_bformat();
   }
+
+  send_for_writeback();
+
+  increment_units();
+
   return;
 }

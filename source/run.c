@@ -3,13 +3,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define SIZE 1024
-
-#define XLEN 32
-
-#define NUM_STAGES 4
-
-#define separator printf("====================================================\n");
+execute_unit alu[ALU_NUM];
+execute_unit lsu[LSU_NUM];
+execute_unit agu[AGU_NUM];
+execute_unit bru[BRU_NUM];
 
 //Current Cycle
 int current_cycle = 1;
@@ -29,7 +26,10 @@ char Icache[SIZE];
 char Dcache[SIZE];
 
 //Registers
-int registers[32];
+int registers[REG_NUM];
+//Physical registers
+reg physRegisters[PHYSREG_NUM];
+
 //Program Counter
 int pc[1] = {0};
 int decodepc, fetchpc, executepc;
@@ -131,7 +131,7 @@ void run(){
     //   // printf("desitnation:%d\n",execute_rdestination);
     //   // printf("total:%d\n", execute_val);
     // }
-    mem_acc();
+    writeback();
 
     print_reg_summary();
 
@@ -152,37 +152,6 @@ void run(){
     if(current_cycle == 75) exit(1);
 }
 }
-
-//sets registers to 0
-void set_register(){
-  size_t n = sizeof(registers)/sizeof(*registers);
-  for(int i = 0; i < n; i++){
-    registers[i] = 0;
-  }
-  for(int i = 0; i < SIZE; i++){
-    st(Icache, i, -1);
-  }
-  sp[0] = SIZE;
-}
-
-void load_program(char* file){
-  FILE* fp;
-  fp = fopen(file, "r");
-  unsigned int tinstruction, loadpc = 0;
-  next_imm = 0;
-  if(fp == NULL){
-    printf("Error in loading program, file is null");
-    exit(1);
-  }
-  while(fscanf(fp, "%x", &tinstruction) != EOF){
-    st(Icache, loadpc, tinstruction);
-    loadpc = loadpc + 4;
-  }
-
-  fclose(fp);
-}
-
-
 
 int main(int argc, char** argv){
 

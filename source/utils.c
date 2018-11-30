@@ -1,5 +1,59 @@
 #include "run.h"
 
+//sets registers to 0
+void set_register(){
+  for(int i = 0; i < REG_NUM; i++){
+    registers[i] = 0;
+  }
+  for(int i = 0; i < PHYSREG_NUM; i++){
+    physRegisters[i].ready = 1;
+    physRegisters[i].value = 0;
+  }
+  for(int i = 0; i < SIZE; i++){
+    st(Icache, i, -1);
+  }
+  sp[0] = SIZE;
+
+  for(int i = 0; i < ALU_NUM; i++){
+    alu[i].cyclesNeeded = 0;
+    alu[i].currentCycles = 0;
+    alu[i].ready = 1;
+  }
+  for(int i = 0; i < LSU_NUM; i++){
+    lsu[i].cyclesNeeded = 0;
+    lsu[i].currentCycles = 0;
+    lsu[i].ready = 1;
+  }
+  for(int i = 0; i < AGU_NUM; i++){
+    agu[i].cyclesNeeded = 0;
+    agu[i].currentCycles = 0;
+    agu[i].ready = 1;
+  }
+  for(int i = 0; i < BRU_NUM; i++){
+    bru[i].cyclesNeeded = 0;
+    bru[i].currentCycles = 0;
+    bru[i].ready = 1;
+  }
+
+}
+
+void load_program(char* file){
+  FILE* fp;
+  fp = fopen(file, "r");
+  unsigned int tinstruction, loadpc = 0;
+  next_imm = 0;
+  if(fp == NULL){
+    printf("Error in loading program, file is null");
+    exit(1);
+  }
+  while(fscanf(fp, "%x", &tinstruction) != EOF){
+    st(Icache, loadpc, tinstruction);
+    loadpc = loadpc + 4;
+  }
+
+  fclose(fp);
+}
+
 void print_reg_summary(){
   printf("Cycle:%d\n", current_cycle);
   if(last_instruction != 1){
