@@ -2,7 +2,7 @@
 
 //add register and immediate
 int addi(int reg1){
-  return reg1 + execute_imm;
+  return reg1 + currentInstruction.imm;
 }
 
 //subtract register and immediate
@@ -12,29 +12,29 @@ int addi(int reg1){
 
 //bit wise and on register and immediate
 int andi(int reg1){
-  return (reg1 & execute_imm);
+  return (reg1 & currentInstruction.imm);
 }
 
 //bit wise or on register and immediate
 int ori(int reg1){
-  return (reg1 | execute_imm);
+  return (reg1 | currentInstruction.imm);
 }
 
 //bit wise xor on register and immediate
 int xori(int reg1){
-  return (reg1 ^ execute_imm);
+  return (reg1 ^ currentInstruction.imm);
 }
 
 //set less than immediate
 int slti(int reg1){
-  if(reg1 < execute_imm)return 1;
+  if(reg1 < currentInstruction.imm)return 1;
   else return 0;
 }
 
 //set less than immediate unsigned
 int sltiu(int reg1){
   unsigned int reg1u = reg1;
-  unsigned int immu = execute_imm;
+  unsigned int immu = currentInstruction.imm;
   if(reg1u < immu)return 1;
   else return 0;
 }
@@ -62,12 +62,12 @@ int srai(int reg1){
 
 //Load Upper Immediate
 int lui(){
-  return (execute_imm & 0xFFFFF000);
+  return (currentInstruction.imm & 0xFFFFF000);
 }
 
 //Add Upper Immediate to PC
 int auipc(){
-  return((execute_imm & 0xFFFFF000) + pc[0]);
+  return((currentInstruction.imm & 0xFFFFF000) + pc[0]);
 }
 
 //Add two registers
@@ -138,17 +138,17 @@ int sra(int reg1, int reg2){
 
 //jump and link
 int jal(){
-  int originalPC = executepc + 4;
-  pc[0] = executepc + execute_imm;
-  printf("%d\n",execute_imm);
+  int originalPC = currentInstruction.pc + 4;
+  pc[0] = currentInstruction.pc + currentInstruction.imm;
+  printf("%d\n",currentInstruction.imm);
   jump_flag = 1;
   return originalPC;
 }
 
 //jump and link register
 int jalr(int reg1){
-  int originalPC = executepc + 4;
-  pc[0] = (execute_imm + reg1) & 0b0;
+  int originalPC = currentInstruction.pc + 4;
+  pc[0] = (currentInstruction.imm + reg1) & 0b0;
   jump_flag = 1;
   return originalPC;
 }
@@ -156,11 +156,11 @@ int jalr(int reg1){
 //branch if equal
 void beq(int reg1, int reg2){
   if(reg1 == reg2){
-    // printf("offset:%d\n",execute_imm);
-    // printf("actual pc:%d\n", executepc);
+    // printf("offset:%d\n",currentInstruction.imm);
+    // printf("actual pc:%d\n", currentInstruction.pc);
     // printf("actual pc:%d\n", currentpc);
-    printf("%d\n",execute_imm);
-    pc[0] = executepc + execute_imm;
+    printf("%d\n",currentInstruction.imm);
+    pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
   }
   return;
@@ -169,7 +169,7 @@ void beq(int reg1, int reg2){
 //branch if not equal
 void bne(int reg1, int reg2){
   if(reg1 != reg2){
-    pc[0] = executepc + execute_imm;
+    pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
   }
   return;
@@ -180,7 +180,7 @@ void blt(int reg1, int reg2){
   // printf("please\n");
   // printf("%d\t%d\n",reg1,reg2);
   if(reg1 < reg2){
-    pc[0] = executepc + execute_imm;
+    pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
   }
   return;
@@ -190,7 +190,7 @@ void blt(int reg1, int reg2){
 void bltu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u < reg2u){
-    pc[0] = executepc + execute_imm;
+    pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
   }
   return;
@@ -199,7 +199,7 @@ void bltu(int reg1, int reg2){
 //branch if greater than
 void bge(int reg1, int reg2){
   if(reg1 >= reg2){
-    pc[0] = executepc + execute_imm;
+    pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
   }
   return;
@@ -208,7 +208,7 @@ void bge(int reg1, int reg2){
 void bgeu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u >= reg2u){
-    pc[0] = executepc + execute_imm;
+    pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
   }
   return;

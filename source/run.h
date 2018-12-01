@@ -81,3 +81,4 @@ void load_program();
 void print_reg_summary();
 void move_next_to_current();
 void mem_acc();
+void exit_early();

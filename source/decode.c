@@ -8,13 +8,18 @@ void decode(){
   if(first_decode < 2){
     first_decode = first_decode + 1;
   }
+  print_decode_summary = 1;
   if(last_instruction == 1){
     if(current_cycle > last_instruction_cycle + 1){
       print_decode_summary = 0;
-      return;
+      // return;
     }
   }
-  print_decode_summary = 1;
+
+  if(decode_instruction == -1){
+    decode_instruction_type = 0;
+    return;
+  }
 
   decode_opcode = (decode_instruction & 0x0000007F);
   switch(decode_opcode){

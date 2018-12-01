@@ -8,7 +8,7 @@
 
 #define RESERVATION_WIDTH 64
 
-#define NUM_STAGES 4
+#define NUM_STAGES 10
 
 #define ALU_NUM 4
 
@@ -21,6 +21,19 @@
 #define TAG_NUM 128
 
 #define separator printf("====================================================\n");
+
+typedef struct instruction{
+  int rdestination;
+  int rsource1value;
+  int rsource2value;
+  int opcode;
+  int funct3;
+  int funct7;
+  int shamt;
+  int imm;
+  int pc;
+  int instruction_type;
+}instruction;
 
 //ALU struct
 typedef struct execute_unit{
@@ -37,6 +50,7 @@ typedef struct execute_unit{
   int wbSourceRegister2;
   int readyForWriteback;
   int shouldWriteback;
+  instruction instruction;
 }execute_unit;
 
 typedef struct reg{
@@ -67,18 +81,7 @@ typedef struct reserve{
   int instruction_type;
 }reserve;
 
-typedef struct instruction{
-  int rdestination;
-  int rsource1value;
-  int rsource2value;
-  int opcode;
-  int funct3;
-  int funct7;
-  int shamt;
-  int imm;
-  int pc;
-  int instruction_type;
-}instruction;
+
 
 typedef struct instructionwrapper{
   instruction instruction[ALU_NUM];
@@ -109,6 +112,7 @@ extern execute_unit lsu[LSU_NUM];
 extern execute_unit agu[AGU_NUM];
 extern execute_unit bru[BRU_NUM];
 
+extern instruction currentInstruction;
 //
 // extern struct ALU *alu;
 

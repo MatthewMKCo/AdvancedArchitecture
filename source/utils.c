@@ -172,6 +172,10 @@ void print_reg_summary(){
     if((i+1) % 5 == 0)printf("\n");
   }
   printf("\n");
+  for(int i = 0; i < PHYSREG_NUM; i++){
+    printf("Register %d; %d\t", i, physRegisters[i].value);
+    if(i % 5 == 0)printf("\n");
+  }
 }
 
 void move_next_to_current(){
@@ -187,21 +191,19 @@ void move_next_to_current(){
   // mem_acc_val = execute_val;
   // printf("MEMORY VALUE IN UTILS:%d\n",mem_acc_val);
 
-  //fetch
   executed_instruction = decode_instruction;
-  execute_rsource1 = decode_rsource1;
-  execute_rsource2 = decode_rsource2;
-  execute_rdestination = decode_rdestination;
-  execute_instruction_type = decode_instruction_type;
-  execute_opcode = decode_opcode;
-  execute_funct3 = decode_funct3;
-  execute_funct7 = decode_funct7;
-  execute_shamt = decode_shamt;
-  execute_imm = decode_imm;
-  executepc = decodepc;
-  execute_access = 0;
-  execute_store = 0;
-  execute_load = 0;
+  issue_rsource1 = decode_rsource1;
+  issue_rsource2 = decode_rsource2;
+  issue_rdestination = decode_rdestination;
+  issue_instruction_type = decode_instruction_type;
+  issue_opcode = decode_opcode;
+  issue_funct3 = decode_funct3;
+  issue_funct7 = decode_funct7;
+  issue_shamt = decode_shamt;
+  issue_imm = decode_imm;
+  issuepc = decodepc;
+  issue_unit_type = decode_unit_type;
+
 
   decode_instruction = fetch_instruction;
   decodepc = fetchpc;
@@ -209,10 +211,12 @@ void move_next_to_current(){
 
 
 
-  //execute
 
-  //memory access
 
-  //write-back
   return;
+}
+
+void exit_early(){
+  printf("EXIT EARLY\n");
+  exit(1);
 }
