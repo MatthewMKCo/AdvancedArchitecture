@@ -1,5 +1,7 @@
 #include "run.h"
 
+// instruction decode_instruction;
+
 void decode(){
   if(first_fetch < 2){
     print_decode_summary = 0;

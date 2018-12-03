@@ -5,39 +5,38 @@ int reservationIteratorALU = 0;
 int reservationIteratorLSU = 0;
 int reservationIteratorBRU = 0;
 
+int issue_isPhys;
+int issue_isPhys2;
+
 
 void issue_rename(){
-  tags[tagIterator].registerNumber = issue_rdestination;
-  tags[tagIterator].ready = 0;
-  issue_rdestination = tagIterator;
-  tagIterator++;
 
-  int tagChecker = tagIterator;
-  while(tagChecker != -1){
-    if(tags[tagChecker].registerNumber == issue_rsource1){
-      issue_rsource1 = tagChecker;
-      break;
-    }
-    tagChecker = tagChecker - 1;
+  if(issue_instruction_type  == 1 || issue_instruction_type == 2 || issue_instruction_type == 3 || issue_instruction_type == 4){
+    issue_rdestination = movenode(unusedTags, inuseTags, issue_rdestination);
   }
-  if(tagChecker == -1){
-    tags[tagIterator].registerNumber = issue_rsource1;
-    tagIterator++;
+
+  find foundtag = find_register(inuseTags, issue_rsource1);
+
+  if(foundtag.found == 1){
+    exit_early();
+    issue_isPhys = 1;
+    issue_rsource1 = foundtag.number;
+
+  }
+  else{
+    issue_isPhys = 0;
   }
 
   if(issue_instruction_type == 3 || issue_instruction_type == 5 || issue_instruction_type == 6){
-    int tagChecker = tagIterator;
-    while(tagChecker != -1){
-      if(tags[tagChecker].registerNumber == issue_rsource2){
-        issue_rsource2 = tagChecker;
-        break;
-      }
-      tagChecker = tagChecker - 1;
+    foundtag = find_register(inuseTags, issue_rsource2);
+    if(foundtag.found == 1){
+      issue_isPhys2 = 1;
+      issue_rsource2 = foundtag.number;
     }
-    if(tagChecker == -1){
-      tags[tagIterator].registerNumber = issue_rsource2;
-      tagIterator++;
+    else{
+      issue_isPhys2 = 0;
     }
+
   }
   return;
 }
@@ -60,26 +59,36 @@ void issue_add_to_reservation(){
     exit(1);
   }
   reservationalu[reservationIteratorALU].rdestination = issue_rdestination;
-
   reservationalu[reservationIteratorALU].rsource1 = issue_rsource1;
-  if(physRegisters[reservationalu[reservationIteratorALU].rsource1].ready == 1){
-    reservationalu[reservationIteratorALU].rsource1value = physRegisters[reservationalu[reservationIteratorALU].rsource1].value;
+  if(issue_isPhys == 0){
+    reservationalu[reservationIteratorALU].rsource1value = registers[issue_rsource1];
     reservationalu[reservationIteratorALU].rsource1ready = 1;
   }
   else{
-    reservationalu[reservationIteratorALU].rsource1ready = 0;
-  }
-
-  if(issue_instruction_type == 3 || issue_instruction_type == 5 || issue_instruction_type == 6){
-    reservationalu[reservationIteratorALU].rsource2 = issue_rsource2;
-    if(physRegisters[reservationalu[reservationIteratorALU].rsource2].ready == 1){
-      reservationalu[reservationIteratorALU].rsource2value = physRegisters[reservationalu[reservationIteratorALU].rsource2].value;
+    if(physRegisters[issue_rsource1].ready == 1){
+      reservationalu[reservationIteratorALU].rsource2value = registers[issue_rsource2];
       reservationalu[reservationIteratorALU].rsource2ready = 1;
     }
     else{
       reservationalu[reservationIteratorALU].rsource2ready = 0;
     }
   }
+
+  if(issue_instruction_type == 3 || issue_instruction_type == 5 || issue_instruction_type == 6){
+    if(issue_isPhys == 0){
+      reservationalu[reservationIteratorALU].rsource1value = registers[issue_rsource1];
+      reservationalu[reservationIteratorALU].rsource1ready = 1;
+    }
+    else{
+      if(physRegisters[issue_rsource1].ready == 1){
+        reservationalu[reservationIteratorALU].rsource2value = registers[issue_rsource2];
+        reservationalu[reservationIteratorALU].rsource2ready = 1;
+      }
+      else{
+        reservationalu[reservationIteratorALU].rsource2ready = 0;
+      }
+  }
+}
   else{
     reservationalu[reservationIteratorALU].rsource2 = -1;
     reservationalu[reservationIteratorALU].rsource2ready = 1;

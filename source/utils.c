@@ -191,6 +191,8 @@ void move_next_to_current(){
   // mem_acc_val = execute_val;
   // printf("MEMORY VALUE IN UTILS:%d\n",mem_acc_val);
 
+  graduate_destination = writeback_destination;
+
   executed_instruction = decode_instruction;
   issue_rsource1 = decode_rsource1;
   issue_rsource2 = decode_rsource2;

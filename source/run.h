@@ -75,6 +75,9 @@ void sb(char* cache, int reg1, int reg2);
 //writeback functions
 void writeback();
 
+//graduate functions
+void graduate();
+
 //utility functions
 void set_register();
 void load_program();
@@ -82,3 +85,13 @@ void print_reg_summary();
 void move_next_to_current();
 void mem_acc();
 void exit_early();
+
+//lists functions
+ring *createring();
+void addafternode(ring *currentring, tag data);
+int movenode(ring *unused, ring *inuse, int registerNumber);
+tag get(ring *currentring);
+void next(ring *currentring);
+find find_tag(ring *currentRing, int tagNumber);
+find find_register(ring *currentRing, int registerNumber);
+find check_first(ring *currentRing, ring *secondRing, int tagDestination);

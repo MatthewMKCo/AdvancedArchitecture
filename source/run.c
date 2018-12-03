@@ -96,6 +96,9 @@ char* executed_instruction_name;
 
 int print_decode_summary = 0, print_execute_summary = 0, print_issue_summary = 0;
 
+int writeback_destination, graduate_destination;
+
+ring* unusedTags; ring* inuseTags;
 
 void pipeline_flush(){
   first_fetch = 0;
@@ -146,6 +149,8 @@ void run(){
     // }
     writeback();
 
+    graduate();
+
     print_reg_summary();
 
     if(branch_flag == 1){
@@ -173,7 +178,20 @@ int main(int argc, char** argv){
     exit(1);
   }
 
+
+
   set_register();
+  inuseTags = createring();
+  unusedTags = createring();
+
+  for(int i = 0; i < PHYSREG_NUM; i++){
+    tag tagPlaceholder;
+    tagPlaceholder.tagNumber = i;
+    tagPlaceholder.registerNumber = -1;
+    addafternode(unusedTags, tagPlaceholder);
+  }
+
+  // printf("Tag:%d\n", x);
   separator;
   printf("Loading Program\n");
   load_program(argv[1]);

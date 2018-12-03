@@ -381,6 +381,7 @@ void send_for_writeback(){
   }
 }
 
+//finds number of available ALUs
 availNum find_available_alu(){
   int i;
   available.number = 0;
@@ -438,6 +439,7 @@ int find_available_bru(){
   }
 }
 
+//Fetches instructions from Reservation Stations
 instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
   instructionwrapper wrappedListofInstructions;
   wrappedListofInstructions.foundInstructions = 0;
@@ -463,6 +465,7 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
     }
 
   }
+
   return wrappedListofInstructions;
 }
 
@@ -488,6 +491,7 @@ void execute(){
     int alu_unit_number = currentAvailable.unitNumber[i];
     currentInstruction = currentInstructions.instruction[i];
     alu[alu_unit_number].ready = 0;
+    alu[alu_unit_number].destinationRegister = currentInstruction.rdestination;
 
     if(currentInstruction.instruction_type == 1){
       execute_iformat(alu_unit_number);

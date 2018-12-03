@@ -33,6 +33,7 @@ typedef struct instruction{
   int imm;
   int pc;
   int instruction_type;
+  int instruction_hex;
 }instruction;
 
 //ALU struct
@@ -60,7 +61,7 @@ typedef struct reg{
 
 typedef struct tag{
   int registerNumber;
-  int ready;
+  int tagNumber;
 }tag;
 
 typedef struct reserve{
@@ -92,20 +93,26 @@ typedef struct availNum{
   int number;
   int unitNumber[ALU_NUM];
 }availNum;
-//
+
 // typedef int item;
-//
-// typedef struct Node{
-//   struct Node *forward;
-//   struct Node *back;
-//   item data;
-// }node;
-//
-// typdef struct Ring{
-//    node *current;
-//    node *first
-//    node *sentinel;
-// }ring;
+
+typedef struct Node{
+  struct Node *forward;
+  struct Node *back;
+  tag data;
+}node;
+
+typedef struct Ring{
+   node *last;
+   node *first;
+   node *sentinel;
+   node *selected;
+}ring;
+
+typedef struct Find{
+  int found;
+  int number;
+}find;
 
 extern execute_unit alu[ALU_NUM];
 extern execute_unit lsu[LSU_NUM];
@@ -159,6 +166,8 @@ extern int decode_rdestination, issue_rdestination, execute_rdestination, mem_rd
 //Execute unit type, 1 = ALU, 2 = LSU, 3 = BRU
 extern int decode_unit_type, issue_unit_type;
 
+extern ring* unusedTags; extern ring* inuseTags;
+
 
 //Current Instruction
 extern uint32_t decode_instruction;
@@ -205,3 +214,5 @@ extern int execute_offset, mem_offset;
 extern char* executed_instruction_name;
 
 extern int print_decode_summary, print_execute_summary, print_issue_summary;
+
+extern int writeback_destination, graduate_destination;

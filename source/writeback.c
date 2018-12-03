@@ -3,11 +3,18 @@
 void writeintophysreg(int i){
 
     // printf("hidsahosdfhsdoifsdfio\n");
+    printf("\n");
     printf("MEM VALUE:%d\n",alu[i].wbValueInside);
+    printf("MEM DESTINATION:%d\n",alu[i].wbDestinationRegister);
+    printf("\n");
+
     physRegisters[alu[i].wbDestinationRegister].value = alu[i].wbValueInside;
+    physRegisters[alu[i].wbDestinationRegister].ready = alu[i].wbValueInside;
+
     // printf("desitnation:%d\n",execute_rdestination);
     // printf("total:%d\n", execute_val);
     // exit_early();
+    writeback_destination = alu[i].wbDestinationRegister;
 }
 
 void writeback(){
