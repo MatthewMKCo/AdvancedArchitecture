@@ -80,9 +80,8 @@ typedef struct reserve{
   int pc;
   int inuse;
   int instruction_type;
+  int inExecute;
 }reserve;
-
-
 
 typedef struct instructionwrapper{
   instruction instruction[ALU_NUM];
@@ -94,12 +93,19 @@ typedef struct availNum{
   int unitNumber[ALU_NUM];
 }availNum;
 
+typedef struct execute_to_writeback{
+  int ready;
+  int value;
+  int tag;
+}execute_to_writeback;
+
 // typedef int item;
 
 typedef struct Node{
   struct Node *forward;
   struct Node *back;
   tag data;
+  uint32_t instruction;
 }node;
 
 typedef struct Ring{
@@ -166,7 +172,7 @@ extern int decode_rdestination, issue_rdestination, execute_rdestination, mem_rd
 //Execute unit type, 1 = ALU, 2 = LSU, 3 = BRU
 extern int decode_unit_type, issue_unit_type;
 
-extern ring* unusedTags; extern ring* inuseTags;
+extern ring* unusedTags; extern ring* inuseTags; extern ring* outOfOrderInstructions;
 
 
 //Current Instruction
@@ -184,7 +190,7 @@ int execute_load, execute_store, mem_load, mem_store;
 extern char instruction_type_char;
 
 //first x
-extern int first_fetch, first_issue ,first_decode, first_execute, first_mem_access;
+extern int first_fetch, first_issue ,first_decode, first_execute, first_writeback;
 
 //last instruction
 extern int last_instruction;
@@ -216,3 +222,5 @@ extern char* executed_instruction_name;
 extern int print_decode_summary, print_execute_summary, print_issue_summary;
 
 extern int writeback_destination, graduate_destination;
+
+extern execute_to_writeback writebackalu[ALU_NUM];

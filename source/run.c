@@ -14,6 +14,8 @@ reserve reservationalu[RESERVATION_WIDTH];
 reserve reservationlsu[RESERVATION_WIDTH];
 reserve reservationbru[RESERVATION_WIDTH];
 
+execute_to_writeback writebackalu[ALU_NUM];
+
 //Current Cycle
 int current_cycle = 1;
 
@@ -65,7 +67,7 @@ int execute_load, execute_store, mem_load, mem_store;
 char instruction_type_char;
 
 //first x
-int first_fetch = 0, first_issue = 0, first_decode = 0, first_execute = 0, first_mem_access = 0;
+int first_fetch = 0, first_issue = 0, first_decode = 0, first_execute = 0, first_writeback = 0;
 
 //last instruction
 int last_instruction = 0;
@@ -98,14 +100,14 @@ int print_decode_summary = 0, print_execute_summary = 0, print_issue_summary = 0
 
 int writeback_destination, graduate_destination;
 
-ring* unusedTags; ring* inuseTags;
+ring* unusedTags; ring* inuseTags; ring* outOfOrderInstructions;
 
 void pipeline_flush(){
   first_fetch = 0;
   first_decode = 0;
   first_issue = 0;
   first_execute = 0;
-  first_mem_access = 0;
+  first_writeback = 0;
   branch_flag = 0;
   jump_flag = 0;
   mem_access = 0;
@@ -183,6 +185,7 @@ int main(int argc, char** argv){
   set_register();
   inuseTags = createring();
   unusedTags = createring();
+  outOfOrderInstructions = createring();
 
   for(int i = 0; i < PHYSREG_NUM; i++){
     tag tagPlaceholder;

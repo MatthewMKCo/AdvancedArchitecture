@@ -11,7 +11,7 @@ void execute_iformat(int number){
         // printf("Instruction:Add Immediate\n");
         executed_instruction_name = "Add Immediate";
         execute_val = addi(currentInstruction.rsource1value);
-        alu[number].cyclesNeeded = 2;
+        alu[number].cyclesNeeded = 1;
         break;
       case(0b111):
         // printf("Instruction:And Immediate\n");
@@ -104,15 +104,16 @@ void execute_rformat(int number){
     case(0b000):
       if(currentInstruction.funct7 == 0b0000000){
         // printf("Instruction:Add\n");
+        exit_early();
         executed_instruction_name = "Add";
         execute_val = add(currentInstruction.rsource1value, currentInstruction.rsource2value);
-        alu[number].cyclesNeeded = 2;
+        alu[number].cyclesNeeded = 1;
       }
       else if(currentInstruction.funct7 == 0b0100000){
         // printf("Instruction:Subtract\n");
         executed_instruction_name = "Subtract";
         execute_val = sub(currentInstruction.rsource1value, currentInstruction.rsource2value);
-        alu[number].cyclesNeeded = 2;
+        alu[number].cyclesNeeded = 1;
       }
       else if(currentInstruction.funct7 == 0b0000001){
         // printf("Instruction:Multiply\n");
@@ -172,6 +173,7 @@ void execute_rformat(int number){
       break;
   }
   alu[number].valueInside = execute_val;
+  alu[number].shouldWriteback = 1;
   return;
 }
 
@@ -234,7 +236,7 @@ void execute_iformat2(){
       // printf("Instruction:Load 8-bit\n");
       executed_instruction_name = "Load 8-bit";
       execute_val = lb(Dcache, execute_offset);
-      lsu[number].cyclesNeeded = 2;
+      lsu[number].cyclesNeeded = 1;
       break;
     case(0b001):
       // printf("Instruction:Load 16-bit\n");
@@ -302,14 +304,18 @@ void execute_sj(){
 void increment_units(){
   for(int i = 0; i < ALU_NUM; i++){
     if(alu[i].ready == 0){
+      printf("HELLO\n\n");
+
       alu[i].currentCycles++;
       if(alu[i].currentCycles == alu[i].cyclesNeeded){
+        printf("HELLO2\n\n");
+
+        // exit_early();
+        alu[i].currentCycles = 0;
         alu[i].ready = 1;
         alu[i].readyForWriteback = 1;
-        printf("%d\n", alu[i].valueInside);
-        // exit_early();
-        alu[i].wbValueInside = alu[i].valueInside;
-        alu[i].wbDestinationRegister = alu[i].destinationRegister;
+        // alu[i].wbValueInside = alu[i].valueInside;
+        // alu[i].wbDestinationRegister = alu[i].destinationRegister;
       }
     }
   }
@@ -359,9 +365,16 @@ void forward_reservation_stations(int tagPassed, int value, int unit_type){
 
 void send_for_writeback(){
   for(int i = 0; i < ALU_NUM; i++){
-    if(alu[i].readyForWriteback == 1){
-      alu[i].readyForWriteback = 2;
-      forward_reservation_stations(alu[i].wbDestinationRegister, alu[i].wbValueInside, 1);
+    if(alu[i].readyForWriteback == 1 && alu[i].shouldWriteback == 1){
+      alu[i].wbValueInside = alu[i].valueInside;
+      alu[i].readyForWriteback = 0;
+      alu[i].shouldWriteback = 0;
+      // alu[i].wbDestinationRegister = alu[i].destinationRegister;
+      // alu[i].readyForWriteback = 2;
+      writebackalu[i].value = alu[i].valueInside;
+      writebackalu[i].ready = 1;
+      writebackalu[i].tag = alu[i].destinationRegister;
+      forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
     }
   }
   for(int i = 0; i < LSU_NUM; i++){
@@ -444,7 +457,7 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
   instructionwrapper wrappedListofInstructions;
   wrappedListofInstructions.foundInstructions = 0;
   for(int i = 0; i < RESERVATION_WIDTH; i++){
-    if(reservationalu[i].rsource1ready && reservationalu[i].rsource2ready && reservationalu[i].inuse){
+    if(reservationalu[i].rsource1ready && reservationalu[i].rsource2ready && reservationalu[i].inuse && reservationalu[i].inExecute){
       instruction newInstruction;
       newInstruction.rdestination = reservationalu[i].rdestination;
       newInstruction.rsource1value = reservationalu[i].rsource1value;
@@ -483,15 +496,18 @@ void execute(){
     }
   }
   print_execute_summary = 1;
-
   availNum currentAvailable = find_available_alu();
   instructionwrapper currentInstructions = check_reservation_alu(currentAvailable.number);
 
   for(int i = 0; i < currentInstructions.foundInstructions; i++){
+
     int alu_unit_number = currentAvailable.unitNumber[i];
     currentInstruction = currentInstructions.instruction[i];
     alu[alu_unit_number].ready = 0;
     alu[alu_unit_number].destinationRegister = currentInstruction.rdestination;
+
+    printf("INSTURCDSHHFI%d\n",currentInstruction.instruction_type);
+    // exit_early();
 
     if(currentInstruction.instruction_type == 1){
       execute_iformat(alu_unit_number);
@@ -522,7 +538,7 @@ void execute(){
   //   execute_bformat();
   // }
 
-  send_for_writeback();
+  // send_for_writeback();
 
   increment_units();
 

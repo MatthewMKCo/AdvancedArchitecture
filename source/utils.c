@@ -176,6 +176,11 @@ void print_reg_summary(){
     printf("Register %d; %d\t", i, physRegisters[i].value);
     if(i % 5 == 0)printf("\n");
   }
+  printf("\n");
+  for(int i = 0; i < ALU_NUM; i++){
+    if(alu[i].ready == 1)printf("ALU %d:FREE\n", i);
+    if(alu[i].ready == 0)printf("ALU %d:INUSE\n", i);
+  }
 }
 
 void move_next_to_current(){
@@ -206,10 +211,13 @@ void move_next_to_current(){
   issuepc = decodepc;
   issue_unit_type = decode_unit_type;
 
+  for(int i = 0; i < RESERVATION_WIDTH; i++){
+    if(reservationalu[i].inuse == 1)reservationalu[i].inExecute = 1;
+  }
+  send_for_writeback();
 
   decode_instruction = fetch_instruction;
   decodepc = fetchpc;
-
 
 
 

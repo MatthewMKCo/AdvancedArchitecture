@@ -18,7 +18,7 @@ void issue_rename(){
   find foundtag = find_register(inuseTags, issue_rsource1);
 
   if(foundtag.found == 1){
-    exit_early();
+    // exit_early();
     issue_isPhys = 1;
     issue_rsource1 = foundtag.number;
 
@@ -102,6 +102,7 @@ void issue_add_to_reservation(){
   reservationalu[reservationIteratorALU].pc = issuepc;
   reservationalu[reservationIteratorALU].instruction_type = issue_instruction_type;
   reservationalu[reservationIteratorALU].inuse = 1;
+  reservationalu[reservationIteratorALU].inExecute = 0;
 
   reservationIteratorALU++;
 }
@@ -117,8 +118,11 @@ void issue(){
   if(last_instruction == 1){
     if(current_cycle > last_instruction_cycle + 2){
       print_execute_summary = 0;
-      return;
+      // return;
     }
+  }
+  if(issue_instruction_type == 0){
+    return;
   }
   print_issue_summary = 1;
 

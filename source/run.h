@@ -29,6 +29,7 @@ int find_available_agu();
 availNum find_available_alu();
 int find_available_bru();
 int find_available_lsu();
+void send_for_writeback();
 //operations.c functions
 int addi(int reg1);
 int andi(int reg1);
@@ -95,3 +96,7 @@ void next(ring *currentring);
 find find_tag(ring *currentRing, int tagNumber);
 find find_register(ring *currentRing, int registerNumber);
 find check_first(ring *currentRing, ring *secondRing, int tagDestination);
+void start(ring *currentring);
+tag getSelected(ring *currentring);
+void deletenode(ring *currentRing);
+void printring(ring *currentRing);
