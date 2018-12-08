@@ -8,9 +8,7 @@ int reservationIteratorBRU = 0;
 int issue_isPhys;
 int issue_isPhys2;
 
-int issue_realsource1;
 int issue_realsource2;
-int issue_realdestination;
 
 int instructionid = 0;
 int stall_from_issue = 0;
@@ -18,17 +16,15 @@ int stall_from_issue = 0;
 void issue_rename(){
 
   if(issue_instruction_type  == 1 || issue_instruction_type == 2 || issue_instruction_type == 3 || issue_instruction_type == 4){
-    issue_realdestination = issue_instruction_struct.rdestination;
     issue_instruction_struct.tagDestination = movenode(unusedTags, inuseTags, issue_instruction_struct.rdestination);
   }
 
-  find foundtag = find_register(inuseTags, issue_rsource1);
+  find foundtag = find_register(inuseTags, issue_instruction_struct.rsource1);
 
   if(foundtag.found == 1){
     issue_isPhys = 1;
-    issue_realsource1 = issue_rsource1;
-    issue_rsource1 = foundtag.number;
-    physRegisters[issue_rsource1].ready = 0;
+    issue_instruction_struct.tagsource1 = foundtag.number;
+    physRegisters[issue_instruction_struct.tagsource1].ready = 0;
   }
   else{
     issue_isPhys = 0;
@@ -71,28 +67,28 @@ void issue_add_to_reservation(){
     return;
   }
   reservationalu[reservationIteratorALU].rdestination = issue_instruction_struct.tagDestination;
-  reservationalu[reservationIteratorALU].rsource1 = issue_rsource1;
+  reservationalu[reservationIteratorALU].rsource1 = issue_instruction_struct.tagsource1;
 
   if(issue_isPhys == 0){
-    reservationalu[reservationIteratorALU].rsource1value = registers[issue_rsource1];
+    reservationalu[reservationIteratorALU].rsource1value = registers[issue_instruction_struct.tagsource1];
     reservationalu[reservationIteratorALU].rsource1ready = 1;
   }
   else{
-    if(physRegisters[issue_rsource1].ready == 1){
-      reservationalu[reservationIteratorALU].rsource1value = physRegisters[issue_rsource1].value;
+    if(physRegisters[issue_instruction_struct.tagsource1].ready == 1){
+      reservationalu[reservationIteratorALU].rsource1value = physRegisters[issue_instruction_struct.tagsource1].value;
       reservationalu[reservationIteratorALU].rsource1ready = 1;
     }
     else{
-      if(issue_rsource1 == issue_instruction_struct.tagDestination){
-        foundtag = second_last(inuseTags, issue_realsource1);
+      if(issue_instruction_struct.tagsource1 == issue_instruction_struct.tagDestination){
+        foundtag = second_last(inuseTags, issue_instruction_struct.rsource1);
         if(foundtag.found == 1){
           reservationalu[reservationIteratorALU].rsource1ready = 0;
           reservationalu[reservationIteratorALU].rsource1 = foundtag.number;
         }
         else{
           reservationalu[reservationIteratorALU].rsource1ready = 1;
-          reservationalu[reservationIteratorALU].rsource1 = issue_realsource1;
-          reservationalu[reservationIteratorALU].rsource1value = registers[issue_realsource1];
+          reservationalu[reservationIteratorALU].rsource1 = issue_instruction_struct.rsource1;
+          reservationalu[reservationIteratorALU].rsource1value = registers[issue_instruction_struct.rsource1];
         }
       }
       else{
