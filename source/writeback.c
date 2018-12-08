@@ -2,22 +2,18 @@
 
 void writeintophysreg(int i){
 
-
+    printf("VALUE:%d\n",writebackalu[i].value);
     physRegisters[writebackalu[i].tag].value = writebackalu[i].value;
     physRegisters[writebackalu[i].tag].ready = 1;
-    // printf("%d\n",alu[i].wbDestinationRegister);
-    // exit_early();
 
-    // printf("desitnation:%d\n",execute_rdestination);
-    // printf("total:%d\n", execute_val);
-    // exit_early();
+    forward_reservation_stations(writebackalu[i].tag, writebackalu[i].value, 1);
+
     writeback_destination = writebackalu[i].tag;
-    // exit_early();
 
     tag orderTag;
     orderTag.tagNumber = writebackalu[i].tag;
     orderTag.registerNumber = -1;
-    addafternode(outOfOrderInstructions, orderTag);
+    addafternodeinstruction(outOfOrderInstructions, writebackalu[i].instruction, writebackalu[i].instructionid, orderTag);
 }
 
 void writeback(){

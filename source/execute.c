@@ -5,6 +5,7 @@ instruction currentInstruction;
 
 //execute I format instructions
 void execute_iformat(int number){
+  alu[number].instruction.instructionid = currentInstruction.instructionid;
   if(currentInstruction.opcode == 0b0010011){
     switch(currentInstruction.funct3){
       case(0b000):
@@ -17,43 +18,51 @@ void execute_iformat(int number){
         // printf("Instruction:And Immediate\n");
         executed_instruction_name = "And Immediate";
         execute_val = andi(currentInstruction.rsource1value);
+        alu[number].cyclesNeeded = 1;
         break;
       case(0b110):
         // printf("Instruction:Or Immediate\n");
         executed_instruction_name = "Or Immediate";
         execute_val = ori(currentInstruction.rsource1value);
+        alu[number].cyclesNeeded = 1;
         break;
       case(0b100):
         // printf("Instruction:Xor Immediate\n");
         executed_instruction_name = "Xor Immediate";
         execute_val = xori(currentInstruction.rsource1value);
+        alu[number].cyclesNeeded = 1;
         break;
       case(0b010):
         // printf("Instruction:STLI\n");
         executed_instruction_name = "STLI";
         execute_val = slti(currentInstruction.rsource1value);
+        alu[number].cyclesNeeded = 1;
         break;
       case(0b011):
         // printf("Instruction:STLIU\n");
         executed_instruction_name = "STLIU";
         execute_val = sltiu(currentInstruction.rsource1value);
+        alu[number].cyclesNeeded = 1;
         break;
       case(0b001):
         // printf("Instruction:Logical Left Shift Immediate\n");
         executed_instruction_name = "Logical Left Shift Immediate";
         execute_val = slli(currentInstruction.rsource1value);
+        alu[number].cyclesNeeded = 1;
         break;
       case(0b101):
         if(currentInstruction.imm == 0b0000000){
           // printf("Instruction:Logical Right Shift Immediate\n");
           executed_instruction_name = "Logical Right Shift Immediate";
           execute_val = srli(currentInstruction.rsource1value);
+          alu[number].cyclesNeeded = 1;
           break;
         }
         else if(currentInstruction.imm == 0b0100000){
           // printf("Instruction:Arithmetic Right Shift Immediate\n");
           executed_instruction_name = "Arithmetic Right Shift Immediate";
           execute_val = srai(currentInstruction.rsource1value);
+          alu[number].cyclesNeeded = 1;
           break;
         }
     }
@@ -75,6 +84,7 @@ void execute_iformat(int number){
     // printf("Instruction:Jump and Link Register\n");
     executed_instruction_name = "Jump and Link Register";
     execute_val = jalr(currentInstruction.rsource1value);
+    alu[number].cyclesNeeded = 1;
   }
   else{
     printf("Error\n");
@@ -100,11 +110,12 @@ void execute_uformat(){
 }
 
 void execute_rformat(int number){
+  alu[number].instruction.instructionid = currentInstruction.instructionid;
+
   switch(currentInstruction.funct3){
     case(0b000):
       if(currentInstruction.funct7 == 0b0000000){
         // printf("Instruction:Add\n");
-        exit_early();
         executed_instruction_name = "Add";
         execute_val = add(currentInstruction.rsource1value, currentInstruction.rsource2value);
         alu[number].cyclesNeeded = 1;
@@ -119,34 +130,40 @@ void execute_rformat(int number){
         // printf("Instruction:Multiply\n");
         executed_instruction_name = "Multiply";
         execute_val = mul(currentInstruction.rsource1value, currentInstruction.rsource2value);
+        alu[number].cyclesNeeded = 1;
       }
       break;
     case(0b001):
       // printf("Instruction:Logical Left Shift\n");
       executed_instruction_name = "Logical Left Shift";
       execute_val = sll(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      alu[number].cyclesNeeded = 1;
       break;
     case(0b010):
       // printf("Instruction:SLT\n");
       executed_instruction_name = "SLT";
       execute_val = slt(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      alu[number].cyclesNeeded = 1;
       break;
     case(0b011):
       // printf("Instruction:SLTU\n");
       executed_instruction_name = "SLTU";
       execute_val = sltu(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      alu[number].cyclesNeeded = 1;
       break;
     case(0b100):
       if(currentInstruction.funct7 == 0b0000001){
         // printf("Instruction:Divide\n");
         executed_instruction_name = "Divide";
         execute_val = divide(currentInstruction.rsource1value, currentInstruction.rsource2value);
+        alu[number].cyclesNeeded = 1;
         break;
       }
       else if(currentInstruction.funct7 == 0b0000000){
         // printf("Instruction:Xor\n");
         executed_instruction_name = "Xor";
         execute_val = xor(currentInstruction.rsource1value, currentInstruction.rsource2value);
+        alu[number].cyclesNeeded = 1;
         break;
       }
     case(0b101):
@@ -154,22 +171,26 @@ void execute_rformat(int number){
         // printf("Instruction:Logical Right Shift\n");
         executed_instruction_name = "Logical Right Shift";
         execute_val = srl(currentInstruction.rsource1value, currentInstruction.rsource2value);
+        alu[number].cyclesNeeded = 1;
       }
       else if(currentInstruction.funct7 == 0b0100000){
         // printf("Instruction:Logical Right Shift\n");
         executed_instruction_name = "Logical Right Shift";
         execute_val = sra(currentInstruction.rsource1value, currentInstruction.rsource2value);
+        alu[number].cyclesNeeded = 1;
       }
       break;
     case(0b110):
       // printf("Instruction:Or\n");
       executed_instruction_name = "Or";
       execute_val = or(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      alu[number].cyclesNeeded = 1;
       break;
     case(0b111):
       // printf("Instruction:And\n");
       executed_instruction_name = "And";
       execute_val = and(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      alu[number].cyclesNeeded = 1;
       break;
   }
   alu[number].valueInside = execute_val;
@@ -304,11 +325,8 @@ void execute_sj(){
 void increment_units(){
   for(int i = 0; i < ALU_NUM; i++){
     if(alu[i].ready == 0){
-      printf("HELLO\n\n");
-
       alu[i].currentCycles++;
       if(alu[i].currentCycles == alu[i].cyclesNeeded){
-        printf("HELLO2\n\n");
 
         // exit_early();
         alu[i].currentCycles = 0;
@@ -354,10 +372,15 @@ void forward_reservation_stations(int tagPassed, int value, int unit_type){
       if(reservationalu[i].rsource1ready == 0 && reservationalu[i].rsource1 == tagPassed){
         reservationalu[i].rsource1value = value;
         reservationalu[i].rsource1ready = 1;
+        printf("%d\n",value);
+        // exit_early();
       }
-      if(reservationalu[i].rsource2ready == 0 && reservationalu[i].rsource1 == tagPassed){
+      if(reservationalu[i].rsource2ready == 0 && reservationalu[i].rsource2 == tagPassed){
         reservationalu[i].rsource2value = value;
         reservationalu[i].rsource2ready = 1;
+        printf("%d\n",value);
+        // exit_early();
+
       }
     }
   }
@@ -374,7 +397,10 @@ void send_for_writeback(){
       writebackalu[i].value = alu[i].valueInside;
       writebackalu[i].ready = 1;
       writebackalu[i].tag = alu[i].destinationRegister;
-      forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
+      writebackalu[i].instruction = alu[i].instruction.instruction_hex;
+      writebackalu[i].instructionid = alu[i].instruction.instructionid;
+
+      // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
     }
   }
   for(int i = 0; i < LSU_NUM; i++){
@@ -469,6 +495,9 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
       newInstruction.imm = reservationalu[i].imm;
       newInstruction.pc = reservationalu[i].pc;
       newInstruction.instruction_type = reservationalu[i].instruction_type;
+      newInstruction.instruction_hex = reservationalu[i].instruction;
+      newInstruction.instructionid = reservationalu[i].instructionid;
+
       wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
       wrappedListofInstructions.foundInstructions++;
       reservationalu[i].inuse = 0;
@@ -476,7 +505,6 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
     if(wrappedListofInstructions.foundInstructions == numberOfAvailableUnits){
       return wrappedListofInstructions;
     }
-
   }
 
   return wrappedListofInstructions;
@@ -503,11 +531,9 @@ void execute(){
 
     int alu_unit_number = currentAvailable.unitNumber[i];
     currentInstruction = currentInstructions.instruction[i];
+
     alu[alu_unit_number].ready = 0;
     alu[alu_unit_number].destinationRegister = currentInstruction.rdestination;
-
-    printf("INSTURCDSHHFI%d\n",currentInstruction.instruction_type);
-    // exit_early();
 
     if(currentInstruction.instruction_type == 1){
       execute_iformat(alu_unit_number);

@@ -481,6 +481,7 @@ def main():
         instruction = []
         lines2 = []
         lines3 = []
+        lines4 = []
         for i in range(0, len(lines)):
             if(lines[i] == '\n'):
                 continue
@@ -495,9 +496,18 @@ def main():
                 dict_jump[str(x[1])] = str(x[0])
                 continue
             lines3.append(lines2[i])
-
         for i in range(0, len(lines3)):
             x = lines3[i].split(" ")
+            if(x[2] == "return\n"):
+                addr = i * (-2)
+                x[2] = str(addr)
+                y = x[0] + " " + x[1] + " " + x[2]
+                lines4.append(y)
+                continue
+            lines4.append(lines3[i])
+
+        for i in range(0, len(lines4)):
+            x = lines4[i].split(" ")
             if(x[0] == '\n'):
                 continue
             if(x[0][0] == '.'):

@@ -24,6 +24,11 @@
 
 typedef struct instruction{
   int rdestination;
+  int tagDestination;
+  int rsource1;
+  int rsource2;
+  int tagsource1;
+  int tagsource2;
   int rsource1value;
   int rsource2value;
   int opcode;
@@ -33,7 +38,8 @@ typedef struct instruction{
   int imm;
   int pc;
   int instruction_type;
-  int instruction_hex;
+  uint32_t instruction_hex;
+  int instructionid;
 }instruction;
 
 //ALU struct
@@ -81,6 +87,8 @@ typedef struct reserve{
   int inuse;
   int instruction_type;
   int inExecute;
+  int instruction;
+  int instructionid;
 }reserve;
 
 typedef struct instructionwrapper{
@@ -97,6 +105,8 @@ typedef struct execute_to_writeback{
   int ready;
   int value;
   int tag;
+  int instruction;
+  int instructionid;
 }execute_to_writeback;
 
 // typedef int item;
@@ -106,13 +116,22 @@ typedef struct Node{
   struct Node *back;
   tag data;
   uint32_t instruction;
+  int id;
+  char *name;
 }node;
+
+typedef struct everything{
+  tag tagData;
+  uint32_t instruction;
+  int id;
+}everything;
 
 typedef struct Ring{
    node *last;
    node *first;
    node *sentinel;
    node *selected;
+   char *name;
 }ring;
 
 typedef struct Find{
@@ -172,13 +191,14 @@ extern int decode_rdestination, issue_rdestination, execute_rdestination, mem_rd
 //Execute unit type, 1 = ALU, 2 = LSU, 3 = BRU
 extern int decode_unit_type, issue_unit_type;
 
-extern ring* unusedTags; extern ring* inuseTags; extern ring* outOfOrderInstructions;
+extern ring* unusedTags; extern ring* inuseTags; extern ring* outOfOrderInstructions; extern ring* inOrderInstructions;
 
 
 //Current Instruction
 extern uint32_t decode_instruction;
 extern uint32_t fetch_instruction;
 extern uint32_t executed_instruction;
+extern uint32_t issue_instruction;
 
 
 //Current Instruction Type
@@ -224,3 +244,7 @@ extern int print_decode_summary, print_execute_summary, print_issue_summary;
 extern int writeback_destination, graduate_destination;
 
 extern execute_to_writeback writebackalu[ALU_NUM];
+
+extern int stall_from_issue;
+
+extern instruction decode_instruction_struct, issue_instruction_struct;

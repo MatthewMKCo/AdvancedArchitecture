@@ -41,7 +41,7 @@ reg physRegisters[PHYSREG_NUM];
 tag tags[TAG_NUM];
 
 //Program Counter
-int pc[1] = {0};
+int pc[1] = {4};
 int decodepc, issuepc, fetchpc, executepc;
 int* sp = &registers[2];
 //Source Registers
@@ -56,6 +56,7 @@ int decode_unit_type, issue_unit_type;
 uint32_t decode_instruction;
 uint32_t fetch_instruction;
 uint32_t executed_instruction;
+uint32_t issue_instruction;
 
 
 //Current Instruction Type
@@ -100,7 +101,9 @@ int print_decode_summary = 0, print_execute_summary = 0, print_issue_summary = 0
 
 int writeback_destination, graduate_destination;
 
-ring* unusedTags; ring* inuseTags; ring* outOfOrderInstructions;
+ring* unusedTags; ring* inuseTags; ring* outOfOrderInstructions; ring* inOrderInstructions;
+
+instruction decode_instruction_struct, issue_instruction_struct;
 
 void pipeline_flush(){
   first_fetch = 0;
@@ -183,9 +186,10 @@ int main(int argc, char** argv){
 
 
   set_register();
-  inuseTags = createring();
-  unusedTags = createring();
-  outOfOrderInstructions = createring();
+  inuseTags = createring("inuseTags");
+  unusedTags = createring("unusedTags");
+  outOfOrderInstructions = createring("outOfOrderInstructions");
+  inOrderInstructions = createring("inOrderInstructions");
 
   for(int i = 0; i < PHYSREG_NUM; i++){
     tag tagPlaceholder;

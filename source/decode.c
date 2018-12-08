@@ -17,6 +17,8 @@ void decode(){
       // return;
     }
   }
+  if(stall_from_issue != 0)return;
+
 
   if(decode_instruction == -1){
     decode_instruction_type = 0;
@@ -67,6 +69,7 @@ void decode(){
       break;
     default:
       decode_instruction_type = -1;
+      decode_unit_type = -1;
       break;
   }
 
@@ -131,4 +134,16 @@ void decode(){
       decode_imm = (decode_imm | 0xFFFFF000);
     }
   }
+  decode_instruction_struct.rdestination = decode_rdestination;
+  decode_instruction_struct.rsource1 = decode_rsource1;
+  decode_instruction_struct.rsource2 = decode_rsource2;
+  decode_instruction_struct.opcode = decode_opcode;
+  decode_instruction_struct.funct3 = decode_funct3;
+  decode_instruction_struct.funct7 = decode_funct7;
+  decode_instruction_struct.shamt = decode_shamt;
+  decode_instruction_struct.imm = decode_imm;
+  decode_instruction_struct.pc = decodepc;
+  decode_instruction_struct.instruction_type = decode_instruction_type;
+  decode_instruction_struct.instruction_hex = decode_instruction;
+
 }

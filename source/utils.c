@@ -40,7 +40,7 @@ void set_register(){
 void load_program(char* file){
   FILE* fp;
   fp = fopen(file, "r");
-  unsigned int tinstruction, loadpc = 0;
+  unsigned int tinstruction, loadpc = 4;
   next_imm = 0;
   if(fp == NULL){
     printf("Error in loading program, file is null");
@@ -171,6 +171,7 @@ void print_reg_summary(){
     }
     if((i+1) % 5 == 0)printf("\n");
   }
+  printf("pc:%d\t", pc[0]);
   printf("\n");
   for(int i = 0; i < PHYSREG_NUM; i++){
     printf("Register %d; %d\t", i, physRegisters[i].value);
@@ -198,26 +199,34 @@ void move_next_to_current(){
 
   graduate_destination = writeback_destination;
 
-  executed_instruction = decode_instruction;
-  issue_rsource1 = decode_rsource1;
-  issue_rsource2 = decode_rsource2;
-  issue_rdestination = decode_rdestination;
-  issue_instruction_type = decode_instruction_type;
-  issue_opcode = decode_opcode;
-  issue_funct3 = decode_funct3;
-  issue_funct7 = decode_funct7;
-  issue_shamt = decode_shamt;
-  issue_imm = decode_imm;
-  issuepc = decodepc;
-  issue_unit_type = decode_unit_type;
+  send_for_writeback();
+
+  if(stall_from_issue != 0)stall_from_issue--;
+  else{
+    issue_instruction = decode_instruction;
+    issue_rsource1 = decode_rsource1;
+    issue_rsource2 = decode_rsource2;
+    issue_rdestination = decode_rdestination;
+    issue_instruction_type = decode_instruction_type;
+    issue_opcode = decode_opcode;
+    issue_funct3 = decode_funct3;
+    issue_funct7 = decode_funct7;
+    issue_shamt = decode_shamt;
+    issue_imm = decode_imm;
+    issuepc = decodepc;
+    issue_unit_type = decode_unit_type;
+    issue_instruction_struct = decode_instruction_struct;
+  }
 
   for(int i = 0; i < RESERVATION_WIDTH; i++){
     if(reservationalu[i].inuse == 1)reservationalu[i].inExecute = 1;
   }
-  send_for_writeback();
 
-  decode_instruction = fetch_instruction;
-  decodepc = fetchpc;
+  if(stall_from_issue == 0){
+    decode_instruction = fetch_instruction;
+    decodepc = fetchpc;
+
+  }
 
 
 
