@@ -18,7 +18,10 @@ void fetch(){
     graduate_finished = 0;
   }
   if(last_instruction == 1)return;
-  if(stall_from_issue != 0)return;
+  if(stall_from_issue != 0){
+    // first_fetch = 0;
+    return;
+  }
   fetch_instruction = ld(Icache, pc[0]);
   fetchpc = pc[0];
   pc[0] = pc[0] + 4;

@@ -2,7 +2,6 @@
 
 void writeintophysreg(int i){
 
-    printf("VALUE:%d\n",writebackalu[i].value);
     physRegisters[writebackalu[i].tag].value = writebackalu[i].value;
     physRegisters[writebackalu[i].tag].ready = 1;
 

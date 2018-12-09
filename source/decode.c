@@ -11,6 +11,10 @@ void decode(){
   if(first_decode < 2){
     first_decode = first_decode + 1;
   }
+  if(stall_from_issue != 0){
+    // first_decode = 0;
+    return;
+  }
   print_decode_summary = 1;
   if(last_instruction == 1){
     if(current_cycle > last_instruction_cycle + 1){
@@ -18,7 +22,6 @@ void decode(){
       // return;
     }
   }
-  if(stall_from_issue != 0)return;
   if(pc[0] == 0){
     decode_finished = 1;
     decode_instruction_struct.instruction_type = 0;
@@ -109,6 +112,7 @@ void decode(){
     decode_rsource1 = (decode_instruction & 0x000F8000) >> 15;
     decode_rsource2 = (decode_instruction & 0x01F00000) >> 20;
     decode_funct7 = (decode_instruction & 0xFE000000) >> 25;
+    printf("DECODE SOURCE:%d\n", decode_rsource1);
   }
   //J type instructions
   else if(decode_instruction_type == 4){

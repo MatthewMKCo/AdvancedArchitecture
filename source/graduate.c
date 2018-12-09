@@ -14,12 +14,12 @@ void graduate(){
   int instructionid1;
   find foundid;
   instructionid1 = getinstructionid(inOrderInstructions);
-  printf("\nInOrderInstructions\n");
-  printring(inOrderInstructions);
-  printf("===\n");
-  printf("OutOfOrderInstructions\n");
-  printring(outOfOrderInstructions);
-  printf("\n");
+  // printf("\nInOrderInstructions\n");
+  // printring(inOrderInstructions);
+  // printf("===\n");
+  // printf("OutOfOrderInstructions\n");
+  // printring(outOfOrderInstructions);
+  // printf("\n");
   while(1){
     foundid = find_id(outOfOrderInstructions, instructionid1);
     if(foundid.found == 1){
@@ -29,9 +29,9 @@ void graduate(){
       if(value.tagData.tagNumber != -2){
         movenode(inuseTags, unusedTags, -1);
         if(value.tagData.registerNumber != 0){
-          printf("%d\n",value.tagData.registerNumber);
-          printf("%d\n",value.tagData.tagNumber);
-          printf("%d\n",physRegisters[value.tagData.tagNumber].value);
+          // printf("%d\n",value.tagData.registerNumber);
+          // printf("%d\n",value.tagData.tagNumber);
+          // printf("%d\n",physRegisters[value.tagData.tagNumber].value);
           registers[value.tagData.registerNumber] = physRegisters[value.tagData.tagNumber].value;
           // stop = 1;
           // exit_early();

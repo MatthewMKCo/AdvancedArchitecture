@@ -104,6 +104,7 @@ void start(ring *currentRing);
 tag getSelected(ring *currentRing);
 void deletenode(ring *currentRing);
 void printring(ring *currentRing);
+void printringbackwards(ring *currentRing);
 find second_last(ring *currentRing, int registerDestination);
 int getinstructionid(ring *currentRing);
 void change_selected_to_first(ring* currentRing);

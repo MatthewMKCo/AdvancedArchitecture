@@ -36,6 +36,14 @@ void set_register(){
     bru[i].ready = 1;
   }
 
+  for(int i = 0; i < RESERVATION_WIDTH; i++){
+    reservationalu[i].rsource1 = -1;
+    reservationalu[i].rsource2 = -1;
+    reservationalu[i].rsource1ready = 0;
+    reservationalu[i].rsource2ready = 0;
+
+  }
+
 }
 
 void load_program(char* file){
@@ -176,7 +184,7 @@ void print_reg_summary(){
   printf("\n");
   for(int i = 0; i < PHYSREG_NUM; i++){
     printf("Register %d; %d\t", i, physRegisters[i].value);
-    if(i % 5 == 0)printf("\n");
+    if((i + 1) % 5 == 0)printf("\n");
   }
   printf("\n");
   for(int i = 0; i < ALU_NUM; i++){
@@ -197,24 +205,27 @@ void move_next_to_current(){
   // printf("EXECUTE VALUE IN UTILS:%d\n",execute_val);
   // mem_acc_val = execute_val;
   // printf("MEMORY VALUE IN UTILS:%d\n",mem_acc_val);
+  if(stall_from_issue != 0){
+    stall_from_issue--;
+    // exit_early();
+  }
   change_to_ready(outOfOrderInstructions);
   graduate_destination = writeback_destination;
 
   send_for_writeback();
 
-  if(stall_from_issue != 0)stall_from_issue--;
-  else{
-    issue_instruction = decode_instruction;
-    issue_rsource1 = decode_rsource1;
-    issue_rsource2 = decode_rsource2;
-    issue_rdestination = decode_rdestination;
-    issue_instruction_type = decode_instruction_type;
-    issue_opcode = decode_opcode;
-    issue_funct3 = decode_funct3;
-    issue_funct7 = decode_funct7;
-    issue_shamt = decode_shamt;
-    issue_imm = decode_imm;
-    issuepc = decodepc;
+  if(stall_from_issue == 0){
+    // issue_instruction = decode_instruction;
+    // issue_rsource1 = decode_rsource1;
+    // issue_rsource2 = decode_rsource2;
+    // issue_rdestination = decode_rdestination;
+    // issue_instruction_type = decode_instruction_type;
+    // issue_opcode = decode_opcode;
+    // issue_funct3 = decode_funct3;
+    // issue_funct7 = decode_funct7;
+    // issue_shamt = decode_shamt;
+    // issue_imm = decode_imm;
+    // issuepc = decodepc;
     issue_unit_type = decode_unit_type;
     issue_instruction_struct = decode_instruction_struct;
   }
@@ -225,12 +236,14 @@ void move_next_to_current(){
     //   printf("%d\n",i);
     //   exit_early();
     // }
-    if(i == 18){
-      printf("%d\n", reservationalu[i].inuse);
-      printf("Source1 ready:%d\tSource is:%d\tPhysReg1 is ready:%d\n", reservationalu[i].rsource1ready, reservationalu[i].rsource1, physRegisters[reservationalu[i].rsource1].ready);
-      printf("Source2 ready:%d\tSource is:%d\tPhysReg2 is ready:%d\n", reservationalu[i].rsource2ready, reservationalu[i].rsource2, physRegisters[reservationalu[i].rsource2].ready);
-      printf("Physical:%d\n\n",physRegisters[9].ready);
-
+    if(reservationalu[i].rdestination == 69){
+    // if(i == 13){
+      // printf("%d\n", reservationalu[i].inuse);
+      // printf("Destination:%d\n",reservationalu[i].rdestination);
+      // printf("Source1 ready:%d\tSource is:%d\tPhysReg1 is ready:%d\n", reservationalu[i].rsource1ready, reservationalu[i].rsource1, physRegisters[reservationalu[i].rsource1].ready);
+      // printf("Source2 ready:%d\tSource is:%d\tPhysReg2 is ready:%d\n", reservationalu[i].rsource2ready, reservationalu[i].rsource2, physRegisters[reservationalu[i].rsource2].ready);
+      // printf("Physical:%d\n\n",physRegisters[9].ready);
+      // exit_early();
     }
   }
 

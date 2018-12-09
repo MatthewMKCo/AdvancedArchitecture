@@ -67,8 +67,9 @@ void movenode2(ring *inuse, node *oldFirst){
   oldFirst -> forward = inuse -> sentinel;
   oldFirst -> back = before;
 
-  if(inuse -> first -> data.tagNumber == -1){
+  if(inuse -> first == inuse -> sentinel){
     inuse -> first = oldFirst;
+    inuse -> sentinel -> forward = oldFirst;
   }
 }
 
@@ -184,7 +185,7 @@ find find_register(ring *currentRing, int registerNumber){
 }
 
 find find_register_last(ring *currentRing, int registerNumber){
-  currentRing -> selected = currentRing -> first;
+  currentRing -> selected = currentRing -> last;
   find foundtag;
   while(currentRing -> selected -> data.registerNumber != -1){
     if(currentRing -> selected -> data.registerNumber == registerNumber){
@@ -256,11 +257,29 @@ void printring(ring *currentRing){
   currentRing -> selected = currentRing -> first;
   while(1){
     if(currentRing -> selected -> data.tagNumber == -1){
-      printf("Id:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> name);
+      printf("Id:%d\tTag:%d\tRegister:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber,currentRing -> selected -> name);
       break;
     }
-    printf("Id:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> name);
+    printf("Id:%d\tTag:%d\tRegister:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber,currentRing -> selected -> name);
     next(currentRing);
+  }
+  printf("Id of first:%d\n", currentRing -> first -> id);
+
+  printf("Id of last:%d\n", currentRing -> last -> id);
+  printf("\n");
+  currentRing -> selected = currentRing -> first;
+}
+
+void printringbackwards(ring *currentRing){
+  printf("Current Ring Name:%s\n", currentRing -> name);
+  currentRing -> selected = currentRing -> last;
+  while(1){
+    if(currentRing -> selected == currentRing -> sentinel){
+      printf("Register:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> name);
+      break;
+    }
+    printf("Register:%d\tName:%s\n", currentRing -> selected -> data.registerNumber, currentRing -> selected -> name);
+    back(currentRing);
   }
   printf("Id of first:%d\n", currentRing -> first -> id);
 

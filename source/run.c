@@ -125,7 +125,6 @@ void run(){
   while(1){
     separator;
 
-    if(last_instruction == 1 || pc[0] == 0){
       // printf("LASTINSTRUCTION:%d\n",last_instruction_cycle);
       if(pc[0] == 0 && graduate_finished == 1){
           printf("End of program\n");
@@ -133,9 +132,10 @@ void run(){
           printf("Number of Instructions executed:%d\n",instructions_executed);
           printf("Number of instructions per cycle:%.2f\n",((float)instructions_executed / (float)(current_cycle - 1)));
           separator;
+          // printring(inOrderInstructions);
           break;
       }
-    }
+
 
     fetch();
 

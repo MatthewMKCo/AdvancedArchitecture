@@ -135,7 +135,7 @@ void execute_rformat(int number){
 
           // exit_early();
         }
-        alu[number].cyclesNeeded = 5;
+        alu[number].cyclesNeeded = 1;
       }
       else if(currentInstruction.funct7 == 0b0100000){
         // printf("Instruction:Subtract\n");
@@ -384,22 +384,24 @@ void increment_units(){
 
 void forward_reservation_stations(int tagPassed, int value, int unit_type){
   if(unit_type == 1){
-    for(int i = 0; i < reservationIteratorALU; i++){
+    for(int i = 0; i < RESERVATION_WIDTH; i++){
+
       if(reservationalu[i].rsource1ready == 0 && reservationalu[i].rsource1 == tagPassed){
         reservationalu[i].rsource1value = value;
         reservationalu[i].instruction.rsource1value = value;
         reservationalu[i].rsource1ready = 1;
-        printf("%d\n",value);
+        // printf("%d\n",value);
         // if(tagPassed==5)exit_early();
       }
       if(reservationalu[i].rsource2ready == 0 && reservationalu[i].rsource2 == tagPassed){
         reservationalu[i].rsource2value = value;
         reservationalu[i].instruction.rsource2value = value;
         reservationalu[i].rsource2ready = 1;
-        printf("%d\n",value);
+        // printf("%d\n",value);
       }
     }
   }
+  if(stop == 1)exit_early();
 }
 
 void send_for_writeback(){
