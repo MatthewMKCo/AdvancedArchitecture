@@ -1,5 +1,6 @@
 #include "run.h"
 
+int decode_pcDestination;
 // instruction decode_instruction;
 
 void decode(){
@@ -18,8 +19,11 @@ void decode(){
     }
   }
   if(stall_from_issue != 0)return;
-
-
+  if(pc[0] == 0){
+    decode_finished = 1;
+    decode_instruction_struct.instruction_type = 0;
+    return;
+  }
   if(decode_instruction == -1){
     decode_instruction_type = 0;
     return;
@@ -113,6 +117,7 @@ void decode(){
     if((decode_imm & 0x00080000)){
       decode_imm = (decode_imm | 0xFFF00000);
     }
+    decode_pcDestination = REG_NUM;
   }
   //B type instructions
   else if(decode_instruction_type == 5){
@@ -145,5 +150,5 @@ void decode(){
   decode_instruction_struct.pc = decodepc;
   decode_instruction_struct.instruction_type = decode_instruction_type;
   decode_instruction_struct.instruction_hex = decode_instruction;
-
+  decode_instruction_struct.pcDestination = decode_pcDestination;
 }

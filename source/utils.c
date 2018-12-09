@@ -13,6 +13,7 @@ void set_register(){
     st(Icache, i, -1);
   }
   sp[0] = SIZE;
+  pc[0] = 4;
 
   for(int i = 0; i < ALU_NUM; i++){
     alu[i].cyclesNeeded = 0;
@@ -196,7 +197,7 @@ void move_next_to_current(){
   // printf("EXECUTE VALUE IN UTILS:%d\n",execute_val);
   // mem_acc_val = execute_val;
   // printf("MEMORY VALUE IN UTILS:%d\n",mem_acc_val);
-
+  change_to_ready(outOfOrderInstructions);
   graduate_destination = writeback_destination;
 
   send_for_writeback();
@@ -220,6 +221,17 @@ void move_next_to_current(){
 
   for(int i = 0; i < RESERVATION_WIDTH; i++){
     if(reservationalu[i].inuse == 1)reservationalu[i].inExecute = 1;
+    // if(reservationalu[i].instruction.tagDestination == 22 && reservationalu[i].inuse == 1){
+    //   printf("%d\n",i);
+    //   exit_early();
+    // }
+    if(i == 18){
+      printf("%d\n", reservationalu[i].inuse);
+      printf("Source1 ready:%d\tSource is:%d\tPhysReg1 is ready:%d\n", reservationalu[i].rsource1ready, reservationalu[i].rsource1, physRegisters[reservationalu[i].rsource1].ready);
+      printf("Source2 ready:%d\tSource is:%d\tPhysReg2 is ready:%d\n", reservationalu[i].rsource2ready, reservationalu[i].rsource2, physRegisters[reservationalu[i].rsource2].ready);
+      printf("Physical:%d\n\n",physRegisters[9].ready);
+
+    }
   }
 
   if(stall_from_issue == 0){
@@ -227,10 +239,7 @@ void move_next_to_current(){
     decodepc = fetchpc;
 
   }
-
-
-
-
+  // if(stop == 1)exit_early();
 
   return;
 }

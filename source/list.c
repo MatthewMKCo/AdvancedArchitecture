@@ -11,6 +11,7 @@ ring *createring(char* name){
   sentinelnode -> data.registerNumber = -1;
   sentinelnode -> id = -1;
   sentinelnode -> name = name;
+  sentinelnode -> ready = 0;
 
   r -> sentinel = sentinelnode;
   r -> last = sentinelnode;
@@ -42,6 +43,7 @@ void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, ta
   newnode -> data = tagData;
   newnode -> instruction = instruction;
   newnode -> id = id;
+  newnode -> ready = 0;
   currentRing -> last -> forward = newnode;
   newnode -> forward = currentRing -> sentinel;
   newnode -> back = currentRing -> last;
@@ -151,7 +153,7 @@ find find_tag(ring *currentRing, int tagNumber){
 find find_id(ring *currentRing, int id){
   currentRing -> selected = currentRing -> first;
   find foundtag;
-  while(currentRing -> selected -> data.tagNumber != -1){
+  while(currentRing -> selected != currentRing -> sentinel){
     if(currentRing -> selected -> id == id){
       foundtag.found = 1;
       foundtag.number = id;
@@ -180,6 +182,23 @@ find find_register(ring *currentRing, int registerNumber){
   foundtag.number = -1;
   return foundtag;
 }
+
+find find_register_last(ring *currentRing, int registerNumber){
+  currentRing -> selected = currentRing -> first;
+  find foundtag;
+  while(currentRing -> selected -> data.registerNumber != -1){
+    if(currentRing -> selected -> data.registerNumber == registerNumber){
+      foundtag.found = 1;
+      foundtag.number = currentRing -> selected -> data.tagNumber;
+      return foundtag;
+    }
+    back(currentRing);
+  }
+  foundtag.found = -1;
+  foundtag.number = -1;
+  return foundtag;
+}
+
 
 find check_first(ring *currentRing, ring *secondRing, int tagDestination){
   find foundtag;
@@ -259,5 +278,15 @@ everything get_everything(ring *currentRing){
   value.id = currentRing -> selected -> id;
   value.tagData = currentRing -> selected -> data;
   value.instruction = currentRing -> selected -> instruction;
+  value.ready = currentRing -> selected -> ready;
   return value;
+}
+
+void change_to_ready(ring* currentRing){
+  start(currentRing);
+  while(currentRing -> selected != currentRing -> sentinel){
+    currentRing -> selected -> ready = 1;
+    next(currentRing);
+  }
+  return;
 }

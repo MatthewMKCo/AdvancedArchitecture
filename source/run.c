@@ -34,14 +34,14 @@ char Icache[SIZE];
 char Dcache[SIZE];
 
 //Registers
-int registers[REG_NUM];
+int registers[REG_NUM + 1];
 //Physical registers
 reg physRegisters[PHYSREG_NUM];
 //Tag array
 tag tags[TAG_NUM];
 
 //Program Counter
-int pc[1] = {4};
+int* pc = &registers[REG_NUM];
 int decodepc, issuepc, fetchpc, executepc;
 int* sp = &registers[2];
 //Source Registers
@@ -105,6 +105,10 @@ ring* unusedTags; ring* inuseTags; ring* outOfOrderInstructions; ring* inOrderIn
 
 instruction decode_instruction_struct, issue_instruction_struct;
 
+int fetch_finished = 0, decode_finished, issue_finished = 0, execute_finished = 0, writeback_finished = 0, graduate_finished = 0;
+
+int execute_cycle_finished;
+
 void pipeline_flush(){
   first_fetch = 0;
   first_decode = 0;
@@ -121,9 +125,9 @@ void run(){
   while(1){
     separator;
 
-    if(last_instruction == 1){
+    if(last_instruction == 1 || pc[0] == 0){
       // printf("LASTINSTRUCTION:%d\n",last_instruction_cycle);
-      if(current_cycle > last_instruction_cycle + (NUM_STAGES - 1)){
+      if(pc[0] == 0 && graduate_finished == 1){
           printf("End of program\n");
           printf("Number of Cycles to complete:%d\n",current_cycle - 1);
           printf("Number of Instructions executed:%d\n",instructions_executed);
@@ -172,7 +176,7 @@ void run(){
     current_cycle++;
     separator;
 
-    if(current_cycle == 75) exit(1);
+    // if(current_cycle == 23) exit(1);
 }
 }
 

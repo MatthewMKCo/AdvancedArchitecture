@@ -3,6 +3,16 @@
 availNum available;
 instruction currentInstruction;
 
+int check_execute_and_reservation_units(){
+  for(int i = 0; i < RESERVATION_WIDTH; i++){
+    if(reservationalu[i].inuse)return 0;
+  }
+  for(int i = 0; i < ALU_NUM; i++){
+    if(alu[i].ready == 0)return 0;
+  }
+  return 1;
+}
+
 //execute I format instructions
 void execute_iformat(int number){
   alu[number].instruction.instructionid = currentInstruction.instructionid;
@@ -118,7 +128,14 @@ void execute_rformat(int number){
         // printf("Instruction:Add\n");
         executed_instruction_name = "Add";
         execute_val = add(currentInstruction.rsource1value, currentInstruction.rsource2value);
-        alu[number].cyclesNeeded = 1;
+        if(alu[number].destinationRegister == 9){
+          printf("R1:%d\n",currentInstruction.rsource1value);
+          printf("R2:%d\n",currentInstruction.rsource2value);
+          printf("Rd:%d\n",alu[number].destinationRegister);
+
+          // exit_early();
+        }
+        alu[number].cyclesNeeded = 5;
       }
       else if(currentInstruction.funct7 == 0b0100000){
         // printf("Instruction:Subtract\n");
@@ -327,8 +344,7 @@ void increment_units(){
     if(alu[i].ready == 0){
       alu[i].currentCycles++;
       if(alu[i].currentCycles == alu[i].cyclesNeeded){
-
-        // exit_early();
+        instructions_executed++;
         alu[i].currentCycles = 0;
         alu[i].ready = 1;
         alu[i].readyForWriteback = 1;
@@ -371,16 +387,16 @@ void forward_reservation_stations(int tagPassed, int value, int unit_type){
     for(int i = 0; i < reservationIteratorALU; i++){
       if(reservationalu[i].rsource1ready == 0 && reservationalu[i].rsource1 == tagPassed){
         reservationalu[i].rsource1value = value;
+        reservationalu[i].instruction.rsource1value = value;
         reservationalu[i].rsource1ready = 1;
         printf("%d\n",value);
-        // exit_early();
+        // if(tagPassed==5)exit_early();
       }
       if(reservationalu[i].rsource2ready == 0 && reservationalu[i].rsource2 == tagPassed){
         reservationalu[i].rsource2value = value;
+        reservationalu[i].instruction.rsource2value = value;
         reservationalu[i].rsource2ready = 1;
         printf("%d\n",value);
-        // exit_early();
-
       }
     }
   }
@@ -399,7 +415,6 @@ void send_for_writeback(){
       writebackalu[i].tag = alu[i].destinationRegister;
       writebackalu[i].instruction = alu[i].instruction.instruction_hex;
       writebackalu[i].instructionid = alu[i].instruction.instructionid;
-
       // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
     }
   }
@@ -483,28 +498,34 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
   instructionwrapper wrappedListofInstructions;
   wrappedListofInstructions.foundInstructions = 0;
   for(int i = 0; i < RESERVATION_WIDTH; i++){
-    if(reservationalu[i].rsource1ready && reservationalu[i].rsource2ready && reservationalu[i].inuse && reservationalu[i].inExecute){
-      instruction newInstruction;
-      newInstruction.rdestination = reservationalu[i].rdestination;
-      newInstruction.rsource1value = reservationalu[i].rsource1value;
-      newInstruction.rsource2value = reservationalu[i].rsource2value;
-      newInstruction.opcode = reservationalu[i].opcode;
-      newInstruction.funct3 = reservationalu[i].funct3;
-      newInstruction.funct7 = reservationalu[i].funct7;
-      newInstruction.shamt = reservationalu[i].shamt;
-      newInstruction.imm = reservationalu[i].imm;
-      newInstruction.pc = reservationalu[i].pc;
-      newInstruction.instruction_type = reservationalu[i].instruction_type;
-      newInstruction.instruction_hex = reservationalu[i].instruction;
-      newInstruction.instructionid = reservationalu[i].instructionid;
-
-      wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
-      wrappedListofInstructions.foundInstructions++;
-      reservationalu[i].inuse = 0;
-    }
     if(wrappedListofInstructions.foundInstructions == numberOfAvailableUnits){
       return wrappedListofInstructions;
     }
+    if(reservationalu[i].rsource1ready && reservationalu[i].rsource2ready && reservationalu[i].inuse && reservationalu[i].inExecute){
+      if(reservationalu[i].rdestination == 9){
+        // exit_early();
+      }
+      instruction newInstruction;
+      newInstruction = reservationalu[i].instruction;
+      // newInstruction.rdestination = reservationalu[i].rdestination;
+      // newInstruction.rsource1value = reservationalu[i].rsource1value;
+      // newInstruction.rsource2value = reservationalu[i].rsource2value;
+      // newInstruction.opcode = reservationalu[i].opcode;
+      // newInstruction.funct3 = reservationalu[i].funct3;
+      // newInstruction.funct7 = reservationalu[i].funct7;
+      // newInstruction.shamt = reservationalu[i].shamt;
+      // newInstruction.imm = reservationalu[i].imm;
+      // newInstruction.pc = reservationalu[i].pc;
+      // newInstruction.instruction_type = reservationalu[i].instruction_type;
+      // newInstruction.instruction_hex = reservationalu[i].instruction_hex;
+      // newInstruction.instructionid = reservationalu[i].instructionid;
+      wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
+      wrappedListofInstructions.foundInstructions++;
+      reservationalu[i].inuse = 0;
+
+      // exit_early();
+    }
+
   }
 
   return wrappedListofInstructions;
@@ -533,7 +554,7 @@ void execute(){
     currentInstruction = currentInstructions.instruction[i];
 
     alu[alu_unit_number].ready = 0;
-    alu[alu_unit_number].destinationRegister = currentInstruction.rdestination;
+    alu[alu_unit_number].destinationRegister = currentInstruction.tagDestination;
 
     if(currentInstruction.instruction_type == 1){
       execute_iformat(alu_unit_number);
@@ -541,8 +562,9 @@ void execute(){
     else if(currentInstruction.instruction_type == 3){
       execute_rformat(alu_unit_number);
     }
-    instructions_executed++;
-    // exit_early();
+    else if(currentInstruction.instruction_type == 4){
+      execute_jformat(alu_unit_number);
+    }
   }
 
 
@@ -568,5 +590,11 @@ void execute(){
 
   increment_units();
 
+  if(issue_finished == 1 && execute_finished != 1){
+    execute_finished = check_execute_and_reservation_units();
+    if(execute_finished){
+      execute_cycle_finished = current_cycle;
+    }
+  }
   return;
 }

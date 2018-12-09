@@ -23,6 +23,8 @@
 #define separator printf("====================================================\n");
 
 typedef struct instruction{
+  int pcDestination;
+  int pctag;
   int rdestination;
   int tagDestination;
   int rsource1;
@@ -87,8 +89,9 @@ typedef struct reserve{
   int inuse;
   int instruction_type;
   int inExecute;
-  int instruction;
+  int instruction_hex;
   int instructionid;
+  instruction instruction;
 }reserve;
 
 typedef struct instructionwrapper{
@@ -118,12 +121,14 @@ typedef struct Node{
   uint32_t instruction;
   int id;
   char *name;
+  int ready;
 }node;
 
 typedef struct everything{
   tag tagData;
   uint32_t instruction;
   int id;
+  int ready;
 }everything;
 
 typedef struct Ring{
@@ -175,12 +180,12 @@ extern reserve reservationbru[RESERVATION_WIDTH];
 extern int reservationIteratorALU;
 
 //Registers
-extern int registers[REG_NUM];
+extern int registers[REG_NUM+1];
 //Re-order buffer registers
 extern reg physRegisters[PHYSREG_NUM];
 
 //Program Counter
-extern int pc[1];
+extern int* pc;
 extern int decodepc, issuepc, fetchpc, executepc;
 extern int* sp;
 //Source Registers
@@ -248,3 +253,11 @@ extern execute_to_writeback writebackalu[ALU_NUM];
 extern int stall_from_issue;
 
 extern instruction decode_instruction_struct, issue_instruction_struct;
+
+extern int stop;
+
+extern int decode_pcDestination;
+
+extern int fetch_finished, decode_finished, issue_finished, execute_finished, writeback_finished, graduate_finished;
+
+extern int execute_cycle_finished;

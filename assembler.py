@@ -499,11 +499,19 @@ def main():
         for i in range(0, len(lines3)):
             x = lines3[i].split(" ")
             if(x[2] == "return\n"):
-                addr = i * (-2)
+                addr = i * (-2) - 2
                 x[2] = str(addr)
                 y = x[0] + " " + x[1] + " " + x[2]
                 lines4.append(y)
                 continue
+            if(i == (len(lines3))-1):
+                if(x[2] != "return\n"):
+                    lines4.append(lines3[i])
+                    i = i + 1
+                    addr = i * (-2) - 2
+                    y = "jal zero " + str(addr)
+                    lines4.append(y)
+                    continue
             lines4.append(lines3[i])
 
         for i in range(0, len(lines4)):
