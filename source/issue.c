@@ -52,14 +52,135 @@ void issue_rename(){
 void issue_add_to_reservation(){
   find foundtag;
   if(issue_unit_type == 1){
-  if(reservationIteratorALU >= RESERVATION_WIDTH)reservationIteratorALU = 0;
+    if(reservationIteratorALU >= RESERVATION_WIDTH)reservationIteratorALU = 0;
+    int i;
+    for(i = 0; i < RESERVATION_WIDTH; i++){
+      if(reservationalu[i].inuse == 1){
+        continue;
+      }
+      else{
+        reservationIteratorALU = i;
+        break;
+      }
+    }
+    if(i == RESERVATION_WIDTH){
+      stall_from_issue = 2;
+      return;
+    }
+
+
+    reservationalu[reservationIteratorALU].rdestination = issue_instruction_struct.tagDestination;
+    reservationalu[reservationIteratorALU].rsource1 = issue_instruction_struct.tagsource1;
+
+    if(issue_isPhys == 0){
+      issue_instruction_struct.rsource1value = registers[issue_instruction_struct.rsource1];
+      reservationalu[reservationIteratorALU].rsource1value = registers[issue_instruction_struct.rsource1];
+      reservationalu[reservationIteratorALU].rsource1ready = 1;
+    }
+    else{
+
+      if(physRegisters[issue_instruction_struct.tagsource1].ready == 1){
+        issue_instruction_struct.rsource1value = physRegisters[issue_instruction_struct.tagsource1].value;
+        reservationalu[reservationIteratorALU].rsource1value = physRegisters[issue_instruction_struct.tagsource1].value;
+        reservationalu[reservationIteratorALU].rsource1ready = 1;
+      }
+      else{
+        if(issue_instruction_struct.tagsource1 == issue_instruction_struct.tagDestination){
+          foundtag = second_last(inuseTags, issue_instruction_struct.rsource1);
+          if(foundtag.found == 1){
+            reservationalu[reservationIteratorALU].rsource1ready = 0;
+            reservationalu[reservationIteratorALU].rsource1 = foundtag.number;
+            issue_instruction_struct.tagsource1 = foundtag.number;
+          }
+          else{
+            reservationalu[reservationIteratorALU].rsource1ready = 1;
+            reservationalu[reservationIteratorALU].rsource1 = issue_instruction_struct.rsource1;
+            reservationalu[reservationIteratorALU].rsource1value = registers[issue_instruction_struct.rsource1];
+            issue_instruction_struct.rsource1value = registers[issue_instruction_struct.rsource1];
+          }
+        }
+        else{
+          reservationalu[reservationIteratorALU].rsource1ready = 0;
+        }
+      }
+    }
+
+    if(issue_instruction_struct.instruction_type == 3 || issue_instruction_struct.instruction_type == 5 || issue_instruction_struct.instruction_type == 6){
+      reservationalu[reservationIteratorALU].rsource2 = issue_instruction_struct.tagsource2;
+      if(issue_isPhys2 == 0){
+        reservationalu[reservationIteratorALU].rsource2 = issue_instruction_struct.rsource2;
+
+        issue_instruction_struct.rsource2value = registers[issue_instruction_struct.rsource2];
+        reservationalu[reservationIteratorALU].rsource2value = registers[issue_instruction_struct.rsource2];
+        reservationalu[reservationIteratorALU].rsource2ready = 1;
+      }
+      else{
+        if(physRegisters[issue_instruction_struct.tagsource2].ready == 1){
+          issue_instruction_struct.rsource2value = physRegisters[issue_instruction_struct.tagsource2].value;
+          reservationalu[reservationIteratorALU].rsource2 = issue_instruction_struct.tagsource2;
+          reservationalu[reservationIteratorALU].rsource2value = physRegisters[issue_instruction_struct.tagsource2].value;
+          reservationalu[reservationIteratorALU].rsource2ready = 1;
+        }
+        else{
+          if(issue_instruction_struct.tagsource2 == issue_instruction_struct.tagDestination){
+            foundtag = second_last(inuseTags, issue_instruction_struct.rsource2);
+            if(foundtag.found == 1){
+              reservationalu[reservationIteratorALU].rsource2ready = 0;
+              reservationalu[reservationIteratorALU].rsource2 = foundtag.number;
+              issue_instruction_struct.tagsource2 = foundtag.number;
+            }
+            else{
+              reservationalu[reservationIteratorALU].rsource2ready = 1;
+              reservationalu[reservationIteratorALU].rsource2 = issue_instruction_struct.rsource2;
+              reservationalu[reservationIteratorALU].rsource2value = registers[issue_instruction_struct.rsource2];
+              issue_instruction_struct.rsource2value = registers[issue_instruction_struct.rsource2];
+            }
+          }
+          else{
+            reservationalu[reservationIteratorALU].rsource2ready = 0;
+          }
+        }
+    }
+  }
+    else{
+      reservationalu[reservationIteratorALU].rsource2 = -1;
+      reservationalu[reservationIteratorALU].rsource2ready = 1;
+    }
+
+    reservationalu[reservationIteratorALU].opcode = issue_instruction_struct.opcode;
+    reservationalu[reservationIteratorALU].funct3 = issue_instruction_struct.funct3;
+    reservationalu[reservationIteratorALU].funct7 = issue_instruction_struct.funct7;
+    reservationalu[reservationIteratorALU].shamt = issue_instruction_struct.shamt;
+    reservationalu[reservationIteratorALU].imm = issue_instruction_struct.imm;
+    reservationalu[reservationIteratorALU].pc = issue_instruction_struct.pc;
+    reservationalu[reservationIteratorALU].instruction_type = issue_instruction_struct.instruction_type;
+    reservationalu[reservationIteratorALU].inuse = 1;
+    reservationalu[reservationIteratorALU].inExecute = 0;
+    reservationalu[reservationIteratorALU].instruction_hex = issue_instruction_struct.instruction_hex;
+    issue_instruction_struct.instructionid = instructionid;
+    reservationalu[reservationIteratorALU].instruction = issue_instruction_struct;
+
+    reservationalu[reservationIteratorALU].instructionid = issue_instruction_struct.instructionid;
+    reservationIteratorALU++;
+
+    tag tagData;
+    tagData.tagNumber = issue_instruction_struct.tagDestination;
+    tagData.registerNumber = issue_instruction_struct.rdestination;
+
+    addafternodeinstruction(inOrderInstructions, issue_instruction_struct.instruction_hex, instructionid, tagData);
+    instructionid++;
+
+}
+
+if(issue_unit_type == 3){
+  if(reservationIteratorBRU >= BRANCH_RESERVATION_WIDTH)reservationIteratorBRU = 0;
   int i;
-  for(i = 0; i < RESERVATION_WIDTH; i++){
-    if(reservationalu[i].inuse == 1){
+  for(i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
+    if(reservationbru[i].inuse == 1){
       continue;
     }
     else{
-      reservationIteratorALU = i;
+      reservationIteratorBRU = i;
       break;
     }
   }
@@ -68,100 +189,99 @@ void issue_add_to_reservation(){
     return;
   }
 
-
-  reservationalu[reservationIteratorALU].rdestination = issue_instruction_struct.tagDestination;
-  reservationalu[reservationIteratorALU].rsource1 = issue_instruction_struct.tagsource1;
+  reservationbru[reservationIteratorBRU].rdestination = issue_instruction_struct.tagDestination;
+  reservationbru[reservationIteratorBRU].rsource1 = issue_instruction_struct.tagsource1;
 
   if(issue_isPhys == 0){
     issue_instruction_struct.rsource1value = registers[issue_instruction_struct.rsource1];
-    reservationalu[reservationIteratorALU].rsource1value = registers[issue_instruction_struct.rsource1];
-    reservationalu[reservationIteratorALU].rsource1ready = 1;
+    reservationbru[reservationIteratorBRU].rsource1value = registers[issue_instruction_struct.rsource1];
+    reservationbru[reservationIteratorBRU].rsource1ready = 1;
   }
   else{
 
     if(physRegisters[issue_instruction_struct.tagsource1].ready == 1){
       issue_instruction_struct.rsource1value = physRegisters[issue_instruction_struct.tagsource1].value;
-      reservationalu[reservationIteratorALU].rsource1value = physRegisters[issue_instruction_struct.tagsource1].value;
-      reservationalu[reservationIteratorALU].rsource1ready = 1;
+      reservationbru[reservationIteratorBRU].rsource1value = physRegisters[issue_instruction_struct.tagsource1].value;
+      reservationbru[reservationIteratorBRU].rsource1ready = 1;
     }
     else{
       if(issue_instruction_struct.tagsource1 == issue_instruction_struct.tagDestination){
         foundtag = second_last(inuseTags, issue_instruction_struct.rsource1);
         if(foundtag.found == 1){
-          reservationalu[reservationIteratorALU].rsource1ready = 0;
-          reservationalu[reservationIteratorALU].rsource1 = foundtag.number;
+          reservationbru[reservationIteratorBRU].rsource1ready = 0;
+          reservationbru[reservationIteratorBRU].rsource1 = foundtag.number;
           issue_instruction_struct.tagsource1 = foundtag.number;
         }
         else{
-          reservationalu[reservationIteratorALU].rsource1ready = 1;
-          reservationalu[reservationIteratorALU].rsource1 = issue_instruction_struct.rsource1;
-          reservationalu[reservationIteratorALU].rsource1value = registers[issue_instruction_struct.rsource1];
+          reservationbru[reservationIteratorBRU].rsource1ready = 1;
+          reservationbru[reservationIteratorBRU].rsource1 = issue_instruction_struct.rsource1;
+          reservationbru[reservationIteratorBRU].rsource1value = registers[issue_instruction_struct.rsource1];
           issue_instruction_struct.rsource1value = registers[issue_instruction_struct.rsource1];
         }
       }
       else{
-        reservationalu[reservationIteratorALU].rsource1ready = 0;
+        reservationbru[reservationIteratorBRU].rsource1ready = 0;
       }
     }
   }
 
   if(issue_instruction_struct.instruction_type == 3 || issue_instruction_struct.instruction_type == 5 || issue_instruction_struct.instruction_type == 6){
-    reservationalu[reservationIteratorALU].rsource2 = issue_instruction_struct.tagsource2;
+    reservationbru[reservationIteratorBRU].rsource2 = issue_instruction_struct.tagsource2;
     if(issue_isPhys2 == 0){
-      reservationalu[reservationIteratorALU].rsource2 = issue_instruction_struct.rsource2;
+      reservationbru[reservationIteratorBRU].rsource2 = issue_instruction_struct.rsource2;
 
       issue_instruction_struct.rsource2value = registers[issue_instruction_struct.rsource2];
-      reservationalu[reservationIteratorALU].rsource2value = registers[issue_instruction_struct.rsource2];
-      reservationalu[reservationIteratorALU].rsource2ready = 1;
+      reservationbru[reservationIteratorBRU].rsource2value = registers[issue_instruction_struct.rsource2];
+      reservationbru[reservationIteratorBRU].rsource2ready = 1;
     }
     else{
       if(physRegisters[issue_instruction_struct.tagsource2].ready == 1){
         issue_instruction_struct.rsource2value = physRegisters[issue_instruction_struct.tagsource2].value;
-        reservationalu[reservationIteratorALU].rsource2 = issue_instruction_struct.tagsource2;
-        reservationalu[reservationIteratorALU].rsource2value = physRegisters[issue_instruction_struct.tagsource2].value;
-        reservationalu[reservationIteratorALU].rsource2ready = 1;
+        reservationbru[reservationIteratorBRU].rsource2 = issue_instruction_struct.tagsource2;
+        reservationbru[reservationIteratorBRU].rsource2value = physRegisters[issue_instruction_struct.tagsource2].value;
+        reservationbru[reservationIteratorBRU].rsource2ready = 1;
       }
       else{
         if(issue_instruction_struct.tagsource2 == issue_instruction_struct.tagDestination){
           foundtag = second_last(inuseTags, issue_instruction_struct.rsource2);
           if(foundtag.found == 1){
-            reservationalu[reservationIteratorALU].rsource2ready = 0;
-            reservationalu[reservationIteratorALU].rsource2 = foundtag.number;
+            reservationbru[reservationIteratorBRU].rsource2ready = 0;
+            reservationbru[reservationIteratorBRU].rsource2 = foundtag.number;
             issue_instruction_struct.tagsource2 = foundtag.number;
           }
           else{
-            reservationalu[reservationIteratorALU].rsource2ready = 1;
-            reservationalu[reservationIteratorALU].rsource2 = issue_instruction_struct.rsource2;
-            reservationalu[reservationIteratorALU].rsource2value = registers[issue_instruction_struct.rsource2];
+            reservationbru[reservationIteratorBRU].rsource2ready = 1;
+            reservationbru[reservationIteratorBRU].rsource2 = issue_instruction_struct.rsource2;
+            reservationbru[reservationIteratorBRU].rsource2value = registers[issue_instruction_struct.rsource2];
             issue_instruction_struct.rsource2value = registers[issue_instruction_struct.rsource2];
           }
         }
         else{
-          reservationalu[reservationIteratorALU].rsource2ready = 0;
+          reservationbru[reservationIteratorBRU].rsource2ready = 0;
         }
       }
   }
 }
   else{
-    reservationalu[reservationIteratorALU].rsource2 = -1;
-    reservationalu[reservationIteratorALU].rsource2ready = 1;
+    reservationbru[reservationIteratorBRU].rsource2 = -1;
+    reservationbru[reservationIteratorBRU].rsource2ready = 1;
   }
 
-  reservationalu[reservationIteratorALU].opcode = issue_instruction_struct.opcode;
-  reservationalu[reservationIteratorALU].funct3 = issue_instruction_struct.funct3;
-  reservationalu[reservationIteratorALU].funct7 = issue_instruction_struct.funct7;
-  reservationalu[reservationIteratorALU].shamt = issue_instruction_struct.shamt;
-  reservationalu[reservationIteratorALU].imm = issue_instruction_struct.imm;
-  reservationalu[reservationIteratorALU].pc = issue_instruction_struct.pc;
-  reservationalu[reservationIteratorALU].instruction_type = issue_instruction_struct.instruction_type;
-  reservationalu[reservationIteratorALU].inuse = 1;
-  reservationalu[reservationIteratorALU].inExecute = 0;
-  reservationalu[reservationIteratorALU].instruction_hex = issue_instruction_struct.instruction_hex;
+  reservationbru[reservationIteratorBRU].opcode = issue_instruction_struct.opcode;
+  reservationbru[reservationIteratorBRU].funct3 = issue_instruction_struct.funct3;
+  reservationbru[reservationIteratorBRU].funct7 = issue_instruction_struct.funct7;
+  reservationbru[reservationIteratorBRU].shamt = issue_instruction_struct.shamt;
+  reservationbru[reservationIteratorBRU].imm = issue_instruction_struct.imm;
+  reservationbru[reservationIteratorBRU].pc = issue_instruction_struct.pc;
+  reservationbru[reservationIteratorBRU].instruction_type = issue_instruction_struct.instruction_type;
+  reservationbru[reservationIteratorBRU].inuse = 1;
+  reservationbru[reservationIteratorBRU].inExecute = 0;
+  reservationbru[reservationIteratorBRU].instruction_hex = issue_instruction_struct.instruction_hex;
   issue_instruction_struct.instructionid = instructionid;
-  reservationalu[reservationIteratorALU].instruction = issue_instruction_struct;
+  reservationbru[reservationIteratorBRU].instruction = issue_instruction_struct;
 
-  reservationalu[reservationIteratorALU].instructionid = issue_instruction_struct.instructionid;
-  reservationIteratorALU++;
+  reservationbru[reservationIteratorBRU].instructionid = issue_instruction_struct.instructionid;
+  reservationIteratorBRU++;
 
   tag tagData;
   tagData.tagNumber = issue_instruction_struct.tagDestination;
@@ -171,6 +291,8 @@ void issue_add_to_reservation(){
   instructionid++;
 
 }
+
+  return;
 
 }
 
@@ -201,13 +323,14 @@ void issue(){
 
   print_issue_summary = 1;
 
-  if(stall_from_issue == 0){
-    issue_rename();
-  }
+  issue_rename();
 
   issue_add_to_reservation();
+
   }
   else{
     issue_add_to_reservation();
   }
+
+  return;
 }

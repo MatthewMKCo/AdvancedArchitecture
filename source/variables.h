@@ -8,6 +8,8 @@
 
 #define RESERVATION_WIDTH 64
 
+#define BRANCH_RESERVATION_WIDTH 16
+
 #define NUM_STAGES 10
 
 #define ALU_NUM 4
@@ -175,7 +177,7 @@ extern int tagIterator;
 
 extern reserve reservationalu[RESERVATION_WIDTH];
 extern reserve reservationlsu[RESERVATION_WIDTH];
-extern reserve reservationbru[RESERVATION_WIDTH];
+extern reserve reservationbru[BRANCH_RESERVATION_WIDTH];
 
 extern int reservationIteratorALU;
 
@@ -248,7 +250,7 @@ extern int print_decode_summary, print_execute_summary, print_issue_summary;
 
 extern int writeback_destination, graduate_destination;
 
-extern execute_to_writeback writebackalu[ALU_NUM];
+extern execute_to_writeback writebackalu[ALU_NUM], writebackbru[BRU_NUM];
 
 extern int stall_from_issue;
 
@@ -261,3 +263,5 @@ extern int decode_pcDestination;
 extern int fetch_finished, decode_finished, issue_finished, execute_finished, writeback_finished, graduate_finished;
 
 extern int execute_cycle_finished;
+
+extern int instructionid;

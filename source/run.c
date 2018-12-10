@@ -12,9 +12,10 @@ execute_unit bru[BRU_NUM];
 //reservation station
 reserve reservationalu[RESERVATION_WIDTH];
 reserve reservationlsu[RESERVATION_WIDTH];
-reserve reservationbru[RESERVATION_WIDTH];
+reserve reservationbru[BRANCH_RESERVATION_WIDTH];
 
 execute_to_writeback writebackalu[ALU_NUM];
+execute_to_writeback writebackbru[BRU_NUM];
 
 //Current Cycle
 int current_cycle = 1;

@@ -160,6 +160,7 @@ void beq(int reg1, int reg2){
     // printf("actual pc:%d\n", currentInstruction.pc);
     // printf("actual pc:%d\n", currentpc);
     printf("%d\n",currentInstruction.imm);
+    instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
   }
@@ -169,6 +170,7 @@ void beq(int reg1, int reg2){
 //branch if not equal
 void bne(int reg1, int reg2){
   if(reg1 != reg2){
+    instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
   }
@@ -180,6 +182,7 @@ void blt(int reg1, int reg2){
   // printf("please\n");
   // printf("%d\t%d\n",reg1,reg2);
   if(reg1 < reg2){
+    instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
   }
@@ -190,6 +193,7 @@ void blt(int reg1, int reg2){
 void bltu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u < reg2u){
+    instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
   }
@@ -199,6 +203,7 @@ void bltu(int reg1, int reg2){
 //branch if greater than
 void bge(int reg1, int reg2){
   if(reg1 >= reg2){
+    instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
   }
@@ -208,11 +213,74 @@ void bge(int reg1, int reg2){
 void bgeu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u >= reg2u){
+    instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
   }
   return;
 }
+// =================================================================
+// //branch if equal
+// int beq(int reg1, int reg2){
+//   if(reg1 == reg2){
+//     // printf("offset:%d\n",currentInstruction.imm);
+//     // printf("actual pc:%d\n", currentInstruction.pc);
+//     // printf("actual pc:%d\n", currentpc);
+//     printf("%d\n",currentInstruction.imm);
+//     // pc[0] = currentInstruction.pc + currentInstruction.imm;
+//     branch_flag = 1;
+//   }
+//   return(currentInstruction.pc + currentInstruction.imm);
+// }
+//
+// //branch if not equal
+// int bne(int reg1, int reg2){
+//   if(reg1 != reg2){
+//     // pc[0] = currentInstruction.pc + currentInstruction.imm;
+//     branch_flag = 1;
+//   }
+//   return(currentInstruction.pc + currentInstruction.imm);
+// }
+//
+// //branch if less than
+// int blt(int reg1, int reg2){
+//   // printf("please\n");
+//   // printf("%d\t%d\n",reg1,reg2);
+//   if(reg1 < reg2){
+//     pc[0] = currentInstruction.pc + currentInstruction.imm;
+//     branch_flag = 1;
+//   }
+//   return(currentInstruction.pc + currentInstruction.imm);
+// }
+//
+// //branch if less than
+// int bltu(int reg1, int reg2){
+//   unsigned int reg1u = reg1, reg2u = reg2;
+//   if(reg1u < reg2u){
+//     pc[0] = currentInstruction.pc + currentInstruction.imm;
+//     branch_flag = 1;
+//   }
+//   return(currentInstruction.pc + currentInstruction.imm);
+// }
+//
+// //branch if greater than
+// int bge(int reg1, int reg2){
+//   if(reg1 >= reg2){
+//     pc[0] = currentInstruction.pc + currentInstruction.imm;
+//     branch_flag = 1;
+//   }
+//   return(currentInstruction.pc + currentInstruction.imm);
+// }
+//
+// int bgeu(int reg1, int reg2){
+//   unsigned int reg1u = reg1, reg2u = reg2;
+//   if(reg1u >= reg2u){
+//     pc[0] = currentInstruction.pc + currentInstruction.imm;
+//     branch_flag = 1;
+//   }
+//   return(currentInstruction.pc + currentInstruction.imm);
+// }
+//
 
 //load memory into register for instructions cache
 int ld(char* cache, int reg1){

@@ -41,7 +41,6 @@ void set_register(){
     reservationalu[i].rsource2 = -1;
     reservationalu[i].rsource1ready = 0;
     reservationalu[i].rsource2ready = 0;
-
   }
 
 }

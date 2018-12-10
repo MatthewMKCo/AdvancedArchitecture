@@ -10,6 +10,9 @@ int check_execute_and_reservation_units(){
   for(int i = 0; i < ALU_NUM; i++){
     if(alu[i].ready == 0)return 0;
   }
+  for(int i = 0; i < BRU_NUM; i++){
+    if(bru[i].ready == 0)return 0;
+  }
   return 1;
 }
 
@@ -128,13 +131,6 @@ void execute_rformat(int number){
         // printf("Instruction:Add\n");
         executed_instruction_name = "Add";
         execute_val = add(currentInstruction.rsource1value, currentInstruction.rsource2value);
-        if(alu[number].destinationRegister == 9){
-          printf("R1:%d\n",currentInstruction.rsource1value);
-          printf("R2:%d\n",currentInstruction.rsource2value);
-          printf("Rd:%d\n",alu[number].destinationRegister);
-
-          // exit_early();
-        }
         alu[number].cyclesNeeded = 1;
       }
       else if(currentInstruction.funct7 == 0b0100000){
@@ -147,7 +143,7 @@ void execute_rformat(int number){
         // printf("Instruction:Multiply\n");
         executed_instruction_name = "Multiply";
         execute_val = mul(currentInstruction.rsource1value, currentInstruction.rsource2value);
-        alu[number].cyclesNeeded = 1;
+        alu[number].cyclesNeeded = 5;
       }
       break;
     case(0b001):
@@ -222,12 +218,14 @@ void execute_jformat(){
   return;
 }
 
-void execute_bformat(){
+void execute_bformat(int number){
+  bru[number].instruction.instructionid = currentInstruction.instructionid;
   switch(currentInstruction.funct3){
     case(0b000):
       // printf("Instruction:Branch if Equal\n");
       executed_instruction_name = "Branch if Equal";
       beq(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      bru[number].cyclesNeeded = 1;
       break;
     case(0b001):
       // printf("Instruction:Branch if Not Equal\n");
@@ -238,6 +236,7 @@ void execute_bformat(){
       // printf("Instruction:Branch if Less Than\n");
       executed_instruction_name = "Branch if Less Than";
       blt(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      bru[number].cyclesNeeded = 1;
       break;
     case(0b101):
       // printf("Instruction:Branch if Greater Than\n");
@@ -353,6 +352,19 @@ void increment_units(){
       }
     }
   }
+  for(int i = 0; i < BRU_NUM; i++){
+    if(bru[i].ready == 0){
+      bru[i].currentCycles++;
+      if(bru[i].currentCycles == bru[i].cyclesNeeded){
+        instructions_executed++;
+        bru[i].currentCycles = 0;
+        bru[i].ready = 1;
+        bru[i].readyForWriteback = 1;
+        // alu[i].wbValueInside = alu[i].valueInside;
+        // alu[i].wbDestinationRegister = alu[i].destinationRegister;
+      }
+    }
+  }
   for(int i = 0; i < LSU_NUM; i++){
     if(lsu[i].ready == 0){
       lsu[i].currentCycles++;
@@ -367,15 +379,6 @@ void increment_units(){
       agu[i].currentCycles++;
       if(agu[i].currentCycles == agu[i].cyclesNeeded){
         agu[i].readyForWriteback = 1;
-      }
-    }
-  }
-  for(int i = 0; i < BRU_NUM; i++){
-    if(bru[i].ready == 0){
-      bru[i].currentCycles++;
-      if(bru[i].currentCycles == bru[i].cyclesNeeded){
-        bru[i].ready = 1;
-        bru[i].readyForWriteback = 1;
       }
     }
   }
@@ -410,6 +413,21 @@ void send_for_writeback(){
       alu[i].wbValueInside = alu[i].valueInside;
       alu[i].readyForWriteback = 0;
       alu[i].shouldWriteback = 0;
+      // alu[i].wbDestinationRegister = alu[i].destinationRegister;
+      // alu[i].readyForWriteback = 2;
+      writebackalu[i].value = alu[i].valueInside;
+      writebackalu[i].ready = 1;
+      writebackalu[i].tag = alu[i].destinationRegister;
+      writebackalu[i].instruction = alu[i].instruction.instruction_hex;
+      writebackalu[i].instructionid = alu[i].instruction.instructionid;
+      // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
+    }
+  }
+  for(int i = 0; i < BRU_NUM; i++){
+    if(bru[i].readyForWriteback == 1){
+      bru[i].wbValueInside = bru[i].valueInside;
+      bru[i].readyForWriteback = 0;
+      bru[i].shouldWriteback = 0;
       // alu[i].wbDestinationRegister = alu[i].destinationRegister;
       // alu[i].readyForWriteback = 2;
       writebackalu[i].value = alu[i].valueInside;
@@ -480,19 +498,16 @@ int find_available_agu(){
   }
 }
 
-int find_available_bru(){
+availNum find_available_bru(){
   int i;
+  available.number = 0;
   for(i = 0; i < BRU_NUM; i++){
     if(bru[i].ready == 1){
-      break;
+      available.unitNumber[available.number] = i;
+      available.number++;
     }
   }
-  if(i == BRU_NUM){
-    return -1;
-  }
-  else{
-    return i;
-  }
+  return available;
 }
 
 //Fetches instructions from Reservation Stations
@@ -504,9 +519,6 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
       return wrappedListofInstructions;
     }
     if(reservationalu[i].rsource1ready && reservationalu[i].rsource2ready && reservationalu[i].inuse && reservationalu[i].inExecute){
-      if(reservationalu[i].rdestination == 9){
-        // exit_early();
-      }
       instruction newInstruction;
       newInstruction = reservationalu[i].instruction;
       // newInstruction.rdestination = reservationalu[i].rdestination;
@@ -532,6 +544,37 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
 
   return wrappedListofInstructions;
 }
+
+//Fetches instructions from Reservation Stations
+instructionwrapper check_reservation_bru(int numberOfAvailableUnits){
+  instructionwrapper wrappedListofInstructions;
+  wrappedListofInstructions.foundInstructions = 0;
+  if(numberOfAvailableUnits == 0)return wrappedListofInstructions;
+  for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
+    if(reservationbru[i].rsource1ready && reservationbru[i].rsource2ready && reservationbru[i].inuse && reservationbru[i].inExecute){
+      if(wrappedListofInstructions.foundInstructions == numberOfAvailableUnits){
+        instruction newInstruction;
+        newInstruction = reservationbru[i].instruction;
+        for(int j = 0; j < numberOfAvailableUnits; j++){
+          if(newInstruction.instructionid < wrappedListofInstructions.instruction[j].instructionid){
+            wrappedListofInstructions.instruction[j] = newInstruction;
+          }
+        }
+      }
+      instruction newInstruction;
+      newInstruction = reservationbru[i].instruction;
+      wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
+      wrappedListofInstructions.foundInstructions++;
+      reservationbru[i].inuse = 0;
+
+      // exit_early();
+    }
+
+  }
+
+  return wrappedListofInstructions;
+}
+
 
 void execute(){
 
@@ -566,6 +609,22 @@ void execute(){
     }
     else if(currentInstruction.instruction_type == 4){
       execute_jformat(alu_unit_number);
+    }
+  }
+
+  currentAvailable = find_available_bru();
+  currentInstructions = check_reservation_bru(currentAvailable.number);
+
+  for(int i = 0; i < currentInstructions.foundInstructions; i++){
+
+    int bru_unit_number = currentAvailable.unitNumber[i];
+    currentInstruction = currentInstructions.instruction[i];
+
+    bru[bru_unit_number].ready = 0;
+    bru[bru_unit_number].destinationRegister = currentInstruction.tagDestination;
+
+    if(currentInstruction.instruction_type == 5){
+      execute_bformat(bru_unit_number);
     }
   }
 

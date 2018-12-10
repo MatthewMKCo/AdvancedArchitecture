@@ -128,6 +128,7 @@ void decode(){
     decode_funct3 = (decode_instruction & 0x00007000) >> 12;
     decode_rsource1 = (decode_instruction & 0x000F8000) >> 15;
     decode_rsource2 = (decode_instruction & 0x01F00000) >> 20;
+    decode_rdestination = REG_NUM;
     decode_imm = (((decode_instruction & 0x00000080) >> 7 << 11) | ((decode_instruction & 0x00000F00) >> 8 << 1) | ((decode_instruction & 0x7E000000) >> 25 << 5) | ((decode_instruction & 0x10000000) >> 31 << 5));
     if((decode_imm & 0x00000800)){
       decode_imm = (decode_imm | 0xFFFFF000);
