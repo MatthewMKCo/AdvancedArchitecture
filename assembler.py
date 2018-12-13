@@ -201,6 +201,7 @@ dict_jump = {
 
 def Itype(x, linenumber, f2, check):
     if(len(x) != 4):
+        print(x)
         print("Error wrong number of arguments on line " + str(linenumber))
         exit()
 

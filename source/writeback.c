@@ -8,7 +8,7 @@ void writeintophysreg(int i){
     if(writebackalu[i].tag == 9){
       // exit_early();
 }
-    forward_reservation_stations(writebackalu[i].tag, writebackalu[i].value, 1);
+    forward_reservation_stations(writebackalu[i].tag, writebackalu[i].value);
 
     writeback_destination = writebackalu[i].tag;
 
@@ -16,6 +16,18 @@ void writeintophysreg(int i){
     orderTag.tagNumber = writebackalu[i].tag;
     orderTag.registerNumber = -1;
     addafternodeinstruction(outOfOrderInstructions, writebackalu[i].instruction, writebackalu[i].instructionid, orderTag);
+    return;
+}
+
+void writebackbranch(int i){
+  tag orderTag;
+  orderTag.tagNumber = -2;
+  orderTag.registerNumber = -1;
+  printring(outOfOrderInstructions);
+  addafternodeinstruction(outOfOrderInstructions, writebackbru[i].instruction, writebackbru[i].instructionid, orderTag);
+  printring(outOfOrderInstructions);
+  // exit_early();
+  return;
 }
 
 void writeback(){
@@ -39,6 +51,12 @@ void writeback(){
     if(writebackalu[i].ready == 1){
       writebackalu[i].ready = 0;
       writeintophysreg(i);
+    }
+  }
+  for(int i = 0; i < BRU_NUM; i++){
+    if(writebackbru[i].ready == 1){
+      writebackbru[i].ready = 0;
+      writebackbranch(i);
     }
   }
 }

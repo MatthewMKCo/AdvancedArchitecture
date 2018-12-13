@@ -187,9 +187,28 @@ void print_reg_summary(){
   }
   printf("\n");
   for(int i = 0; i < ALU_NUM; i++){
-    if(alu[i].ready == 1)printf("ALU %d:FREE\n", i);
-    if(alu[i].ready == 0)printf("ALU %d:INUSE\n", i);
+    if(alu[i].ready == 1)printf("ALU %d:FREE\t", i);
+    if(alu[i].ready == 0)printf("ALU %d:INUSE\t", i);
   }
+  printf("\n");
+  for(int i = 0; i < BRU_NUM; i++){
+    if(bru[i].ready == 1)printf("BRU %d:FREE\t", i);
+    if(bru[i].ready == 0)printf("BRU %d:INUSE\t", i);
+  }
+  printf("\n");
+  for(int i = 0; i < LSU_NUM; i++){
+    if(lsu[i].ready == 1)printf("LSU %d:FREE\t", i);
+    if(lsu[i].ready == 0)printf("LSU %d:INUSE\t", i);
+  }
+  printf("\n");
+  // printf("%d\n", fetch_finished);
+  // printf("%d\n", decode_finished);
+  // printf("%d\n", issue_finished);
+  // printf("%d\n", execute_finished);
+  // printf("%d\n", writeback_finished);
+  // printf("%d\n", graduate_finished);
+
+
 }
 
 void move_next_to_current(){
@@ -213,7 +232,7 @@ void move_next_to_current(){
 
   send_for_writeback();
 
-  if(stall_from_issue == 0){
+  if(stall_from_issue == 0 || first_decode >= 1){
     // issue_instruction = decode_instruction;
     // issue_rsource1 = decode_rsource1;
     // issue_rsource2 = decode_rsource2;
@@ -245,8 +264,11 @@ void move_next_to_current(){
       // exit_early();
     }
   }
+  for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
+    if(reservationbru[i].inuse == 1)reservationbru[i].inExecute = 1;
+  }
 
-  if(stall_from_issue == 0){
+  if(stall_from_issue == 0 || first_fetch >= 1){
     decode_instruction = fetch_instruction;
     decodepc = fetchpc;
 
@@ -259,4 +281,20 @@ void move_next_to_current(){
 void exit_early(){
   printf("EXIT EARLY\n");
   exit(1);
+}
+
+void purgepipe(){
+  for(int i = 0; i < RESERVATION_WIDTH; i++){
+    if(reservationalu[i].instruction.instructionid > purgeid){
+      reservationalu[i].inuse = 0;
+      reservationalu[i].inExecute = 0;
+    }
+  }
+  for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
+    if(reservationbru[i].instruction.instructionid >= purgeid){
+      reservationbru[i].inuse = 0;
+      reservationbru[i].inExecute = 0;
+    }
+  }
+  deletenodeswithgreaterthanid(purgeid);
 }

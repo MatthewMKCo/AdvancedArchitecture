@@ -163,6 +163,8 @@ void beq(int reg1, int reg2){
     instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
+    purgeid = currentInstruction.instructionid;
+    purge = 1;
   }
   return;
 }
@@ -173,6 +175,8 @@ void bne(int reg1, int reg2){
     instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
+    purgeid = currentInstruction.instructionid;
+    purge = 1;
   }
   return;
 }
@@ -181,10 +185,13 @@ void bne(int reg1, int reg2){
 void blt(int reg1, int reg2){
   // printf("please\n");
   // printf("%d\t%d\n",reg1,reg2);
+
   if(reg1 < reg2){
     instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
+    purgeid = currentInstruction.instructionid;
+    purge = 1;
   }
   return;
 }
@@ -196,6 +203,8 @@ void bltu(int reg1, int reg2){
     instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
+    purgeid = currentInstruction.instructionid;
+    purge = 1;
   }
   return;
 }
@@ -206,6 +215,8 @@ void bge(int reg1, int reg2){
     instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
+    purgeid = currentInstruction.instructionid;
+    purge = 1;
   }
   return;
 }
@@ -216,6 +227,8 @@ void bgeu(int reg1, int reg2){
     instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
+    purgeid = currentInstruction.instructionid;
+    purge = 1;
   }
   return;
 }

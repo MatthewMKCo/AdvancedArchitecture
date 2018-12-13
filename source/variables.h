@@ -265,3 +265,7 @@ extern int fetch_finished, decode_finished, issue_finished, execute_finished, wr
 extern int execute_cycle_finished;
 
 extern int instructionid;
+
+extern int flush_from_issue;
+
+extern int purgeid, purge;

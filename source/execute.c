@@ -7,6 +7,9 @@ int check_execute_and_reservation_units(){
   for(int i = 0; i < RESERVATION_WIDTH; i++){
     if(reservationalu[i].inuse)return 0;
   }
+  for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
+    if(reservationbru[i].inuse)return 0;
+  }
   for(int i = 0; i < ALU_NUM; i++){
     if(alu[i].ready == 0)return 0;
   }
@@ -231,10 +234,12 @@ void execute_bformat(int number){
       // printf("Instruction:Branch if Not Equal\n");
       executed_instruction_name = "Branch if Not Equal";
       bne(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      bru[number].cyclesNeeded = 1;
       break;
     case(0b100):
       // printf("Instruction:Branch if Less Than\n");
       executed_instruction_name = "Branch if Less Than";
+      // exit_early();
       blt(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
       break;
@@ -242,16 +247,19 @@ void execute_bformat(int number){
       // printf("Instruction:Branch if Greater Than\n");
       executed_instruction_name = "Branch if Greater Than";
       bge(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      bru[number].cyclesNeeded = 1;
       break;
     case(0b110):
       // printf("Instruction:Branch if Less Than Unsigned\n");
       executed_instruction_name = "Branch if Less Than Unsigned";
       bltu(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      bru[number].cyclesNeeded = 1;
       break;
     case(0b111):
       // printf("Instruction:Branch if Greater Than Unsigned\n");
       executed_instruction_name = "Branch if Greater Than Unsigned";
       bgeu(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      bru[number].cyclesNeeded = 1;
       break;
   }
   return;
@@ -385,8 +393,7 @@ void increment_units(){
   return;
 }
 
-void forward_reservation_stations(int tagPassed, int value, int unit_type){
-  if(unit_type == 1){
+void forward_reservation_stations(int tagPassed, int value){
     for(int i = 0; i < RESERVATION_WIDTH; i++){
 
       if(reservationalu[i].rsource1ready == 0 && reservationalu[i].rsource1 == tagPassed){
@@ -403,8 +410,24 @@ void forward_reservation_stations(int tagPassed, int value, int unit_type){
         // printf("%d\n",value);
       }
     }
-  }
-  if(stop == 1)exit_early();
+
+    for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
+
+      if(reservationbru[i].rsource1ready == 0 && reservationbru[i].rsource1 == tagPassed){
+        reservationbru[i].rsource1value = value;
+        reservationbru[i].instruction.rsource1value = value;
+        reservationbru[i].rsource1ready = 1;
+        // printf("%d\n",value);
+        // if(tagPassed==5)exit_early();
+      }
+      if(reservationbru[i].rsource2ready == 0 && reservationbru[i].rsource2 == tagPassed){
+        reservationbru[i].rsource2value = value;
+        reservationbru[i].instruction.rsource2value = value;
+        reservationbru[i].rsource2ready = 1;
+        // printf("%d\n",value);
+      }
+    }
+
 }
 
 void send_for_writeback(){
@@ -425,16 +448,12 @@ void send_for_writeback(){
   }
   for(int i = 0; i < BRU_NUM; i++){
     if(bru[i].readyForWriteback == 1){
-      bru[i].wbValueInside = bru[i].valueInside;
       bru[i].readyForWriteback = 0;
       bru[i].shouldWriteback = 0;
-      // alu[i].wbDestinationRegister = alu[i].destinationRegister;
-      // alu[i].readyForWriteback = 2;
-      writebackalu[i].value = alu[i].valueInside;
-      writebackalu[i].ready = 1;
-      writebackalu[i].tag = alu[i].destinationRegister;
-      writebackalu[i].instruction = alu[i].instruction.instruction_hex;
-      writebackalu[i].instructionid = alu[i].instruction.instructionid;
+      // writebackbru[i].value = bru[i].valueInside;
+      writebackbru[i].ready = 1;
+      writebackbru[i].instruction = bru[i].instruction.instruction_hex;
+      writebackbru[i].instructionid = bru[i].instruction.instructionid;
       // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
     }
   }
@@ -616,7 +635,6 @@ void execute(){
   currentInstructions = check_reservation_bru(currentAvailable.number);
 
   for(int i = 0; i < currentInstructions.foundInstructions; i++){
-
     int bru_unit_number = currentAvailable.unitNumber[i];
     currentInstruction = currentInstructions.instruction[i];
 
@@ -651,7 +669,7 @@ void execute(){
 
   increment_units();
 
-  if(issue_finished == 1 && execute_finished != 1){
+  if(issue_finished == 1 && execute_finished != 1 && current_cycle > last_instruction_cycle + 3){
     execute_finished = check_execute_and_reservation_units();
     if(execute_finished){
       execute_cycle_finished = current_cycle;

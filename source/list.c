@@ -1,4 +1,5 @@
 #include "run.h"
+#include <string.h>
 
 void replacedata(node *node, int registerNumber);
 
@@ -27,6 +28,7 @@ void addafternode(ring *currentRing, tag data){
   newnode -> name = currentRing -> name;
   newnode -> data = data;
   currentRing -> last -> forward = newnode;
+  currentRing -> sentinel -> back = newnode;
   newnode -> forward = currentRing -> sentinel;
   newnode -> back = currentRing -> last;
   currentRing -> last = newnode;
@@ -61,15 +63,17 @@ void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, ta
 
 void movenode2(ring *inuse, node *oldFirst){
   node *before = inuse -> last;
+
   inuse -> last -> forward = oldFirst;
   inuse -> sentinel -> back = oldFirst;
   inuse -> last = oldFirst;
   oldFirst -> forward = inuse -> sentinel;
   oldFirst -> back = before;
-
   if(inuse -> first == inuse -> sentinel){
     inuse -> first = oldFirst;
+    inuse -> last = oldFirst;
     inuse -> sentinel -> forward = oldFirst;
+    inuse -> sentinel -> back = oldFirst;
   }
 }
 
@@ -79,20 +83,73 @@ int movenode(ring *unused, ring *inuse, int registerNumber){
   node *after = unused -> first -> forward;
   node *oldFirst = unused -> first;
   if(oldFirst -> data.tagNumber == -1){
-    printf("ERROR in movenode\n");
+    printring(inuseTags);
+    printring(unusedTags);
+    printf("ERROR in movenode for %s\n", unused -> name);
     exit_early(1);
   }
 
   unused -> first = oldFirst -> forward;
   unused -> first -> back = before;
   before -> forward = after;
+  unused -> last = unused -> sentinel -> back;
+  // printf("%d\n", registerNumber);
+  // printf("%s\n", unused -> name);
+  // int ret = strcmp(unused -> name, "inuseTags")
+  // if(oldFirst -> data.tagNumber == 13 ){
+  //   exit_early();
+  // }
 
   replacedata(oldFirst, registerNumber);
-
+  oldFirst -> name = inuse -> name;
   movenode2(inuse, oldFirst);
 
   return oldFirst -> data.tagNumber;
 }
+
+//deletes the selected node after finding tag
+int moveselectednode(ring *unused, ring *inuse, int registerNumber, int findTagNumber){
+  unused -> selected = unused -> first;
+  while(1){
+    if(unused -> selected == unused -> sentinel){
+      printring(inuseTags);
+      printring(unusedTags);
+      printf("ERROR in moveselectednode for %s\n", unused -> name);
+      exit_early(1);
+    }
+    if(unused -> selected -> data.tagNumber == findTagNumber)break;
+    else next(unused);
+  }
+
+  node *before = unused -> selected -> back;
+  node *after = unused -> selected -> forward;
+  node *oldSelected = unused -> selected;
+  if(oldSelected -> data.tagNumber == -1){
+    printring(inuseTags);
+    printring(unusedTags);
+    printf("ERROR in movenode for %s\n", unused -> name);
+    exit_early(1);
+  }
+
+  unused -> selected = oldSelected -> forward;
+  unused -> selected -> back = before;
+  before -> forward = after;
+  unused -> first = unused -> sentinel -> forward;
+  unused -> last = unused -> sentinel -> back;
+  // printf("%d\n", registerNumber);
+  // printf("%s\n", unused -> name);
+  // int ret = strcmp(unused -> name, "inuseTags")
+  // if(oldFirst -> data.tagNumber == 13 ){
+  //   exit_early();
+  // }
+
+  replacedata(oldSelected, registerNumber);
+  oldSelected -> name = inuse -> name;
+  movenode2(inuse, oldSelected);
+
+  return oldSelected -> data.tagNumber;
+}
+
 
 
 
@@ -257,10 +314,10 @@ void printring(ring *currentRing){
   currentRing -> selected = currentRing -> first;
   while(1){
     if(currentRing -> selected -> data.tagNumber == -1){
-      printf("Id:%d\tTag:%d\tRegister:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber,currentRing -> selected -> name);
+      printf("Id:%d\tTag:%d\tRegister:%d\tReady:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber, currentRing -> selected -> ready,currentRing -> selected -> name);
       break;
     }
-    printf("Id:%d\tTag:%d\tRegister:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber,currentRing -> selected -> name);
+    printf("Id:%d\tTag:%d\tRegister:%d\tReady:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber, currentRing -> selected -> ready,currentRing -> selected -> name);
     next(currentRing);
   }
   printf("Id of first:%d\n", currentRing -> first -> id);
@@ -274,7 +331,7 @@ void printringbackwards(ring *currentRing){
   printf("Current Ring Name:%s\n", currentRing -> name);
   currentRing -> selected = currentRing -> last;
   while(1){
-    if(currentRing -> selected == currentRing -> sentinel){
+    if(currentRing -> selected -> data.registerNumber == -1){
       printf("Register:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> name);
       break;
     }
@@ -308,4 +365,31 @@ void change_to_ready(ring* currentRing){
     next(currentRing);
   }
   return;
+}
+
+void deletenodeswithgreaterthanid(int purgeid){
+  outOfOrderInstructions -> selected = outOfOrderInstructions -> first;
+  while(1){
+    if(outOfOrderInstructions -> selected == outOfOrderInstructions -> sentinel){
+      break;
+    }
+    if(outOfOrderInstructions -> selected -> id > purgeid){
+      deletenode(outOfOrderInstructions);
+    }
+    next(outOfOrderInstructions);
+  }
+
+  inOrderInstructions -> selected = inOrderInstructions -> first;
+  while(1){
+    if(inOrderInstructions -> selected == inOrderInstructions -> sentinel){
+      break;
+    }
+    if(inOrderInstructions -> selected -> id > purgeid){
+      if(inOrderInstructions -> selected -> data.tagNumber >= 0){
+        moveselectednode(inuseTags, unusedTags, -1, inOrderInstructions -> selected -> data.tagNumber);
+      }
+      deletenode(inOrderInstructions);
+    }
+    next(inOrderInstructions);
+  }
 }

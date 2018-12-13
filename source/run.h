@@ -86,8 +86,9 @@ void print_reg_summary();
 void move_next_to_current();
 void mem_acc();
 void exit_early();
-void forward_reservation_stations(int tagPassed, int value, int unit_type);
+void forward_reservation_stations(int tagPassed, int value);
 void are_instructions_ready();
+void purgepipe();
 
 //lists functions
 ring *createring(char* name);
@@ -111,3 +112,4 @@ void change_selected_to_first(ring* currentRing);
 find find_id(ring *currentRing, int id);
 everything get_everything(ring *currentRing);
 void change_to_ready(ring *currentRing);
+void deletenodeswithgreaterthanid();

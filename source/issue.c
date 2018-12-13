@@ -16,7 +16,12 @@ int stall_from_issue = 0;
 void issue_rename(){
 
   if(issue_instruction_struct.instruction_type  == 1 || issue_instruction_struct.instruction_type == 2 || issue_instruction_struct.instruction_type == 3 || issue_instruction_struct.instruction_type == 4){
+    // printf("hi\n");
+    // printring(unusedTags);
+    // printring(unusedTags);
     issue_instruction_struct.tagDestination = movenode(unusedTags, inuseTags, issue_instruction_struct.rdestination);
+    // printring(unusedTags);
+
     physRegisters[issue_instruction_struct.tagDestination].ready = 0;
   }
 
@@ -68,7 +73,6 @@ void issue_add_to_reservation(){
       return;
     }
 
-
     reservationalu[reservationIteratorALU].rdestination = issue_instruction_struct.tagDestination;
     reservationalu[reservationIteratorALU].rsource1 = issue_instruction_struct.tagsource1;
 
@@ -85,8 +89,13 @@ void issue_add_to_reservation(){
         reservationalu[reservationIteratorALU].rsource1ready = 1;
       }
       else{
+
         if(issue_instruction_struct.tagsource1 == issue_instruction_struct.tagDestination){
+          printf("hi\n");
+          // printring(unusedTags);
           foundtag = second_last(inuseTags, issue_instruction_struct.rsource1);
+          printf("hi\n");
+
           if(foundtag.found == 1){
             reservationalu[reservationIteratorALU].rsource1ready = 0;
             reservationalu[reservationIteratorALU].rsource1 = foundtag.number;
@@ -284,7 +293,7 @@ if(issue_unit_type == 3){
   reservationIteratorBRU++;
 
   tag tagData;
-  tagData.tagNumber = issue_instruction_struct.tagDestination;
+  tagData.tagNumber = -2;
   tagData.registerNumber = issue_instruction_struct.rdestination;
 
   addafternodeinstruction(inOrderInstructions, issue_instruction_struct.instruction_hex, instructionid, tagData);
@@ -298,10 +307,18 @@ if(issue_unit_type == 3){
 
 void issue(){
   if(stall_from_issue == 0){
+    if(issue_finished)return;
+    if(pc[0] == 0){
+      if(current_cycle > last_instruction_cycle + 2){
+        issue_finished = 1;
+        return;
+      }
+    }
   if(first_decode < 2){
     print_issue_summary = 0;
     return;
   }
+
   if(first_issue < 2)first_issue++;
   // if(last_instruction == 1){
   //   if(current_cycle > last_instruction_cycle + 2){
@@ -309,18 +326,23 @@ void issue(){
   //     // return;
   //   }
   // }
-  if(issue_finished)return;
+
   if(issue_instruction_struct.instruction_type == 0){
     return;
   }
+  // printf("%d\n", issue_instruction_struct.instruction_type);
   if(issue_instruction_struct.instruction_type == 4 && issue_instruction_struct.rdestination == 0){
     issue_instruction_struct.instruction_type = 0;
     pc[0] = issue_instruction_struct.pc + issue_instruction_struct.imm;
     instructions_executed++;
-    issue_finished = 1;
+    if(pc[0] == 0){
+      // issue_finished = 1;
+    }
+    else{
+      flush_from_issue = 1;
+    }
     return;
   }
-
   print_issue_summary = 1;
 
   issue_rename();

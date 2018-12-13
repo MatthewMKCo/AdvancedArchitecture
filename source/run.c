@@ -53,6 +53,8 @@ int decode_rdestination, issue_rdestination, execute_rdestination, mem_rdestinat
 //Execute unit type, 1 = ALU, 2 = LSU, 3 = BRU
 int decode_unit_type, issue_unit_type;
 
+int flush_from_issue = 0;
+
 //Current Instruction
 uint32_t decode_instruction;
 uint32_t fetch_instruction;
@@ -110,6 +112,8 @@ int fetch_finished = 0, decode_finished, issue_finished = 0, execute_finished = 
 
 int execute_cycle_finished;
 
+int purgeid = 0, purge = 0;
+
 void pipeline_flush(){
   first_fetch = 0;
   first_decode = 0;
@@ -163,21 +167,39 @@ void run(){
 
     print_reg_summary();
 
-    if(branch_flag == 1){
-      pipeline_flush();
+
+    if(purge == 1){
+      purge = 0;
+      first_fetch = 0;
+      first_decode = 0;
+      first_issue = 0;
+      issue_finished = 0;
+      flush_from_issue = 0;
+      purgepipe();
+    }
+    // if(branch_flag == 1){
+    //   pipeline_flush();
+    // }
+    //
+    // if(jump_flag == 1){
+    //   pipeline_flush();
+    //   // exit(1);
+    // }
+
+    if(flush_from_issue == 1){
+      flush_from_issue = 0;
+      first_fetch = 0;
+      first_decode = 0;
+      decode_instruction_struct.instruction_type = 0;
     }
 
-    if(jump_flag == 1){
-      pipeline_flush();
-      // exit(1);
-    }
+
 
     move_next_to_current();
-
     current_cycle++;
     separator;
 
-    // if(current_cycle == 23) exit(1);
+    // if(current_cycle == 19) exit(1);
 }
 }
 
