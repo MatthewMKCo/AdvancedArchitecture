@@ -1,3 +1,7 @@
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 #define SIZE 1024
 
 #define XLEN 32

@@ -112,7 +112,6 @@ void decode(){
     decode_rsource1 = (decode_instruction & 0x000F8000) >> 15;
     decode_rsource2 = (decode_instruction & 0x01F00000) >> 20;
     decode_funct7 = (decode_instruction & 0xFE000000) >> 25;
-    printf("DECODE SOURCE:%d\n", decode_rsource1);
   }
   //J type instructions
   else if(decode_instruction_type == 4){

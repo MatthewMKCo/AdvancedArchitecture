@@ -232,7 +232,7 @@ void move_next_to_current(){
 
   send_for_writeback();
 
-  if(stall_from_issue == 0 || first_decode >= 1){
+  if(stall_from_issue == 0 && first_decode >= 1){
     // issue_instruction = decode_instruction;
     // issue_rsource1 = decode_rsource1;
     // issue_rsource2 = decode_rsource2;
@@ -245,6 +245,7 @@ void move_next_to_current(){
     // issue_imm = decode_imm;
     // issuepc = decodepc;
     issue_unit_type = decode_unit_type;
+    printf("\n\nstruct\n\n");
     issue_instruction_struct = decode_instruction_struct;
   }
 
@@ -268,7 +269,7 @@ void move_next_to_current(){
     if(reservationbru[i].inuse == 1)reservationbru[i].inExecute = 1;
   }
 
-  if(stall_from_issue == 0 || first_fetch >= 1){
+  if(stall_from_issue == 0 && first_fetch >= 1){
     decode_instruction = fetch_instruction;
     decodepc = fetchpc;
 

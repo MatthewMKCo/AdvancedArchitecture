@@ -1,7 +1,6 @@
 #include "run.h"
 
 void writeintophysreg(int i){
-
     physRegisters[writebackalu[i].tag].value = writebackalu[i].value;
     physRegisters[writebackalu[i].tag].ready = 1;
 
@@ -23,9 +22,9 @@ void writebackbranch(int i){
   tag orderTag;
   orderTag.tagNumber = -2;
   orderTag.registerNumber = -1;
-  printring(outOfOrderInstructions);
+  // printring(outOfOrderInstructions);
   addafternodeinstruction(outOfOrderInstructions, writebackbru[i].instruction, writebackbru[i].instructionid, orderTag);
-  printring(outOfOrderInstructions);
+  // printring(outOfOrderInstructions);
   // exit_early();
   return;
 }
@@ -46,7 +45,6 @@ void writeback(){
     // if(last_instruction == 1){
     //   if(current_cycle > last_instruction_cycle + 3)return;
     // }
-
   for(int i = 0; i < ALU_NUM; i++){
     if(writebackalu[i].ready == 1){
       writebackalu[i].ready = 0;

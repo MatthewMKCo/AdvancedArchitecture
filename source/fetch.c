@@ -29,8 +29,8 @@ void fetch(){
   }
   fetch_instruction = ld(Icache, pc[0]);
   fetchpc = pc[0];
+
   pc[0] = pc[0] + 4;
-  // printf("fetchinstruction:%x\n",fetch_next_instruction);
 
   if(fetch_instruction == -1 && last_instruction != 1){
     // last_instruction = 1;

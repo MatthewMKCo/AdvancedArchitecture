@@ -312,7 +312,7 @@ void execute_iformat2(){
 void execute_sformat2(){
   switch(currentInstruction.funct3){
     case(0b000):
-      printf("Instruction:Store 8-bit\n");
+      // printf("Instruction:Store 8-bit\n");
       executed_instruction_name = "Store 8-bit";
       sb(Dcache, execute_offset, currentInstruction.rsource2value);
       break;
