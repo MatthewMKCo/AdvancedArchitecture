@@ -15,15 +15,15 @@ void issue();
 
 //execute functions
 //execute.c functions
-void execute_iformat();
-void execute_uformat();
-void execute_rformat();
-void execute_jformat();
-void execute_bformat();
-void execute_sformat();
-void execute_sformat2();
-void execute_iformat2();
-void execute_sj();
+void execute_iformat(int number);
+void execute_uformat(int number);
+void execute_rformat(int number);
+void execute_jformat(int number);
+void execute_bformat(int number);
+void execute_sformat(int number);
+void execute_sformat2(int number);
+void execute_iformat2(int number);
+// void execute_sj();
 void execute();
 int find_available_agu();
 availNum find_available_alu();

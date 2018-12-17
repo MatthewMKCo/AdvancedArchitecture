@@ -83,10 +83,11 @@ int movenode(ring *unused, ring *inuse, int registerNumber){
   node *after = unused -> first -> forward;
   node *oldFirst = unused -> first;
   if(oldFirst -> data.tagNumber == -1){
-    printring(inuseTags);
-    printring(unusedTags);
-    printf("ERROR in movenode for %s\n", unused -> name);
-    exit_early(1);
+    // printring(inuseTags);
+    // printring(unusedTags);
+    // printf("ERROR in movenode for %s\n", unused -> name);
+    return oldFirst -> data.tagNumber;
+    // exit_early(1);
   }
 
   unused -> first = oldFirst -> forward;

@@ -199,7 +199,7 @@ void run(){
     current_cycle++;
     separator;
 
-    // if(current_cycle == 6) exit(1);
+    // if(current_cycle == 40) exit(1);
 }
 }
 

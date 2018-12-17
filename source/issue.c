@@ -12,17 +12,26 @@ int stop = 0;
 
 int instructionid = 0;
 int stall_from_issue = 0;
+int stall_rename = 1;
 
 void issue_rename(){
 
-  if(issue_instruction_struct.instruction_type  == 1 || issue_instruction_struct.instruction_type == 2 || issue_instruction_struct.instruction_type == 3 || issue_instruction_struct.instruction_type == 4){
+  if(issue_instruction_struct.instruction_type  == 1 || issue_instruction_struct.instruction_type == 2 || issue_instruction_struct.instruction_type == 3){
     issue_instruction_struct.tagDestination = movenode(unusedTags, inuseTags, issue_instruction_struct.rdestination);
+    if(issue_instruction_struct.tagDestination == -1){
+      stall_from_issue = 2;
+      stall_rename = 1;
+      return;
+    }
+    else{
+      stall_rename = 0;
+    }
     physRegisters[issue_instruction_struct.tagDestination].ready = 0;
   }
 
-  if(issue_instruction_struct.instruction_type == 4){
-    issue_instruction_struct.pctag = movenode(unusedTags, inuseTags, issue_instruction_struct.pcDestination);
-  }
+  // if(issue_instruction_struct.instruction_type == 4){
+  //   issue_instruction_struct.pctag = movenode(unusedTags, inuseTags, issue_instruction_struct.pcDestination);
+  // }
 
   find foundtag = find_register_last(inuseTags, issue_instruction_struct.rsource1);
 
@@ -52,6 +61,10 @@ void issue_rename(){
 void issue_add_to_reservation(){
   find foundtag;
   if(issue_unit_type == 1){
+    printf("PHYSICAL REGISTER 9: %d\n", physRegisters[9].ready);
+    printf("TAG SOURCE 1:%d\n",issue_instruction_struct.tagsource1);
+    printf("TAG DESTINATION:%d\n",issue_instruction_struct.tagDestination);
+
     if(reservationIteratorALU >= RESERVATION_WIDTH)reservationIteratorALU = 0;
     int i;
     for(i = 0; i < RESERVATION_WIDTH; i++){
@@ -89,9 +102,14 @@ void issue_add_to_reservation(){
           foundtag = second_last(inuseTags, issue_instruction_struct.rsource1);
 
           if(foundtag.found == 1){
-            reservationalu[reservationIteratorALU].rsource1ready = 0;
             reservationalu[reservationIteratorALU].rsource1 = foundtag.number;
             issue_instruction_struct.tagsource1 = foundtag.number;
+            if(physRegisters[foundtag.number].ready){
+              reservationalu[reservationIteratorALU].rsource1value = physRegisters[foundtag.number].value;
+              issue_instruction_struct.rsource1value = physRegisters[foundtag.number].value;
+              reservationalu[reservationIteratorALU].rsource1ready = 1;
+            }
+            else reservationalu[reservationIteratorALU].rsource1ready = 0;
           }
           else{
             reservationalu[reservationIteratorALU].rsource1ready = 1;
@@ -126,9 +144,15 @@ void issue_add_to_reservation(){
           if(issue_instruction_struct.tagsource2 == issue_instruction_struct.tagDestination){
             foundtag = second_last(inuseTags, issue_instruction_struct.rsource2);
             if(foundtag.found == 1){
-              reservationalu[reservationIteratorALU].rsource2ready = 0;
               reservationalu[reservationIteratorALU].rsource2 = foundtag.number;
               issue_instruction_struct.tagsource2 = foundtag.number;
+
+              if(physRegisters[foundtag.number].ready){
+                reservationalu[reservationIteratorALU].rsource2value = physRegisters[foundtag.number].value;
+                issue_instruction_struct.rsource2value = physRegisters[foundtag.number].value;
+                reservationalu[reservationIteratorALU].rsource2ready = 1;
+              }
+              else reservationalu[reservationIteratorALU].rsource2ready = 0;
             }
             else{
               reservationalu[reservationIteratorALU].rsource2ready = 1;
@@ -185,7 +209,7 @@ if(issue_unit_type == 3){
       break;
     }
   }
-  if(i == RESERVATION_WIDTH){
+  if(i == BRANCH_RESERVATION_WIDTH){
     stall_from_issue = 2;
     return;
   }
@@ -209,9 +233,14 @@ if(issue_unit_type == 3){
       if(issue_instruction_struct.tagsource1 == issue_instruction_struct.tagDestination){
         foundtag = second_last(inuseTags, issue_instruction_struct.rsource1);
         if(foundtag.found == 1){
-          reservationbru[reservationIteratorBRU].rsource1ready = 0;
           reservationbru[reservationIteratorBRU].rsource1 = foundtag.number;
           issue_instruction_struct.tagsource1 = foundtag.number;
+          if(physRegisters[foundtag.number].ready){
+            reservationbru[reservationIteratorBRU].rsource1value = physRegisters[foundtag.number].value;
+            issue_instruction_struct.rsource1value = physRegisters[foundtag.number].value;
+            reservationbru[reservationIteratorBRU].rsource1ready = 1;
+          }
+          else reservationbru[reservationIteratorBRU].rsource1ready = 0;
         }
         else{
           reservationbru[reservationIteratorBRU].rsource1ready = 1;
@@ -246,9 +275,14 @@ if(issue_unit_type == 3){
         if(issue_instruction_struct.tagsource2 == issue_instruction_struct.tagDestination){
           foundtag = second_last(inuseTags, issue_instruction_struct.rsource2);
           if(foundtag.found == 1){
-            reservationbru[reservationIteratorBRU].rsource2ready = 0;
             reservationbru[reservationIteratorBRU].rsource2 = foundtag.number;
             issue_instruction_struct.tagsource2 = foundtag.number;
+            if(physRegisters[foundtag.number].ready){
+              reservationbru[reservationIteratorBRU].rsource2value = physRegisters[foundtag.number].value;
+              issue_instruction_struct.rsource2value = physRegisters[foundtag.number].value;
+              reservationbru[reservationIteratorBRU].rsource2ready = 1;
+            }
+            else reservationbru[reservationIteratorBRU].rsource2ready = 0;
           }
           else{
             reservationbru[reservationIteratorBRU].rsource2ready = 1;
@@ -290,7 +324,136 @@ if(issue_unit_type == 3){
 
   addafternodeinstruction(inOrderInstructions, issue_instruction_struct.instruction_hex, instructionid, tagData);
   instructionid++;
+  // if(instructionid == 22)exit_early();
+}
 
+if(issue_unit_type == 2){
+  if(reservationIteratorLSU >= STORE_RESERVATION_WIDTH)reservationIteratorLSU = 0;
+  int i;
+  for(i = 0; i < STORE_RESERVATION_WIDTH; i++){
+    if(reservationlsu[i].inuse == 1){
+      continue;
+    }
+    else{
+      reservationIteratorLSU = i;
+      break;
+    }
+  }
+  if(i == STORE_RESERVATION_WIDTH){
+    stall_from_issue = 2;
+    return;
+  }
+
+  reservationlsu[reservationIteratorLSU].rdestination = issue_instruction_struct.tagDestination;
+  reservationlsu[reservationIteratorLSU].rsource1 = issue_instruction_struct.tagsource1;
+
+  if(issue_isPhys == 0){
+    issue_instruction_struct.rsource1value = registers[issue_instruction_struct.rsource1];
+    reservationlsu[reservationIteratorLSU].rsource1value = registers[issue_instruction_struct.rsource1];
+    reservationlsu[reservationIteratorLSU].rsource1ready = 1;
+  }
+  else{
+
+    if(physRegisters[issue_instruction_struct.tagsource1].ready == 1){
+      issue_instruction_struct.rsource1value = physRegisters[issue_instruction_struct.tagsource1].value;
+      reservationlsu[reservationIteratorLSU].rsource1value = physRegisters[issue_instruction_struct.tagsource1].value;
+      reservationlsu[reservationIteratorLSU].rsource1ready = 1;
+    }
+    else{
+      if(issue_instruction_struct.tagsource1 == issue_instruction_struct.tagDestination){
+        foundtag = second_last(inuseTags, issue_instruction_struct.rsource1);
+        if(foundtag.found == 1){
+          reservationlsu[reservationIteratorLSU].rsource1 = foundtag.number;
+          issue_instruction_struct.tagsource1 = foundtag.number;
+          if(physRegisters[foundtag.number].ready){
+            reservationlsu[reservationIteratorLSU].rsource1value = physRegisters[foundtag.number].value;
+            issue_instruction_struct.rsource1value = physRegisters[foundtag.number].value;
+            reservationlsu[reservationIteratorLSU].rsource1ready = 1;
+          }
+          else reservationlsu[reservationIteratorLSU].rsource1ready = 0;
+        }
+        else{
+          reservationlsu[reservationIteratorLSU].rsource1ready = 1;
+          reservationlsu[reservationIteratorLSU].rsource1 = issue_instruction_struct.rsource1;
+          reservationlsu[reservationIteratorLSU].rsource1value = registers[issue_instruction_struct.rsource1];
+          issue_instruction_struct.rsource1value = registers[issue_instruction_struct.rsource1];
+        }
+      }
+      else{
+        reservationlsu[reservationIteratorLSU].rsource1ready = 0;
+      }
+    }
+  }
+
+  if(issue_instruction_struct.instruction_type == 3 || issue_instruction_struct.instruction_type == 5 || issue_instruction_struct.instruction_type == 6){
+    reservationlsu[reservationIteratorLSU].rsource2 = issue_instruction_struct.tagsource2;
+    if(issue_isPhys2 == 0){
+      reservationlsu[reservationIteratorLSU].rsource2 = issue_instruction_struct.rsource2;
+
+      issue_instruction_struct.rsource2value = registers[issue_instruction_struct.rsource2];
+      reservationlsu[reservationIteratorLSU].rsource2value = registers[issue_instruction_struct.rsource2];
+      reservationlsu[reservationIteratorLSU].rsource2ready = 1;
+    }
+    else{
+      if(physRegisters[issue_instruction_struct.tagsource2].ready == 1){
+        issue_instruction_struct.rsource2value = physRegisters[issue_instruction_struct.tagsource2].value;
+        reservationlsu[reservationIteratorLSU].rsource2 = issue_instruction_struct.tagsource2;
+        reservationlsu[reservationIteratorLSU].rsource2value = physRegisters[issue_instruction_struct.tagsource2].value;
+        reservationlsu[reservationIteratorLSU].rsource2ready = 1;
+      }
+      else{
+        if(issue_instruction_struct.tagsource2 == issue_instruction_struct.tagDestination){
+          foundtag = second_last(inuseTags, issue_instruction_struct.rsource2);
+          if(foundtag.found == 1){
+            reservationlsu[reservationIteratorLSU].rsource2 = foundtag.number;
+            issue_instruction_struct.tagsource2 = foundtag.number;
+            if(physRegisters[foundtag.number].ready){
+              reservationlsu[reservationIteratorLSU].rsource2value = physRegisters[foundtag.number].value;
+              issue_instruction_struct.rsource2value = physRegisters[foundtag.number].value;
+              reservationlsu[reservationIteratorLSU].rsource2ready = 1;
+            }
+            else reservationlsu[reservationIteratorLSU].rsource2ready = 0;
+          }
+          else{
+            reservationlsu[reservationIteratorLSU].rsource2ready = 1;
+            reservationlsu[reservationIteratorLSU].rsource2 = issue_instruction_struct.rsource2;
+            reservationlsu[reservationIteratorLSU].rsource2value = registers[issue_instruction_struct.rsource2];
+            issue_instruction_struct.rsource2value = registers[issue_instruction_struct.rsource2];
+          }
+        }
+        else{
+          reservationlsu[reservationIteratorLSU].rsource2ready = 0;
+        }
+      }
+  }
+}
+  else{
+    reservationlsu[reservationIteratorLSU].rsource2 = -1;
+    reservationlsu[reservationIteratorLSU].rsource2ready = 1;
+  }
+
+  reservationlsu[reservationIteratorLSU].opcode = issue_instruction_struct.opcode;
+  reservationlsu[reservationIteratorLSU].funct3 = issue_instruction_struct.funct3;
+  reservationlsu[reservationIteratorLSU].funct7 = issue_instruction_struct.funct7;
+  reservationlsu[reservationIteratorLSU].shamt = issue_instruction_struct.shamt;
+  reservationlsu[reservationIteratorLSU].imm = issue_instruction_struct.imm;
+  reservationlsu[reservationIteratorLSU].pc = issue_instruction_struct.pc;
+  reservationlsu[reservationIteratorLSU].instruction_type = issue_instruction_struct.instruction_type;
+  reservationlsu[reservationIteratorLSU].inuse = 1;
+  reservationlsu[reservationIteratorLSU].inExecute = 0;
+  reservationlsu[reservationIteratorLSU].instruction_hex = issue_instruction_struct.instruction_hex;
+  issue_instruction_struct.instructionid = instructionid;
+  reservationlsu[reservationIteratorLSU].instruction = issue_instruction_struct;
+
+  reservationlsu[reservationIteratorLSU].instructionid = issue_instruction_struct.instructionid;
+  reservationIteratorLSU++;
+
+  tag tagData;
+  tagData.tagNumber = -2;
+  tagData.registerNumber = issue_instruction_struct.rdestination;
+
+  addafternodeinstruction(inOrderInstructions, issue_instruction_struct.instruction_hex, instructionid, tagData);
+  instructionid++;
 }
 
   return;
@@ -342,9 +505,16 @@ void issue(){
   print_issue_summary = 1;
 
   issue_rename();
+  if(stall_rename == 1)return;
 
   issue_add_to_reservation();
 
+  }
+  else if(stall_rename){
+    issue_rename();
+    if(stall_rename == 1)return;
+
+    issue_add_to_reservation();
   }
   else{
     issue_add_to_reservation();

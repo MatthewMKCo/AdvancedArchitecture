@@ -42,6 +42,7 @@ void writeback(){
         writeback_finished = 1;
       }
     }
+
     // if(last_instruction == 1){
     //   if(current_cycle > last_instruction_cycle + 3)return;
     // }

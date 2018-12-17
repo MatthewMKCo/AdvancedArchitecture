@@ -14,6 +14,8 @@
 
 #define BRANCH_RESERVATION_WIDTH 16
 
+#define STORE_RESERVATION_WIDTH 16
+
 #define NUM_STAGES 10
 
 #define ALU_NUM 4
@@ -48,6 +50,7 @@ typedef struct instruction{
   int instruction_type;
   uint32_t instruction_hex;
   int instructionid;
+  int index;
 }instruction;
 
 //ALU struct
@@ -103,6 +106,7 @@ typedef struct reserve{
 typedef struct instructionwrapper{
   instruction instruction[ALU_NUM];
   int foundInstructions;
+  int index;
 }instructionwrapper;
 
 typedef struct availNum{

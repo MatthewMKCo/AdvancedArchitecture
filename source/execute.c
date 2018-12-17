@@ -21,8 +21,8 @@ int check_execute_and_reservation_units(){
 
 //execute I format instructions
 void execute_iformat(int number){
-  alu[number].instruction.instructionid = currentInstruction.instructionid;
   if(currentInstruction.opcode == 0b0010011){
+    alu[number].instruction.instructionid = currentInstruction.instructionid;
     switch(currentInstruction.funct3){
       case(0b000):
         // printf("Instruction:Add Immediate\n");
@@ -89,7 +89,7 @@ void execute_iformat(int number){
     // printf("Instruction:Offset Calculated for Load\n");
     // executed_instruction_name
     execute_offset = execute_imm + currentInstruction.rsource1value;
-    execute_iformat2();
+    execute_iformat2(number);
     // printf("execute_imm:%d\n", execute_imm);
     // printf("register_imm:%d\n", currentInstruction.rsource1value);
 
@@ -97,6 +97,7 @@ void execute_iformat(int number){
     execute_load = 1;
   }
   else if(currentInstruction.opcode == 0b1100111){
+    alu[number].instruction.instructionid = currentInstruction.instructionid;
     // printf("Instruction:Jump and Link Register\n");
     executed_instruction_name = "Jump and Link Register";
     execute_val = jalr(currentInstruction.rsource1value);
@@ -109,17 +110,23 @@ void execute_iformat(int number){
   return;
 }
 
-void execute_uformat(){
+void execute_uformat(int number){
+  alu[number].instruction.instructionid = currentInstruction.instructionid;
   switch(currentInstruction.opcode){
     case(0b0110111):
       // printf("Instruction:Load Upper Immediate\n");
       executed_instruction_name = "Load Upper Immediate";
       execute_val = lui();
+      alu[number].cyclesNeeded = 1;
+      alu[number].valueInside = execute_val;
+      alu[number].shouldWriteback = 1;
       break;
     case(0b0010111):
       // printf("Instruction:Add Upper Immediate to PC\n");
       executed_instruction_name = "Add Upper Immediate to PC";
       auipc();
+      alu[number].cyclesNeeded = 1;
+      alu[number].shouldWriteback = 0;
       break;
   }
   return;
@@ -127,7 +134,6 @@ void execute_uformat(){
 
 void execute_rformat(int number){
   alu[number].instruction.instructionid = currentInstruction.instructionid;
-
   switch(currentInstruction.funct3){
     case(0b000):
       if(currentInstruction.funct7 == 0b0000000){
@@ -214,7 +220,7 @@ void execute_rformat(int number){
   return;
 }
 
-void execute_jformat(){
+void execute_jformat(int number){
   // printf("Instruction:Jump and Link\n");
   executed_instruction_name = "Jump and Link";
   jal();
@@ -265,7 +271,7 @@ void execute_bformat(int number){
   return;
 }
 
-void execute_iformat2(){
+void execute_iformat2(int number){
   // printf("load offset:%d\n",execute_offset);
   // if(lsu[number].currentCycles != 0 && lsu[number].cyclesNeeded != 0){
   //   if(lsu[number].currentCycles == lsu[number].cyclesNeeded){
@@ -275,7 +281,7 @@ void execute_iformat2(){
   // if(lsu[number].ready != 1){
   //   return;
   // }
-  int number = find_available_lsu();
+  lsu[number].instruction.instructionid = currentInstruction.instructionid;
   switch(currentInstruction.funct3){
     case(0b000):
       // printf("Instruction:Load 8-bit\n");
@@ -309,41 +315,35 @@ void execute_iformat2(){
   return;
 }
 
-void execute_sformat2(){
+void execute_sformat2(int number){
+  lsu[number].instruction.instructionid = currentInstruction.instructionid;
   switch(currentInstruction.funct3){
     case(0b000):
       // printf("Instruction:Store 8-bit\n");
       executed_instruction_name = "Store 8-bit";
       sb(Dcache, execute_offset, currentInstruction.rsource2value);
+      lsu[number].cyclesNeeded = 1;
       break;
     case(0b001):
       // printf("Instruction:Store 16-bit\n");
       executed_instruction_name = "Store 16-bit";
       sh(Dcache, execute_offset, currentInstruction.rsource2value);
+      lsu[number].cyclesNeeded = 1;
       break;
     case(0b010):
       // printf("Instruction:Store 32-bit\n");
       executed_instruction_name = "Store 32-bit";
       sw(Dcache, execute_offset, currentInstruction.rsource2value);
+      lsu[number].cyclesNeeded = 1;
       break;
   }
   return;
 }
 
-void execute_sformat(){
+void execute_sformat(int number){
   // printf("Instruction:Offset Calculated for Store\n");
   execute_offset = execute_imm + currentInstruction.rsource1value;
-  execute_sformat2();
-}
-
-void execute_sj(){
-  if(execute_instruction_type == 4){
-    execute_jformat();
-  }
-  else if(execute_instruction_type == 6){
-    execute_sformat();
-  }
-  return;
+  execute_sformat2(number);
 }
 
 void increment_units(){
@@ -540,6 +540,11 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
     if(reservationalu[i].rsource1ready && reservationalu[i].rsource2ready && reservationalu[i].inuse && reservationalu[i].inExecute){
       instruction newInstruction;
       newInstruction = reservationalu[i].instruction;
+      if(i == 0){
+        printf("%d\n",newInstruction.rsource1value);
+        printf("%d\n",newInstruction.rsource2value);
+
+      }
       // newInstruction.rdestination = reservationalu[i].rdestination;
       // newInstruction.rsource1value = reservationalu[i].rsource1value;
       // newInstruction.rsource2value = reservationalu[i].rsource2value;
@@ -564,6 +569,7 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
   return wrappedListofInstructions;
 }
 
+int b = 0;
 //Fetches instructions from Reservation Stations
 instructionwrapper check_reservation_bru(int numberOfAvailableUnits){
   instructionwrapper wrappedListofInstructions;
@@ -572,25 +578,51 @@ instructionwrapper check_reservation_bru(int numberOfAvailableUnits){
   for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
     if(reservationbru[i].rsource1ready && reservationbru[i].rsource2ready && reservationbru[i].inuse && reservationbru[i].inExecute){
       if(wrappedListofInstructions.foundInstructions == numberOfAvailableUnits){
+      //   if(reservationbru[i].instructionid == 21){
+      //     printf("%d\n",reservationbru[i].instruction.instructionid);
+      //     printf("%d\n", wrappedListofInstructions.instruction[0].instructionid);
+      //     printf("%d\n",i);
+      //     exit_early();
+      // }
+
         instruction newInstruction;
         newInstruction = reservationbru[i].instruction;
         for(int j = 0; j < numberOfAvailableUnits; j++){
           if(newInstruction.instructionid < wrappedListofInstructions.instruction[j].instructionid){
+            int x = wrappedListofInstructions.instruction[j].index;
+            newInstruction.index = i;
             wrappedListofInstructions.instruction[j] = newInstruction;
+            reservationbru[i].inuse = 0;
+            reservationbru[x].inuse = 1;
+            // if(newInstruction.instructionid == 21)exit_early();
+
           }
         }
       }
-      instruction newInstruction;
-      newInstruction = reservationbru[i].instruction;
-      wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
-      wrappedListofInstructions.foundInstructions++;
-      reservationbru[i].inuse = 0;
+      else{
+        instruction newInstruction;
+        newInstruction = reservationbru[i].instruction;
+        newInstruction.index = i;
+        wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
+        wrappedListofInstructions.foundInstructions++;
+        reservationbru[i].inuse = 0;
 
       // exit_early();
     }
 
-  }
+    }
 
+  }
+  // if(wrappedListofInstructions.foundInstructions > 0)b++;
+  // if(b == 3){
+  //   printf("%d\n",reservationbru[1].inuse);
+  //   printf("%d\n",reservationbru[1].instructionid);
+  //
+  //   printf("%d\n",wrappedListofInstructions.instruction[0].instructionid);
+  //   exit_early();
+  // }
+  // printf("%d\n",reservationbru[1].inuse);
+  // printf("%d\n",reservationbru[1].instructionid);
   return wrappedListofInstructions;
 }
 
@@ -613,15 +645,18 @@ void execute(){
   instructionwrapper currentInstructions = check_reservation_alu(currentAvailable.number);
 
   for(int i = 0; i < currentInstructions.foundInstructions; i++){
-
     int alu_unit_number = currentAvailable.unitNumber[i];
     currentInstruction = currentInstructions.instruction[i];
 
+    printf("hi\n");
     alu[alu_unit_number].ready = 0;
     alu[alu_unit_number].destinationRegister = currentInstruction.tagDestination;
 
     if(currentInstruction.instruction_type == 1){
       execute_iformat(alu_unit_number);
+    }
+    else if(currentInstruction.instruction_type == 2){
+      execute_uformat(alu_unit_number);
     }
     else if(currentInstruction.instruction_type == 3){
       execute_rformat(alu_unit_number);

@@ -208,6 +208,19 @@ void print_reg_summary(){
   // printf("%d\n", writeback_finished);
   // printf("%d\n", graduate_finished);
 
+  // for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
+  //   if(reservationbru[i].instructionid == 21){
+  //     printf("%d\n",i);
+  //     exit_early();
+  //   }
+  // }
+  // for(int i = 0; i < RESERVATION_WIDTH; i++){
+  //   if(reservationalu[i].instructionid == 21){
+  //     printf("%d\n",i);
+  //     exit_early();
+  //   }
+  // }
+
 
 }
 
@@ -245,7 +258,6 @@ void move_next_to_current(){
     // issue_imm = decode_imm;
     // issuepc = decodepc;
     issue_unit_type = decode_unit_type;
-    printf("\n\nstruct\n\n");
     issue_instruction_struct = decode_instruction_struct;
   }
 
