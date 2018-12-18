@@ -74,7 +74,7 @@ void print_reg_summary(){
   if(print_execute_summary){
     printf("Executed Instruction Type:%c\n", instruction_type_char);
     printf("Instruction Executed:0x%.8X\n", executed_instruction);
-    printf("Instruction Executed:%s\n", executed_instruction_name);
+    // printf("Instruction Executed:%s\n", executed_instruction_name);
   }
 
   //Print all register values
@@ -220,6 +220,19 @@ void print_reg_summary(){
   //     exit_early();
   //   }
   // }
+  // for(int i = 0; i < RESERVATION_WIDTH; i++){
+  //   if(reservationalu[i].instructionid == 50){
+  //     printf("%d\n", i );
+  //     exit_early();
+  //   }
+  // }
+  printf("INSTRUCTION ID:%d\n",reservationalu[3].instructionid);
+  printf("RSOURCE 1:%d\n",reservationalu[3].rsource1ready);
+  printf("%d\n",reservationalu[3].rsource2);
+  printf("%d\n",reservationalu[3].rsource2ready);
+
+  printf("RSOURCE 2:%d\n",physRegisters[30].ready);
+
 
 
 }
@@ -281,6 +294,10 @@ void move_next_to_current(){
     if(reservationbru[i].inuse == 1)reservationbru[i].inExecute = 1;
   }
 
+  for(int i = 0; i < STORE_RESERVATION_WIDTH; i++){
+    if(reservationlsu[i].inuse == 1)reservationlsu[i].inExecute = 1;
+  }
+
   if(stall_from_issue == 0 && first_fetch >= 1){
     decode_instruction = fetch_instruction;
     decodepc = fetchpc;
@@ -295,8 +312,9 @@ void exit_early(){
   printf("EXIT EARLY\n");
   exit(1);
 }
-
+int b = 0;
 void purgepipe(){
+  printf("PURGEID :%d\n",purgeid);
   for(int i = 0; i < RESERVATION_WIDTH; i++){
     if(reservationalu[i].instruction.instructionid > purgeid){
       reservationalu[i].inuse = 0;
@@ -304,10 +322,57 @@ void purgepipe(){
     }
   }
   for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
-    if(reservationbru[i].instruction.instructionid >= purgeid){
+    if(reservationbru[i].instruction.instructionid > purgeid){
       reservationbru[i].inuse = 0;
       reservationbru[i].inExecute = 0;
     }
   }
+  for(int i = 0; i < STORE_RESERVATION_WIDTH; i++){
+    if(reservationlsu[i].instruction.instructionid > purgeid){
+      reservationlsu[i].inuse = 0;
+      reservationlsu[i].inExecute = 0;
+    }
+  }
+  for(int i = 0; i < ALU_NUM; i++){
+    if((alu[i].ready == 0 || alu[i].readyForWriteback == 1) && alu[i].instruction.instructionid > purgeid){
+      alu[i].ready = 1;
+      alu[i].readyForWriteback = 0;
+      alu[i].shouldWriteback = 0;
+    }
+  }
+  for(int i = 0; i < BRU_NUM; i++){
+    if((bru[i].ready == 0 || bru[i].readyForWriteback == 1) && bru[i].instruction.instructionid > purgeid){
+      bru[i].ready = 1;
+      bru[i].readyForWriteback = 0;
+      bru[i].shouldWriteback = 0;
+    }
+  }
+  for(int i = 0; i < LSU_NUM; i++){
+    if((lsu[i].ready == 0 || lsu[i].readyForWriteback == 1) && lsu[i].instruction.instructionid > purgeid){
+      lsu[i].ready = 1;
+      lsu[i].readyForWriteback = 0;
+      lsu[i].shouldWriteback = 0;
+    }
+  }
+  for(int i = 0; i < ALU_NUM; i++){
+    if(writebackalu[i].ready == 1 && writebackalu[i].instructionid > purgeid){
+      writebackalu[i].ready = 0;
+    }
+  }
+  for(int i = 0; i < BRU_NUM; i++){
+    if(writebackbru[i].ready == 1 && writebackbru[i].instructionid > purgeid){
+      writebackbru[i].ready = 0;
+    }
+  }
+  for(int i = 0; i < LSU_NUM; i++){
+    if(writebacklsu[i].ready == 1 && writebacklsu[i].instructionid > purgeid){
+      writebacklsu[i].ready = 0;
+    }
+  }
   deletenodeswithgreaterthanid(purgeid);
+  printring(inOrderInstructions);
+  printring(outOfOrderInstructions);
+
+  // if(b==7)exit_early();
+  b++;
 }

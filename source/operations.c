@@ -159,7 +159,7 @@ void beq(int reg1, int reg2){
     // printf("offset:%d\n",currentInstruction.imm);
     // printf("actual pc:%d\n", currentInstruction.pc);
     // printf("actual pc:%d\n", currentpc);
-    printf("%d\n",currentInstruction.imm);
+    // printf("%d\n",currentInstruction.imm);
     instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;
@@ -180,8 +180,7 @@ void bne(int reg1, int reg2){
   }
   return;
 }
-
-//branch if less than
+//branch if less than 197
 void blt(int reg1, int reg2){
   // printf("please\n");
   // printf("%d\t%d\n",reg1,reg2);

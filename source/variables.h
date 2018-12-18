@@ -120,6 +120,7 @@ typedef struct execute_to_writeback{
   int tag;
   int instruction;
   int instructionid;
+  int instruction_type;
 }execute_to_writeback;
 
 // typedef int item;
@@ -207,7 +208,7 @@ extern int decode_rdestination, issue_rdestination, execute_rdestination, mem_rd
 extern int decode_unit_type, issue_unit_type;
 
 extern ring* unusedTags; extern ring* inuseTags; extern ring* outOfOrderInstructions; extern ring* inOrderInstructions;
-
+extern ring* allInOrder;
 
 //Current Instruction
 extern uint32_t decode_instruction;
@@ -258,7 +259,7 @@ extern int print_decode_summary, print_execute_summary, print_issue_summary;
 
 extern int writeback_destination, graduate_destination;
 
-extern execute_to_writeback writebackalu[ALU_NUM], writebackbru[BRU_NUM];
+extern execute_to_writeback writebackalu[ALU_NUM], writebackbru[BRU_NUM], writebacklsu[LSU_NUM];
 
 extern int stall_from_issue;
 
@@ -274,6 +275,8 @@ extern int execute_cycle_finished;
 
 extern int instructionid;
 
-extern int flush_from_issue;
+extern int flush_from_issue, stall_rename;
 
 extern int purgeid, purge;
+
+extern int continue_execute;

@@ -28,6 +28,9 @@ void issue_rename(){
     }
     physRegisters[issue_instruction_struct.tagDestination].ready = 0;
   }
+  else{
+    issue_instruction_struct.tagDestination = -1;
+  }
 
   // if(issue_instruction_struct.instruction_type == 4){
   //   issue_instruction_struct.pctag = movenode(unusedTags, inuseTags, issue_instruction_struct.pcDestination);
@@ -61,10 +64,6 @@ void issue_rename(){
 void issue_add_to_reservation(){
   find foundtag;
   if(issue_unit_type == 1){
-    printf("PHYSICAL REGISTER 9: %d\n", physRegisters[9].ready);
-    printf("TAG SOURCE 1:%d\n",issue_instruction_struct.tagsource1);
-    printf("TAG DESTINATION:%d\n",issue_instruction_struct.tagDestination);
-
     if(reservationIteratorALU >= RESERVATION_WIDTH)reservationIteratorALU = 0;
     int i;
     for(i = 0; i < RESERVATION_WIDTH; i++){
@@ -193,6 +192,8 @@ void issue_add_to_reservation(){
     tagData.registerNumber = issue_instruction_struct.rdestination;
 
     addafternodeinstruction(inOrderInstructions, issue_instruction_struct.instruction_hex, instructionid, tagData);
+    // printf("%d\n",tagData.registerNumber);
+    // if(instructionid == 6)exit_early();
     instructionid++;
 
 }
@@ -321,7 +322,6 @@ if(issue_unit_type == 3){
   tag tagData;
   tagData.tagNumber = -2;
   tagData.registerNumber = issue_instruction_struct.rdestination;
-
   addafternodeinstruction(inOrderInstructions, issue_instruction_struct.instruction_hex, instructionid, tagData);
   instructionid++;
   // if(instructionid == 22)exit_early();
@@ -449,8 +449,14 @@ if(issue_unit_type == 2){
   reservationIteratorLSU++;
 
   tag tagData;
-  tagData.tagNumber = -2;
-  tagData.registerNumber = issue_instruction_struct.rdestination;
+  if(issue_instruction_struct.instruction_type == 1){
+    tagData.tagNumber = issue_instruction_struct.tagDestination;
+    tagData.registerNumber = issue_instruction_struct.rdestination;
+  }
+  else{
+    tagData.tagNumber = -2;
+    tagData.registerNumber = -2;
+  }
 
   addafternodeinstruction(inOrderInstructions, issue_instruction_struct.instruction_hex, instructionid, tagData);
   instructionid++;
@@ -475,19 +481,13 @@ void issue(){
   }
 
   if(first_issue < 2)first_issue++;
-  // if(last_instruction == 1){
-  //   if(current_cycle > last_instruction_cycle + 2){
-  //     print_execute_summary = 0;
-  //     // return;
-  //   }
-  // }
 
   if(issue_instruction_struct.instruction_type == 0){
     return;
   }
 
   // printf("%d\n", issue_instruction_struct.instruction_type);
-  if(issue_instruction_struct.instruction_type == 4 && issue_instruction_struct.rdestination == 0){
+  if(issue_instruction_struct.instruction_type == 4 && issue_instruction_struct.rdestination == 0 && pc[0] != 0){
     issue_instruction_struct.instruction_type = 0;
     pc[0] = issue_instruction_struct.pc + issue_instruction_struct.imm;
 
@@ -500,8 +500,10 @@ void issue(){
 
       flush_from_issue = 1;
     }
+
     return;
   }
+
   print_issue_summary = 1;
 
   issue_rename();
@@ -511,12 +513,56 @@ void issue(){
 
   }
   else if(stall_rename){
+    if(issue_instruction_struct.instruction_type == 0){
+      return;
+    }
+
+    // printf("%d\n", issue_instruction_struct.instruction_type);
+    if(issue_instruction_struct.instruction_type == 4 && issue_instruction_struct.rdestination == 0 && pc[0] != 0){
+      issue_instruction_struct.instruction_type = 0;
+      pc[0] = issue_instruction_struct.pc + issue_instruction_struct.imm;
+
+      instructions_executed++;
+
+      if(pc[0] == 0){
+        // issue_finished = 1;
+      }
+      else{
+
+        flush_from_issue = 1;
+      }
+      printf("INSTRUCTIONS EXECUTED FROM ISSUE:%d\n\n\n\n", instructions_executed);
+
+      return;
+    }
     issue_rename();
     if(stall_rename == 1)return;
 
     issue_add_to_reservation();
   }
   else{
+    if(issue_instruction_struct.instruction_type == 0){
+      return;
+    }
+
+    // printf("%d\n", issue_instruction_struct.instruction_type);
+    if(issue_instruction_struct.instruction_type == 4 && issue_instruction_struct.rdestination == 0 && pc[0] != 0){
+      issue_instruction_struct.instruction_type = 0;
+      pc[0] = issue_instruction_struct.pc + issue_instruction_struct.imm;
+
+      instructions_executed++;
+
+      if(pc[0] == 0){
+        // issue_finished = 1;
+      }
+      else{
+
+        flush_from_issue = 1;
+      }
+      printf("INSTRUCTIONS EXECUTED FROM ISSUE:%d\n\n\n\n", instructions_executed);
+
+      return;
+    }
     issue_add_to_reservation();
   }
   return;

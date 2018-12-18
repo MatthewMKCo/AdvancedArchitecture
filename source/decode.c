@@ -26,12 +26,6 @@ void decode(){
   }
   print_decode_summary = 1;
 
-  if(decode_instruction == -1){
-    decode_instruction_type = 0;
-    return;
-  }
-
-
   decode_opcode = (decode_instruction & 0x0000007F);
   switch(decode_opcode){
     case 0b0010011:

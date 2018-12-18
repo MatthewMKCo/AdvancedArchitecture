@@ -20,9 +20,12 @@ void graduate(){
   // printf("OutOfOrderInstructions\n");
   // printring(outOfOrderInstructions);
   // printf("\n");
+  // printf("AllInOrder\n");
+  // printring(allInOrder);
   while(1){
     foundid = find_id(outOfOrderInstructions, instructionid1);
     if(foundid.found == 1){
+      // if(instructionid1 == 113)exit_early();
       everything value = get_everything(inOrderInstructions);
       everything value2 = get_everything(outOfOrderInstructions);
       if(value2.ready != 1)break;
@@ -37,9 +40,18 @@ void graduate(){
           // exit_early();
       }
     }
-      deletenode(inOrderInstructions);
+      // printf("%d\n",getinstructionid(inOrderInstructions));
+      // printf("%x\n",value.instruction);
+      // if(instructionid1 == 115)exit_early();
+      // deletenode(inOrderInstructions);
+      printring(inOrderInstructions);
+      // if(instructionid1 == 366)exit_early();
+      movenode(inOrderInstructions, allInOrder, value.tagData.registerNumber);
       deletenode(outOfOrderInstructions);
       start(outOfOrderInstructions);
+      start(inOrderInstructions);
+
+
       instructionid1 = getinstructionid(inOrderInstructions);
 
     }

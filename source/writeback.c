@@ -1,12 +1,10 @@
 #include "run.h"
-
 void writeintophysreg(int i){
     physRegisters[writebackalu[i].tag].value = writebackalu[i].value;
     physRegisters[writebackalu[i].tag].ready = 1;
 
-    if(writebackalu[i].tag == 9){
-      // exit_early();
-}
+    if(writebackalu[i].instructionid == 116 && writebackalu[i].tag == 91)exit_early();
+
     forward_reservation_stations(writebackalu[i].tag, writebackalu[i].value);
 
     writeback_destination = writebackalu[i].tag;
@@ -29,6 +27,28 @@ void writebackbranch(int i){
   return;
 }
 
+void writebackloadstore(int i){
+  tag orderTag;
+
+  // printf("%d\n",);
+  // if(writebacklsu[i].instructionid == 366)exit_early();
+
+  if(writebacklsu[i].instruction_type == 1){
+    orderTag.tagNumber = writebacklsu[i].tag;
+    orderTag.registerNumber = -1;
+    physRegisters[writebacklsu[i].tag].value = writebacklsu[i].value;
+    physRegisters[writebacklsu[i].tag].ready = 1;
+    forward_reservation_stations(writebacklsu[i].tag, writebacklsu[i].value);
+  }
+  else{
+    orderTag.tagNumber = -2;
+    orderTag.registerNumber = -1;
+  }
+
+  addafternodeinstruction(outOfOrderInstructions, writebacklsu[i].instruction, writebacklsu[i].instructionid, orderTag);
+  return;
+}
+
 void writeback(){
     if(first_execute < 2)return;
     if(first_writeback < 2)first_writeback++;
@@ -46,16 +66,22 @@ void writeback(){
     // if(last_instruction == 1){
     //   if(current_cycle > last_instruction_cycle + 3)return;
     // }
+  for(int i = 0; i < BRU_NUM; i++){
+    if(writebackbru[i].ready == 1){
+      writebackbru[i].ready = 0;
+      writebackbranch(i);
+    }
+  }
   for(int i = 0; i < ALU_NUM; i++){
     if(writebackalu[i].ready == 1){
       writebackalu[i].ready = 0;
       writeintophysreg(i);
     }
   }
-  for(int i = 0; i < BRU_NUM; i++){
-    if(writebackbru[i].ready == 1){
-      writebackbru[i].ready = 0;
-      writebackbranch(i);
+  for(int i = 0; i < LSU_NUM; i++){
+    if(writebacklsu[i].ready == 1){
+      writebacklsu[i].ready = 0;
+      writebackloadstore(i);
     }
   }
 }

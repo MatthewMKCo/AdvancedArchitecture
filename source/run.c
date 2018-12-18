@@ -16,6 +16,7 @@ reserve reservationbru[BRANCH_RESERVATION_WIDTH];
 
 execute_to_writeback writebackalu[ALU_NUM];
 execute_to_writeback writebackbru[BRU_NUM];
+execute_to_writeback writebacklsu[LSU_NUM];
 
 //Current Cycle
 int current_cycle = 1;
@@ -105,6 +106,7 @@ int print_decode_summary = 0, print_execute_summary = 0, print_issue_summary = 0
 int writeback_destination, graduate_destination;
 
 ring* unusedTags; ring* inuseTags; ring* outOfOrderInstructions; ring* inOrderInstructions;
+ring* allInOrder;
 
 instruction decode_instruction_struct, issue_instruction_struct;
 
@@ -113,6 +115,8 @@ int fetch_finished = 0, decode_finished, issue_finished = 0, execute_finished = 
 int execute_cycle_finished;
 
 int purgeid = 0, purge = 0;
+
+int continue_execute = 0;
 
 void pipeline_flush(){
   first_fetch = 0;
@@ -175,6 +179,7 @@ void run(){
       first_issue = 0;
       issue_finished = 0;
       flush_from_issue = 0;
+      stall_rename = 0;
       purgepipe();
     }
     // if(branch_flag == 1){
@@ -199,7 +204,7 @@ void run(){
     current_cycle++;
     separator;
 
-    // if(current_cycle == 40) exit(1);
+    // if(current_cycle == 84) exit(1);
 }
 }
 
@@ -217,6 +222,7 @@ int main(int argc, char** argv){
   unusedTags = createring("unusedTags");
   outOfOrderInstructions = createring("outOfOrderInstructions");
   inOrderInstructions = createring("inOrderInstructions");
+  allInOrder = createring("allInOrder");
 
   for(int i = 0; i < PHYSREG_NUM; i++){
     tag tagPlaceholder;

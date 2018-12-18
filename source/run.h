@@ -28,7 +28,7 @@ void execute();
 int find_available_agu();
 availNum find_available_alu();
 availNum find_available_bru();
-int find_available_lsu();
+availNum find_available_lsu();
 void send_for_writeback();
 //operations.c functions
 int addi(int reg1);

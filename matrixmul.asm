@@ -71,13 +71,14 @@ sw a1 a0 0
 
 .LBB0_5:
 addi a4 a4 1
-jal zero .LBB0_3
+beq zero zero .LBB0_3
 
 .LBB0_6:
 addi a3 a3 1
-jal zero .LBB0_1
+beq zero zero .LBB0_1
 
 .LBB0_7:
 lw t0 s0 -60
 lw t1 s0 -64
 lw t2 s0 -68
+jal zero return

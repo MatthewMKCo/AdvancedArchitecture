@@ -377,7 +377,7 @@ void deletenodeswithgreaterthanid(int purgeid){
     if(outOfOrderInstructions -> selected -> id > purgeid){
       deletenode(outOfOrderInstructions);
     }
-    next(outOfOrderInstructions);
+    else next(outOfOrderInstructions);
   }
 
   inOrderInstructions -> selected = inOrderInstructions -> first;
@@ -391,6 +391,6 @@ void deletenodeswithgreaterthanid(int purgeid){
       }
       deletenode(inOrderInstructions);
     }
-    next(inOrderInstructions);
+    else next(inOrderInstructions);
   }
 }

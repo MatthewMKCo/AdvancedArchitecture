@@ -10,11 +10,17 @@ int check_execute_and_reservation_units(){
   for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
     if(reservationbru[i].inuse)return 0;
   }
+  for(int i = 0; i < STORE_RESERVATION_WIDTH; i++){
+    if(reservationlsu[i].inuse)return 0;
+  }
   for(int i = 0; i < ALU_NUM; i++){
     if(alu[i].ready == 0)return 0;
   }
   for(int i = 0; i < BRU_NUM; i++){
     if(bru[i].ready == 0)return 0;
+  }
+  for(int i = 0; i < LSU_NUM; i++){
+    if(lsu[i].ready == 0)return 0;
   }
   return 1;
 }
@@ -88,7 +94,7 @@ void execute_iformat(int number){
   else if(currentInstruction.opcode == 0b0000011){
     // printf("Instruction:Offset Calculated for Load\n");
     // executed_instruction_name
-    execute_offset = execute_imm + currentInstruction.rsource1value;
+    execute_offset = currentInstruction.imm + currentInstruction.rsource1value;
     execute_iformat2(number);
     // printf("execute_imm:%d\n", execute_imm);
     // printf("register_imm:%d\n", currentInstruction.rsource1value);
@@ -293,21 +299,25 @@ void execute_iformat2(int number){
       // printf("Instruction:Load 16-bit\n");
       executed_instruction_name = "Load 16-bit";
       execute_val = lh(Dcache, execute_offset);
+      lsu[number].cyclesNeeded = 1;
       break;
     case(0b010):
       // printf("Instruction:Load 32-bit\n");
       executed_instruction_name = "Load 32-bit";
       execute_val = lw(Dcache, execute_offset);
+      lsu[number].cyclesNeeded = 4;
       break;
     case(0b100):
       // printf("Instruction:Load 8-bit Unsigned\n");
       executed_instruction_name = "Load 8-bit Unsigned";
       execute_val = lbu(Dcache, execute_offset);
+      lsu[number].cyclesNeeded = 1;
       break;
     case(0b101):
       // printf("Instruction:Load 16-bit Unsigned\n");
       executed_instruction_name = "Load 16-bit Unsigned";
       execute_val = lhu(Dcache, execute_offset);
+      lsu[number].cyclesNeeded = 1;
       break;
   }
   lsu[number].shouldWriteback = 1;
@@ -334,7 +344,7 @@ void execute_sformat2(int number){
       // printf("Instruction:Store 32-bit\n");
       executed_instruction_name = "Store 32-bit";
       sw(Dcache, execute_offset, currentInstruction.rsource2value);
-      lsu[number].cyclesNeeded = 1;
+      lsu[number].cyclesNeeded = 4;
       break;
   }
   return;
@@ -342,7 +352,7 @@ void execute_sformat2(int number){
 
 void execute_sformat(int number){
   // printf("Instruction:Offset Calculated for Store\n");
-  execute_offset = execute_imm + currentInstruction.rsource1value;
+  execute_offset = currentInstruction.imm + currentInstruction.rsource1value;
   execute_sformat2(number);
 }
 
@@ -355,6 +365,7 @@ void increment_units(){
         alu[i].currentCycles = 0;
         alu[i].ready = 1;
         alu[i].readyForWriteback = 1;
+
         // alu[i].wbValueInside = alu[i].valueInside;
         // alu[i].wbDestinationRegister = alu[i].destinationRegister;
       }
@@ -377,8 +388,12 @@ void increment_units(){
     if(lsu[i].ready == 0){
       lsu[i].currentCycles++;
       if(lsu[i].currentCycles == lsu[i].cyclesNeeded){
+        instructions_executed++;
+        lsu[i].currentCycles = 0;
         lsu[i].ready = 1;
         lsu[i].readyForWriteback = 1;
+        // alu[i].wbValueInside = alu[i].valueInside;
+        // alu[i].wbDestinationRegister = alu[i].destinationRegister;
       }
     }
   }
@@ -395,7 +410,6 @@ void increment_units(){
 
 void forward_reservation_stations(int tagPassed, int value){
     for(int i = 0; i < RESERVATION_WIDTH; i++){
-
       if(reservationalu[i].rsource1ready == 0 && reservationalu[i].rsource1 == tagPassed){
         reservationalu[i].rsource1value = value;
         reservationalu[i].instruction.rsource1value = value;
@@ -412,7 +426,6 @@ void forward_reservation_stations(int tagPassed, int value){
     }
 
     for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
-
       if(reservationbru[i].rsource1ready == 0 && reservationbru[i].rsource1 == tagPassed){
         reservationbru[i].rsource1value = value;
         reservationbru[i].instruction.rsource1value = value;
@@ -424,6 +437,23 @@ void forward_reservation_stations(int tagPassed, int value){
         reservationbru[i].rsource2value = value;
         reservationbru[i].instruction.rsource2value = value;
         reservationbru[i].rsource2ready = 1;
+        // printf("%d\n",value);
+      }
+    }
+
+    for(int i = 0; i < STORE_RESERVATION_WIDTH; i++){
+
+      if(reservationlsu[i].rsource1ready == 0 && reservationlsu[i].rsource1 == tagPassed){
+        reservationlsu[i].rsource1value = value;
+        reservationlsu[i].instruction.rsource1value = value;
+        reservationlsu[i].rsource1ready = 1;
+        // printf("%d\n",value);
+        // if(tagPassed==5)exit_early();
+      }
+      if(reservationlsu[i].rsource2ready == 0 && reservationlsu[i].rsource2 == tagPassed){
+        reservationlsu[i].rsource2value = value;
+        reservationlsu[i].instruction.rsource2value = value;
+        reservationlsu[i].rsource2ready = 1;
         // printf("%d\n",value);
       }
     }
@@ -443,6 +473,7 @@ void send_for_writeback(){
       writebackalu[i].tag = alu[i].destinationRegister;
       writebackalu[i].instruction = alu[i].instruction.instruction_hex;
       writebackalu[i].instructionid = alu[i].instruction.instructionid;
+      writebackalu[i].instruction_type = alu[i].instruction.instruction_type;
       // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
     }
   }
@@ -454,24 +485,28 @@ void send_for_writeback(){
       writebackbru[i].ready = 1;
       writebackbru[i].instruction = bru[i].instruction.instruction_hex;
       writebackbru[i].instructionid = bru[i].instruction.instructionid;
+      writebackbru[i].instruction_type = bru[i].instruction.instruction_type;
+
       // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
     }
   }
   for(int i = 0; i < LSU_NUM; i++){
     if(lsu[i].readyForWriteback == 1){
-      lsu[i].readyForWriteback = 2;
+      lsu[i].readyForWriteback = 0;
+      lsu[i].shouldWriteback = 0;
+
+      writebacklsu[i].ready = 1;
+      writebacklsu[i].value = lsu[i].valueInside;
+      writebacklsu[i].tag = lsu[i].destinationRegister;
+      writebacklsu[i].instruction = lsu[i].instruction.instruction_hex;
+      writebacklsu[i].instructionid = lsu[i].instruction.instructionid;
+      writebacklsu[i].instruction_type = lsu[i].instruction.instruction_type;
+
+
+      // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
     }
   }
-  for(int i = 0; i < AGU_NUM; i++){
-    if(agu[i].readyForWriteback == 1){
-      agu[i].readyForWriteback = 2;
-    }
-  }
-  for(int i = 0; i < BRU_NUM; i++){
-    if(bru[i].readyForWriteback == 1){
-      bru[i].readyForWriteback = 2;
-    }
-  }
+  return;
 }
 
 //finds number of available ALUs
@@ -487,19 +522,16 @@ availNum find_available_alu(){
   return available;
 }
 
-int find_available_lsu(){
+availNum find_available_lsu(){
   int i;
+  available.number = 0;
   for(i = 0; i < LSU_NUM; i++){
     if(lsu[i].ready == 1){
-      break;
+      available.unitNumber[available.number] = i;
+      available.number++;
     }
   }
-  if(i == LSU_NUM){
-    return -1;
-  }
-  else{
-    return i;
-  }
+  return available;
 }
 
 int find_available_agu(){
@@ -569,7 +601,6 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
   return wrappedListofInstructions;
 }
 
-int b = 0;
 //Fetches instructions from Reservation Stations
 instructionwrapper check_reservation_bru(int numberOfAvailableUnits){
   instructionwrapper wrappedListofInstructions;
@@ -578,13 +609,6 @@ instructionwrapper check_reservation_bru(int numberOfAvailableUnits){
   for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
     if(reservationbru[i].rsource1ready && reservationbru[i].rsource2ready && reservationbru[i].inuse && reservationbru[i].inExecute){
       if(wrappedListofInstructions.foundInstructions == numberOfAvailableUnits){
-      //   if(reservationbru[i].instructionid == 21){
-      //     printf("%d\n",reservationbru[i].instruction.instructionid);
-      //     printf("%d\n", wrappedListofInstructions.instruction[0].instructionid);
-      //     printf("%d\n",i);
-      //     exit_early();
-      // }
-
         instruction newInstruction;
         newInstruction = reservationbru[i].instruction;
         for(int j = 0; j < numberOfAvailableUnits; j++){
@@ -594,8 +618,6 @@ instructionwrapper check_reservation_bru(int numberOfAvailableUnits){
             wrappedListofInstructions.instruction[j] = newInstruction;
             reservationbru[i].inuse = 0;
             reservationbru[x].inuse = 1;
-            // if(newInstruction.instructionid == 21)exit_early();
-
           }
         }
       }
@@ -606,49 +628,71 @@ instructionwrapper check_reservation_bru(int numberOfAvailableUnits){
         wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
         wrappedListofInstructions.foundInstructions++;
         reservationbru[i].inuse = 0;
-
-      // exit_early();
     }
-
     }
-
   }
-  // if(wrappedListofInstructions.foundInstructions > 0)b++;
-  // if(b == 3){
-  //   printf("%d\n",reservationbru[1].inuse);
-  //   printf("%d\n",reservationbru[1].instructionid);
-  //
-  //   printf("%d\n",wrappedListofInstructions.instruction[0].instructionid);
-  //   exit_early();
-  // }
-  // printf("%d\n",reservationbru[1].inuse);
-  // printf("%d\n",reservationbru[1].instructionid);
   return wrappedListofInstructions;
 }
 
+instructionwrapper check_reservation_lsu(int numberOfAvailableUnits){
+  instructionwrapper wrappedListofInstructions;
+  wrappedListofInstructions.foundInstructions = 0;
+  instruction newInstruction;
+  int first_time = 1;
+  if(numberOfAvailableUnits == 0)return wrappedListofInstructions;
+  for(int j = 0; j < numberOfAvailableUnits; j++){
+    for(int i = 0; i < STORE_RESERVATION_WIDTH; i++){
+      if(reservationlsu[i].inuse && reservationlsu[i].inExecute){
+        if(first_time == 1){
+          first_time = 0;
+          newInstruction = reservationlsu[i].instruction;
+          newInstruction.index = i;
+        }
+        else{
+          if(newInstruction.instructionid > reservationlsu[i].instruction.instructionid){
+            newInstruction = reservationlsu[i].instruction;
+            newInstruction.index = i;
+          }
+        }
+      }
+    }
+    if(first_time != 1){
+      wrappedListofInstructions.instruction[j] = newInstruction;
+      first_time = 1;
+      if(reservationlsu[newInstruction.index].rsource1ready && reservationlsu[newInstruction.index].rsource2ready){
+        wrappedListofInstructions.foundInstructions++;
+        reservationlsu[newInstruction.index].inuse = 0;
+      }
+    }
+    else break;
+  }
+  return wrappedListofInstructions;
+}
 
 void execute(){
 
-  if(first_issue < 2){
+  if(first_issue < 2 && continue_execute == 0){
     print_execute_summary = 0;
     return;
   }
-  if(first_execute < 2)first_execute++;
+  if(first_execute < 2){
+    continue_execute = 1;
+    first_execute++;
+  }
   if(last_instruction == 1){
     if(current_cycle > last_instruction_cycle + 3){
       print_execute_summary = 0;
-      // return;
     }
   }
   print_execute_summary = 1;
   availNum currentAvailable = find_available_alu();
   instructionwrapper currentInstructions = check_reservation_alu(currentAvailable.number);
 
+
   for(int i = 0; i < currentInstructions.foundInstructions; i++){
     int alu_unit_number = currentAvailable.unitNumber[i];
     currentInstruction = currentInstructions.instruction[i];
 
-    printf("hi\n");
     alu[alu_unit_number].ready = 0;
     alu[alu_unit_number].destinationRegister = currentInstruction.tagDestination;
 
@@ -662,8 +706,11 @@ void execute(){
       execute_rformat(alu_unit_number);
     }
     else if(currentInstruction.instruction_type == 4){
-      execute_jformat(alu_unit_number);
+      // execute_jformat(alu_unit_number);
     }
+    printf("Instruction Executed:%s\n", executed_instruction_name);
+    printf("Instruction ID:%d\n", currentInstruction.instructionid);
+
   }
 
   currentAvailable = find_available_bru();
@@ -679,6 +726,30 @@ void execute(){
     if(currentInstruction.instruction_type == 5){
       execute_bformat(bru_unit_number);
     }
+    printf("Instruction Executed:%s\n", executed_instruction_name);
+    printf("Instruction ID:%d\n", currentInstruction.instructionid);
+
+  }
+
+  currentAvailable = find_available_lsu();
+  currentInstructions = check_reservation_lsu(currentAvailable.number);
+
+  for(int i = 0; i < currentInstructions.foundInstructions; i++){
+    int lsu_unit_number = currentAvailable.unitNumber[i];
+    currentInstruction = currentInstructions.instruction[i];
+
+    lsu[lsu_unit_number].ready = 0;
+    lsu[lsu_unit_number].destinationRegister = currentInstruction.tagDestination;
+    lsu[lsu_unit_number].instruction = currentInstruction;
+
+    if(currentInstruction.instruction_type == 1){
+      execute_iformat(lsu_unit_number);
+    }
+    else if(currentInstruction.instruction_type == 6){
+      execute_sformat(lsu_unit_number);
+    }
+    printf("Instruction Executed:%s\n", executed_instruction_name);
+    printf("Instruction ID:%d\n", currentInstruction.instructionid);
   }
 
 
@@ -701,6 +772,17 @@ void execute(){
   // }
 
   // send_for_writeback();
+
+  // if(purge == 1){
+  //   purge = 0;
+  //   first_fetch = 0;
+  //   first_decode = 0;
+  //   first_issue = 0;
+  //   issue_finished = 0;
+  //   flush_from_issue = 0;
+  //   stall_rename = 0;
+  //   purgepipe();
+  // }
 
   increment_units();
 
