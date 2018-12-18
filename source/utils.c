@@ -65,10 +65,12 @@ void load_program(char* file){
 void print_reg_summary(){
   printf("Cycle:%d\n", current_cycle);
   if(last_instruction != 1){
-    printf("Current PC in Fetch:%d\n",fetchpc);
+    printf("Current PC in Fetch:%d\n",fetchpc[NWAY - 1]);
   }
   if(print_decode_summary){
-    printf("Decode Instruction:%x\n",decode_instruction);
+    for(int i = 0; i < NWAY; i++){
+    printf("Decode Instruction:%x\n",decode_instruction[i]);
+  }
     // printf("Decode Opcode:%d\n",decode_opcode);
   }
   if(print_execute_summary){
@@ -262,8 +264,10 @@ void move_next_to_current(){
     // issue_shamt = decode_shamt;
     // issue_imm = decode_imm;
     // issuepc = decodepc;
-    issue_unit_type = decode_unit_type;
-    issue_instruction_struct = decode_instruction_struct;
+    for(int i = 0; i < NWAY; i ++){
+      issue_unit_type[i] = decode_unit_type[i];
+      issue_instruction_struct[i] = decode_instruction_struct[i];
+    }
   }
 
   for(int i = 0; i < RESERVATION_WIDTH; i++){
@@ -291,8 +295,10 @@ void move_next_to_current(){
   }
 
   if(stall_from_issue == 0 && first_fetch >= 1){
-    decode_instruction = fetch_instruction;
-    decodepc = fetchpc;
+    for(int i = 0; i < NWAY; i++){
+      decode_instruction[i] = fetch_instruction[i];
+      decodepc[i] = fetchpc[i];
+    }
 
   }
   // if(stop == 1)exit_early();

@@ -27,13 +27,16 @@ void fetch(){
     // first_fetch = 0;
     return;
   }
-  fetch_instruction = ld(Icache, pc[0]);
-  fetchpc = pc[0];
+
+  for(int i = 0; i < NWAY; i++){
+  fetch_instruction[i] = ld(Icache, pc[0]);
+  fetchpc[i] = pc[0];
 
   pc[0] = pc[0] + 4;
 
-  if(fetch_instruction == -1 && last_instruction != 1){
+  if(fetch_instruction[i] == -1 && last_instruction != 1){
     // last_instruction = 1;
     // last_instruction_cycle = current_cycle - 1;
   }
+}
 }

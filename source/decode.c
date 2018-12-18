@@ -1,14 +1,16 @@
 #include "run.h"
 
 int decode_pcDestination;
-// instruction decode_instruction;
+// instruction decode_instruction[i];
 
 void decode(){
   if(decode_finished)return;
   if(pc[0] == 0){
     if(current_cycle > last_instruction_cycle + 1){
       decode_finished = 1;
-      decode_instruction_struct.instruction_type = 0;
+      for(int i = 0; i < NWAY; i ++){
+        decode_instruction_struct[i].instruction_type = 0;
+      }
       first_decode = 0;
       return;
     }
@@ -26,7 +28,8 @@ void decode(){
   }
   print_decode_summary = 1;
 
-  decode_opcode = (decode_instruction & 0x0000007F);
+  for(int i = 0; i < NWAY; i++){
+  decode_opcode = (decode_instruction[i] & 0x0000007F);
   switch(decode_opcode){
     case 0b0010011:
       decode_instruction_type = 1;
@@ -76,19 +79,19 @@ void decode(){
 
   //I type instructions
   if(decode_instruction_type == 1){
-    decode_rdestination = (decode_instruction & 0x00000F80) >> 7;
-    decode_funct3 = (decode_instruction & 0x00007000) >> 12;
-    decode_rsource1 = (decode_instruction & 0x000F8000) >> 15;
+    decode_rdestination = (decode_instruction[i] & 0x00000F80) >> 7;
+    decode_funct3 = (decode_instruction[i] & 0x00007000) >> 12;
+    decode_rsource1 = (decode_instruction[i] & 0x000F8000) >> 15;
     if(decode_funct3 == 0b101 || decode_funct3 == 0b001){
-      decode_shamt = (decode_instruction & 0x01F00000) >> 20;
-      decode_imm = (decode_instruction & 0xFE000000) >> 25;
+      decode_shamt = (decode_instruction[i] & 0x01F00000) >> 20;
+      decode_imm = (decode_instruction[i] & 0xFE000000) >> 25;
     }
     else if(decode_opcode == 0b1100111 && decode_funct3 == 0b000){
-      decode_imm = (decode_instruction & 0xFFF00000) >> 20;
+      decode_imm = (decode_instruction[i] & 0xFFF00000) >> 20;
       decode_imm = (decode_imm & 0x00000001);
     }
     else{
-      decode_imm = (decode_instruction & 0xFFF00000) >> 20;
+      decode_imm = (decode_instruction[i] & 0xFFF00000) >> 20;
       if((decode_imm & 0x00000800)){
         decode_imm = (decode_imm | 0xFFFFF000);
       }
@@ -96,21 +99,21 @@ void decode(){
   }
   //U type instructions
   else if(decode_instruction_type == 2){
-    decode_rdestination = (decode_instruction & 0x00000F80) >> 7;
-    decode_imm = (decode_instruction & 0xFFFFF000);
+    decode_rdestination = (decode_instruction[i] & 0x00000F80) >> 7;
+    decode_imm = (decode_instruction[i] & 0xFFFFF000);
   }
   //R type instructions
   else if(decode_instruction_type == 3){
-    decode_rdestination = (decode_instruction & 0x00000F80) >> 7;
-    decode_funct3 = (decode_instruction & 0x00007000) >> 12;
-    decode_rsource1 = (decode_instruction & 0x000F8000) >> 15;
-    decode_rsource2 = (decode_instruction & 0x01F00000) >> 20;
-    decode_funct7 = (decode_instruction & 0xFE000000) >> 25;
+    decode_rdestination = (decode_instruction[i] & 0x00000F80) >> 7;
+    decode_funct3 = (decode_instruction[i] & 0x00007000) >> 12;
+    decode_rsource1 = (decode_instruction[i] & 0x000F8000) >> 15;
+    decode_rsource2 = (decode_instruction[i] & 0x01F00000) >> 20;
+    decode_funct7 = (decode_instruction[i] & 0xFE000000) >> 25;
   }
   //J type instructions
   else if(decode_instruction_type == 4){
-    decode_rdestination = (decode_instruction & 0x00000F80) >> 7;
-    decode_imm = (((decode_instruction & 0x000FF000) >> 12 << 12) | ((decode_instruction & 0x00100000) >> 20 << 11) | ((decode_instruction & 0x7FE00000) >> 21 << 1) | ((decode_instruction & 0x80000000) >> 31 << 20));
+    decode_rdestination = (decode_instruction[i] & 0x00000F80) >> 7;
+    decode_imm = (((decode_instruction[i] & 0x000FF000) >> 12 << 12) | ((decode_instruction[i] & 0x00100000) >> 20 << 11) | ((decode_instruction[i] & 0x7FE00000) >> 21 << 1) | ((decode_instruction[i] & 0x80000000) >> 31 << 20));
     if((decode_imm & 0x00080000)){
       decode_imm = (decode_imm | 0xFFF00000);
     }
@@ -118,35 +121,36 @@ void decode(){
   }
   //B type instructions
   else if(decode_instruction_type == 5){
-    decode_funct3 = (decode_instruction & 0x00007000) >> 12;
-    decode_rsource1 = (decode_instruction & 0x000F8000) >> 15;
-    decode_rsource2 = (decode_instruction & 0x01F00000) >> 20;
+    decode_funct3 = (decode_instruction[i] & 0x00007000) >> 12;
+    decode_rsource1 = (decode_instruction[i] & 0x000F8000) >> 15;
+    decode_rsource2 = (decode_instruction[i] & 0x01F00000) >> 20;
     // decode_rdestination = REG_NUM;
-    decode_imm = (((decode_instruction & 0x00000080) >> 7 << 11) | ((decode_instruction & 0x00000F00) >> 8 << 1) | ((decode_instruction & 0x7E000000) >> 25 << 5) | ((decode_instruction & 0x10000000) >> 31 << 5));
+    decode_imm = (((decode_instruction[i] & 0x00000080) >> 7 << 11) | ((decode_instruction[i] & 0x00000F00) >> 8 << 1) | ((decode_instruction[i] & 0x7E000000) >> 25 << 5) | ((decode_instruction[i] & 0x10000000) >> 31 << 5));
     if((decode_imm & 0x00000800)){
       decode_imm = (decode_imm | 0xFFFFF000);
     }
   }
   //S type instructions
   else if(decode_instruction_type == 6){
-    decode_funct3 = (decode_instruction & 0x00007000) >> 12;
-    decode_rsource1 = (decode_instruction & 0x000F8000) >> 15;
-    decode_rsource2 = (decode_instruction & 0x01F00000) >> 20;
-    decode_imm = (((decode_instruction & 0x00000F80) >> 7) | ((decode_instruction & 0xFE000000) >> 25 << 5));
+    decode_funct3 = (decode_instruction[i] & 0x00007000) >> 12;
+    decode_rsource1 = (decode_instruction[i] & 0x000F8000) >> 15;
+    decode_rsource2 = (decode_instruction[i] & 0x01F00000) >> 20;
+    decode_imm = (((decode_instruction[i] & 0x00000F80) >> 7) | ((decode_instruction[i] & 0xFE000000) >> 25 << 5));
     if((decode_imm & 0x00000800)){
       decode_imm = (decode_imm | 0xFFFFF000);
     }
   }
-  decode_instruction_struct.rdestination = decode_rdestination;
-  decode_instruction_struct.rsource1 = decode_rsource1;
-  decode_instruction_struct.rsource2 = decode_rsource2;
-  decode_instruction_struct.opcode = decode_opcode;
-  decode_instruction_struct.funct3 = decode_funct3;
-  decode_instruction_struct.funct7 = decode_funct7;
-  decode_instruction_struct.shamt = decode_shamt;
-  decode_instruction_struct.imm = decode_imm;
-  decode_instruction_struct.pc = decodepc;
-  decode_instruction_struct.instruction_type = decode_instruction_type;
-  decode_instruction_struct.instruction_hex = decode_instruction;
-  decode_instruction_struct.pcDestination = decode_pcDestination;
+  decode_instruction_struct[i].rdestination = decode_rdestination;
+  decode_instruction_struct[i].rsource1 = decode_rsource1;
+  decode_instruction_struct[i].rsource2 = decode_rsource2;
+  decode_instruction_struct[i].opcode = decode_opcode;
+  decode_instruction_struct[i].funct3 = decode_funct3;
+  decode_instruction_struct[i].funct7 = decode_funct7;
+  decode_instruction_struct[i].shamt = decode_shamt;
+  decode_instruction_struct[i].imm = decode_imm;
+  decode_instruction_struct[i].pc = decodepc[i];
+  decode_instruction_struct[i].instruction_type = decode_instruction_type;
+  decode_instruction_struct[i].instruction_hex = decode_instruction[i];
+  decode_instruction_struct[i].pcDestination = decode_pcDestination;
+}
 }

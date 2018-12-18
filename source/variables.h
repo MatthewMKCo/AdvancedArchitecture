@@ -28,6 +28,8 @@
 
 #define TAG_NUM 128
 
+#define NWAY 1
+
 #define separator printf("====================================================\n");
 
 typedef struct instruction{
@@ -197,7 +199,7 @@ extern reg physRegisters[PHYSREG_NUM];
 
 //Program Counter
 extern int* pc;
-extern int decodepc, issuepc, fetchpc, executepc;
+extern int decodepc[NWAY], issuepc, fetchpc[NWAY], executepc;
 extern int* sp;
 //Source Registers
 extern int decode_rsource1, issue_rsource1, execute_rsource1, mem_rsource1;
@@ -205,14 +207,14 @@ extern int decode_rsource2, issue_rsource2, execute_rsource2, mem_rsource2;
 //Destination register
 extern int decode_rdestination, issue_rdestination, execute_rdestination, mem_rdestination, writeback_rdestination;
 //Execute unit type, 1 = ALU, 2 = LSU, 3 = BRU
-extern int decode_unit_type, issue_unit_type;
+extern int decode_unit_type[NWAY], issue_unit_type[NWAY];
 
 extern ring* unusedTags; extern ring* inuseTags; extern ring* outOfOrderInstructions; extern ring* inOrderInstructions;
 extern ring* allInOrder;
 
 //Current Instruction
-extern uint32_t decode_instruction;
-extern uint32_t fetch_instruction;
+extern uint32_t decode_instruction[NWAY];
+extern uint32_t fetch_instruction[NWAY];
 extern uint32_t executed_instruction;
 extern uint32_t issue_instruction;
 
@@ -263,7 +265,7 @@ extern execute_to_writeback writebackalu[ALU_NUM], writebackbru[BRU_NUM], writeb
 
 extern int stall_from_issue;
 
-extern instruction decode_instruction_struct, issue_instruction_struct;
+extern instruction decode_instruction_struct[NWAY], issue_instruction_struct[NWAY];
 
 extern int stop;
 

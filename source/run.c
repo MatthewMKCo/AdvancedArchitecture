@@ -44,7 +44,7 @@ tag tags[TAG_NUM];
 
 //Program Counter
 int* pc = &registers[REG_NUM];
-int decodepc, issuepc, fetchpc, executepc;
+int decodepc[NWAY], issuepc, fetchpc[NWAY], executepc;
 int* sp = &registers[2];
 //Source Registers
 int decode_rsource1, issue_rsource1, execute_rsource1, mem_rsource1;
@@ -52,13 +52,13 @@ int decode_rsource2, issue_rsource2, execute_rsource2, mem_rsource2;
 //Destination register
 int decode_rdestination, issue_rdestination, execute_rdestination, mem_rdestination, writeback_rdestination;
 //Execute unit type, 1 = ALU, 2 = LSU, 3 = BRU
-int decode_unit_type, issue_unit_type;
+int decode_unit_type[NWAY], issue_unit_type[NWAY];
 
 int flush_from_issue = 0;
 
 //Current Instruction
-uint32_t decode_instruction;
-uint32_t fetch_instruction;
+uint32_t decode_instruction[NWAY];
+uint32_t fetch_instruction[NWAY];
 uint32_t executed_instruction;
 uint32_t issue_instruction;
 
@@ -108,7 +108,7 @@ int writeback_destination, graduate_destination;
 ring* unusedTags; ring* inuseTags; ring* outOfOrderInstructions; ring* inOrderInstructions;
 ring* allInOrder;
 
-instruction decode_instruction_struct, issue_instruction_struct;
+instruction decode_instruction_struct[NWAY], issue_instruction_struct[NWAY];
 
 int fetch_finished = 0, decode_finished, issue_finished = 0, execute_finished = 0, writeback_finished = 0, graduate_finished = 0;
 
@@ -195,7 +195,9 @@ void run(){
       flush_from_issue = 0;
       first_fetch = 0;
       first_decode = 0;
-      decode_instruction_struct.instruction_type = 0;
+      for(int i = 0; i < NWAY; i++){
+        decode_instruction_struct[i].instruction_type = 0;
+      }
     }
 
 
