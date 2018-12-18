@@ -8,7 +8,7 @@
 
 #define REG_NUM 32
 
-#define PHYSREG_NUM 128
+#define PHYSREG_NUM 32
 
 #define RESERVATION_WIDTH 64
 
@@ -253,7 +253,7 @@ extern int mem_access, execute_access;
 
 extern int execute_offset, mem_offset;
 
-extern char* executed_instruction_name;
+extern char* executed_instruction_name[ALU_NUM + LSU_NUM + BRU_NUM];
 
 extern int print_decode_summary, print_execute_summary, print_issue_summary;
 
@@ -280,3 +280,5 @@ extern int flush_from_issue, stall_rename;
 extern int purgeid, purge;
 
 extern int continue_execute;
+
+extern int numberOfExecutedInstructions;

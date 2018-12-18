@@ -44,7 +44,7 @@ void graduate(){
       // printf("%x\n",value.instruction);
       // if(instructionid1 == 115)exit_early();
       // deletenode(inOrderInstructions);
-      printring(inOrderInstructions);
+      // printring(inOrderInstructions);
       // if(instructionid1 == 366)exit_early();
       movenode(inOrderInstructions, allInOrder, value.tagData.registerNumber);
       deletenode(outOfOrderInstructions);

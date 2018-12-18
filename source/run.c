@@ -99,7 +99,7 @@ int mem_access, execute_access;
 
 int execute_offset, mem_offset;
 
-char* executed_instruction_name;
+char* executed_instruction_name[ALU_NUM + LSU_NUM + BRU_NUM];
 
 int print_decode_summary = 0, print_execute_summary = 0, print_issue_summary = 0;
 

@@ -72,9 +72,9 @@ void print_reg_summary(){
     // printf("Decode Opcode:%d\n",decode_opcode);
   }
   if(print_execute_summary){
-    printf("Executed Instruction Type:%c\n", instruction_type_char);
-    printf("Instruction Executed:0x%.8X\n", executed_instruction);
-    // printf("Instruction Executed:%s\n", executed_instruction_name);
+    for(int i = 0; i < numberOfExecutedInstructions; i++){
+      printf("Instruction Being Executed:%s\n", executed_instruction_name[i]);
+    }
   }
 
   //Print all register values
@@ -226,14 +226,6 @@ void print_reg_summary(){
   //     exit_early();
   //   }
   // }
-  printf("INSTRUCTION ID:%d\n",reservationalu[3].instructionid);
-  printf("RSOURCE 1:%d\n",reservationalu[3].rsource1ready);
-  printf("%d\n",reservationalu[3].rsource2);
-  printf("%d\n",reservationalu[3].rsource2ready);
-
-  printf("RSOURCE 2:%d\n",physRegisters[30].ready);
-
-
 
 }
 
@@ -314,7 +306,6 @@ void exit_early(){
 }
 int b = 0;
 void purgepipe(){
-  printf("PURGEID :%d\n",purgeid);
   for(int i = 0; i < RESERVATION_WIDTH; i++){
     if(reservationalu[i].instruction.instructionid > purgeid){
       reservationalu[i].inuse = 0;
@@ -370,8 +361,8 @@ void purgepipe(){
     }
   }
   deletenodeswithgreaterthanid(purgeid);
-  printring(inOrderInstructions);
-  printring(outOfOrderInstructions);
+  // printring(inOrderInstructions);
+  // printring(outOfOrderInstructions);
 
   // if(b==7)exit_early();
   b++;

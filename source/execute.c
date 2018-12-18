@@ -2,6 +2,7 @@
 
 availNum available;
 instruction currentInstruction;
+int numberOfExecutedInstructions = 0;
 
 int check_execute_and_reservation_units(){
   for(int i = 0; i < RESERVATION_WIDTH; i++){
@@ -32,57 +33,57 @@ void execute_iformat(int number){
     switch(currentInstruction.funct3){
       case(0b000):
         // printf("Instruction:Add Immediate\n");
-        executed_instruction_name = "Add Immediate";
+        executed_instruction_name[numberOfExecutedInstructions] = "Add Immediate";
         execute_val = addi(currentInstruction.rsource1value);
         alu[number].cyclesNeeded = 1;
         break;
       case(0b111):
         // printf("Instruction:And Immediate\n");
-        executed_instruction_name = "And Immediate";
+        executed_instruction_name[numberOfExecutedInstructions] = "And Immediate";
         execute_val = andi(currentInstruction.rsource1value);
         alu[number].cyclesNeeded = 1;
         break;
       case(0b110):
         // printf("Instruction:Or Immediate\n");
-        executed_instruction_name = "Or Immediate";
+        executed_instruction_name[numberOfExecutedInstructions] = "Or Immediate";
         execute_val = ori(currentInstruction.rsource1value);
         alu[number].cyclesNeeded = 1;
         break;
       case(0b100):
         // printf("Instruction:Xor Immediate\n");
-        executed_instruction_name = "Xor Immediate";
+        executed_instruction_name[numberOfExecutedInstructions] = "Xor Immediate";
         execute_val = xori(currentInstruction.rsource1value);
         alu[number].cyclesNeeded = 1;
         break;
       case(0b010):
         // printf("Instruction:STLI\n");
-        executed_instruction_name = "STLI";
+        executed_instruction_name[numberOfExecutedInstructions] = "STLI";
         execute_val = slti(currentInstruction.rsource1value);
         alu[number].cyclesNeeded = 1;
         break;
       case(0b011):
         // printf("Instruction:STLIU\n");
-        executed_instruction_name = "STLIU";
+        executed_instruction_name[numberOfExecutedInstructions] = "STLIU";
         execute_val = sltiu(currentInstruction.rsource1value);
         alu[number].cyclesNeeded = 1;
         break;
       case(0b001):
         // printf("Instruction:Logical Left Shift Immediate\n");
-        executed_instruction_name = "Logical Left Shift Immediate";
+        executed_instruction_name[numberOfExecutedInstructions] = "Logical Left Shift Immediate";
         execute_val = slli(currentInstruction.rsource1value);
         alu[number].cyclesNeeded = 1;
         break;
       case(0b101):
         if(currentInstruction.imm == 0b0000000){
           // printf("Instruction:Logical Right Shift Immediate\n");
-          executed_instruction_name = "Logical Right Shift Immediate";
+          executed_instruction_name[numberOfExecutedInstructions] = "Logical Right Shift Immediate";
           execute_val = srli(currentInstruction.rsource1value);
           alu[number].cyclesNeeded = 1;
           break;
         }
         else if(currentInstruction.imm == 0b0100000){
           // printf("Instruction:Arithmetic Right Shift Immediate\n");
-          executed_instruction_name = "Arithmetic Right Shift Immediate";
+          executed_instruction_name[numberOfExecutedInstructions] = "Arithmetic Right Shift Immediate";
           execute_val = srai(currentInstruction.rsource1value);
           alu[number].cyclesNeeded = 1;
           break;
@@ -93,7 +94,7 @@ void execute_iformat(int number){
   }
   else if(currentInstruction.opcode == 0b0000011){
     // printf("Instruction:Offset Calculated for Load\n");
-    // executed_instruction_name
+    // executed_instruction_name[numberOfExecutedInstructions]
     execute_offset = currentInstruction.imm + currentInstruction.rsource1value;
     execute_iformat2(number);
     // printf("execute_imm:%d\n", execute_imm);
@@ -105,7 +106,7 @@ void execute_iformat(int number){
   else if(currentInstruction.opcode == 0b1100111){
     alu[number].instruction.instructionid = currentInstruction.instructionid;
     // printf("Instruction:Jump and Link Register\n");
-    executed_instruction_name = "Jump and Link Register";
+    executed_instruction_name[numberOfExecutedInstructions] = "Jump and Link Register";
     execute_val = jalr(currentInstruction.rsource1value);
     alu[number].cyclesNeeded = 1;
   }
@@ -121,7 +122,7 @@ void execute_uformat(int number){
   switch(currentInstruction.opcode){
     case(0b0110111):
       // printf("Instruction:Load Upper Immediate\n");
-      executed_instruction_name = "Load Upper Immediate";
+      executed_instruction_name[numberOfExecutedInstructions] = "Load Upper Immediate";
       execute_val = lui();
       alu[number].cyclesNeeded = 1;
       alu[number].valueInside = execute_val;
@@ -129,7 +130,7 @@ void execute_uformat(int number){
       break;
     case(0b0010111):
       // printf("Instruction:Add Upper Immediate to PC\n");
-      executed_instruction_name = "Add Upper Immediate to PC";
+      executed_instruction_name[numberOfExecutedInstructions] = "Add Upper Immediate to PC";
       auipc();
       alu[number].cyclesNeeded = 1;
       alu[number].shouldWriteback = 0;
@@ -144,52 +145,52 @@ void execute_rformat(int number){
     case(0b000):
       if(currentInstruction.funct7 == 0b0000000){
         // printf("Instruction:Add\n");
-        executed_instruction_name = "Add";
+        executed_instruction_name[numberOfExecutedInstructions] = "Add";
         execute_val = add(currentInstruction.rsource1value, currentInstruction.rsource2value);
         alu[number].cyclesNeeded = 1;
       }
       else if(currentInstruction.funct7 == 0b0100000){
         // printf("Instruction:Subtract\n");
-        executed_instruction_name = "Subtract";
+        executed_instruction_name[numberOfExecutedInstructions] = "Subtract";
         execute_val = sub(currentInstruction.rsource1value, currentInstruction.rsource2value);
         alu[number].cyclesNeeded = 1;
       }
       else if(currentInstruction.funct7 == 0b0000001){
         // printf("Instruction:Multiply\n");
-        executed_instruction_name = "Multiply";
+        executed_instruction_name[numberOfExecutedInstructions] = "Multiply";
         execute_val = mul(currentInstruction.rsource1value, currentInstruction.rsource2value);
         alu[number].cyclesNeeded = 5;
       }
       break;
     case(0b001):
       // printf("Instruction:Logical Left Shift\n");
-      executed_instruction_name = "Logical Left Shift";
+      executed_instruction_name[numberOfExecutedInstructions] = "Logical Left Shift";
       execute_val = sll(currentInstruction.rsource1value, currentInstruction.rsource2value);
       alu[number].cyclesNeeded = 1;
       break;
     case(0b010):
       // printf("Instruction:SLT\n");
-      executed_instruction_name = "SLT";
+      executed_instruction_name[numberOfExecutedInstructions] = "SLT";
       execute_val = slt(currentInstruction.rsource1value, currentInstruction.rsource2value);
       alu[number].cyclesNeeded = 1;
       break;
     case(0b011):
       // printf("Instruction:SLTU\n");
-      executed_instruction_name = "SLTU";
+      executed_instruction_name[numberOfExecutedInstructions] = "SLTU";
       execute_val = sltu(currentInstruction.rsource1value, currentInstruction.rsource2value);
       alu[number].cyclesNeeded = 1;
       break;
     case(0b100):
       if(currentInstruction.funct7 == 0b0000001){
         // printf("Instruction:Divide\n");
-        executed_instruction_name = "Divide";
+        executed_instruction_name[numberOfExecutedInstructions] = "Divide";
         execute_val = divide(currentInstruction.rsource1value, currentInstruction.rsource2value);
         alu[number].cyclesNeeded = 1;
         break;
       }
       else if(currentInstruction.funct7 == 0b0000000){
         // printf("Instruction:Xor\n");
-        executed_instruction_name = "Xor";
+        executed_instruction_name[numberOfExecutedInstructions] = "Xor";
         execute_val = xor(currentInstruction.rsource1value, currentInstruction.rsource2value);
         alu[number].cyclesNeeded = 1;
         break;
@@ -197,26 +198,26 @@ void execute_rformat(int number){
     case(0b101):
       if(currentInstruction.funct7 == 0b0000000){
         // printf("Instruction:Logical Right Shift\n");
-        executed_instruction_name = "Logical Right Shift";
+        executed_instruction_name[numberOfExecutedInstructions] = "Logical Right Shift";
         execute_val = srl(currentInstruction.rsource1value, currentInstruction.rsource2value);
         alu[number].cyclesNeeded = 1;
       }
       else if(currentInstruction.funct7 == 0b0100000){
         // printf("Instruction:Logical Right Shift\n");
-        executed_instruction_name = "Logical Right Shift";
+        executed_instruction_name[numberOfExecutedInstructions] = "Logical Right Shift";
         execute_val = sra(currentInstruction.rsource1value, currentInstruction.rsource2value);
         alu[number].cyclesNeeded = 1;
       }
       break;
     case(0b110):
       // printf("Instruction:Or\n");
-      executed_instruction_name = "Or";
+      executed_instruction_name[numberOfExecutedInstructions] = "Or";
       execute_val = or(currentInstruction.rsource1value, currentInstruction.rsource2value);
       alu[number].cyclesNeeded = 1;
       break;
     case(0b111):
       // printf("Instruction:And\n");
-      executed_instruction_name = "And";
+      executed_instruction_name[numberOfExecutedInstructions] = "And";
       execute_val = and(currentInstruction.rsource1value, currentInstruction.rsource2value);
       alu[number].cyclesNeeded = 1;
       break;
@@ -228,7 +229,7 @@ void execute_rformat(int number){
 
 void execute_jformat(int number){
   // printf("Instruction:Jump and Link\n");
-  executed_instruction_name = "Jump and Link";
+  executed_instruction_name[numberOfExecutedInstructions] = "Jump and Link";
   jal();
   return;
 }
@@ -238,38 +239,38 @@ void execute_bformat(int number){
   switch(currentInstruction.funct3){
     case(0b000):
       // printf("Instruction:Branch if Equal\n");
-      executed_instruction_name = "Branch if Equal";
+      executed_instruction_name[numberOfExecutedInstructions] = "Branch if Equal";
       beq(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
       break;
     case(0b001):
       // printf("Instruction:Branch if Not Equal\n");
-      executed_instruction_name = "Branch if Not Equal";
+      executed_instruction_name[numberOfExecutedInstructions] = "Branch if Not Equal";
       bne(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
       break;
     case(0b100):
       // printf("Instruction:Branch if Less Than\n");
-      executed_instruction_name = "Branch if Less Than";
+      executed_instruction_name[numberOfExecutedInstructions] = "Branch if Less Than";
       // exit_early();
       blt(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
       break;
     case(0b101):
       // printf("Instruction:Branch if Greater Than\n");
-      executed_instruction_name = "Branch if Greater Than";
+      executed_instruction_name[numberOfExecutedInstructions] = "Branch if Greater Than";
       bge(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
       break;
     case(0b110):
       // printf("Instruction:Branch if Less Than Unsigned\n");
-      executed_instruction_name = "Branch if Less Than Unsigned";
+      executed_instruction_name[numberOfExecutedInstructions] = "Branch if Less Than Unsigned";
       bltu(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
       break;
     case(0b111):
       // printf("Instruction:Branch if Greater Than Unsigned\n");
-      executed_instruction_name = "Branch if Greater Than Unsigned";
+      executed_instruction_name[numberOfExecutedInstructions] = "Branch if Greater Than Unsigned";
       bgeu(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
       break;
@@ -291,31 +292,31 @@ void execute_iformat2(int number){
   switch(currentInstruction.funct3){
     case(0b000):
       // printf("Instruction:Load 8-bit\n");
-      executed_instruction_name = "Load 8-bit";
+      executed_instruction_name[numberOfExecutedInstructions] = "Load 8-bit";
       execute_val = lb(Dcache, execute_offset);
       lsu[number].cyclesNeeded = 1;
       break;
     case(0b001):
       // printf("Instruction:Load 16-bit\n");
-      executed_instruction_name = "Load 16-bit";
+      executed_instruction_name[numberOfExecutedInstructions] = "Load 16-bit";
       execute_val = lh(Dcache, execute_offset);
       lsu[number].cyclesNeeded = 1;
       break;
     case(0b010):
       // printf("Instruction:Load 32-bit\n");
-      executed_instruction_name = "Load 32-bit";
+      executed_instruction_name[numberOfExecutedInstructions] = "Load 32-bit";
       execute_val = lw(Dcache, execute_offset);
       lsu[number].cyclesNeeded = 4;
       break;
     case(0b100):
       // printf("Instruction:Load 8-bit Unsigned\n");
-      executed_instruction_name = "Load 8-bit Unsigned";
+      executed_instruction_name[numberOfExecutedInstructions] = "Load 8-bit Unsigned";
       execute_val = lbu(Dcache, execute_offset);
       lsu[number].cyclesNeeded = 1;
       break;
     case(0b101):
       // printf("Instruction:Load 16-bit Unsigned\n");
-      executed_instruction_name = "Load 16-bit Unsigned";
+      executed_instruction_name[numberOfExecutedInstructions] = "Load 16-bit Unsigned";
       execute_val = lhu(Dcache, execute_offset);
       lsu[number].cyclesNeeded = 1;
       break;
@@ -330,19 +331,19 @@ void execute_sformat2(int number){
   switch(currentInstruction.funct3){
     case(0b000):
       // printf("Instruction:Store 8-bit\n");
-      executed_instruction_name = "Store 8-bit";
+      executed_instruction_name[numberOfExecutedInstructions] = "Store 8-bit";
       sb(Dcache, execute_offset, currentInstruction.rsource2value);
       lsu[number].cyclesNeeded = 1;
       break;
     case(0b001):
       // printf("Instruction:Store 16-bit\n");
-      executed_instruction_name = "Store 16-bit";
+      executed_instruction_name[numberOfExecutedInstructions] = "Store 16-bit";
       sh(Dcache, execute_offset, currentInstruction.rsource2value);
       lsu[number].cyclesNeeded = 1;
       break;
     case(0b010):
       // printf("Instruction:Store 32-bit\n");
-      executed_instruction_name = "Store 32-bit";
+      executed_instruction_name[numberOfExecutedInstructions] = "Store 32-bit";
       sw(Dcache, execute_offset, currentInstruction.rsource2value);
       lsu[number].cyclesNeeded = 4;
       break;
@@ -572,11 +573,6 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
     if(reservationalu[i].rsource1ready && reservationalu[i].rsource2ready && reservationalu[i].inuse && reservationalu[i].inExecute){
       instruction newInstruction;
       newInstruction = reservationalu[i].instruction;
-      if(i == 0){
-        printf("%d\n",newInstruction.rsource1value);
-        printf("%d\n",newInstruction.rsource2value);
-
-      }
       // newInstruction.rdestination = reservationalu[i].rdestination;
       // newInstruction.rsource1value = reservationalu[i].rsource1value;
       // newInstruction.rsource2value = reservationalu[i].rsource2value;
@@ -684,6 +680,7 @@ void execute(){
       print_execute_summary = 0;
     }
   }
+  numberOfExecutedInstructions = 0;
   print_execute_summary = 1;
   availNum currentAvailable = find_available_alu();
   instructionwrapper currentInstructions = check_reservation_alu(currentAvailable.number);
@@ -698,19 +695,19 @@ void execute(){
 
     if(currentInstruction.instruction_type == 1){
       execute_iformat(alu_unit_number);
+      numberOfExecutedInstructions++;
     }
     else if(currentInstruction.instruction_type == 2){
       execute_uformat(alu_unit_number);
+      numberOfExecutedInstructions++;
     }
     else if(currentInstruction.instruction_type == 3){
       execute_rformat(alu_unit_number);
+      numberOfExecutedInstructions++;
     }
     else if(currentInstruction.instruction_type == 4){
       // execute_jformat(alu_unit_number);
     }
-    printf("Instruction Executed:%s\n", executed_instruction_name);
-    printf("Instruction ID:%d\n", currentInstruction.instructionid);
-
   }
 
   currentAvailable = find_available_bru();
@@ -725,10 +722,8 @@ void execute(){
 
     if(currentInstruction.instruction_type == 5){
       execute_bformat(bru_unit_number);
+      numberOfExecutedInstructions++;
     }
-    printf("Instruction Executed:%s\n", executed_instruction_name);
-    printf("Instruction ID:%d\n", currentInstruction.instructionid);
-
   }
 
   currentAvailable = find_available_lsu();
@@ -744,12 +739,12 @@ void execute(){
 
     if(currentInstruction.instruction_type == 1){
       execute_iformat(lsu_unit_number);
+      numberOfExecutedInstructions++;
     }
     else if(currentInstruction.instruction_type == 6){
       execute_sformat(lsu_unit_number);
+      numberOfExecutedInstructions++;
     }
-    printf("Instruction Executed:%s\n", executed_instruction_name);
-    printf("Instruction ID:%d\n", currentInstruction.instructionid);
   }
 
 

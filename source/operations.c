@@ -140,7 +140,7 @@ int sra(int reg1, int reg2){
 int jal(){
   int originalPC = currentInstruction.pc + 4;
   pc[0] = currentInstruction.pc + currentInstruction.imm;
-  printf("%d\n",currentInstruction.imm);
+  // printf("%d\n",currentInstruction.imm);
   jump_flag = 1;
   return originalPC;
 }
