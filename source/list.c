@@ -318,7 +318,7 @@ void printring(ring *currentRing){
       printf("Id:%d\tTag:%d\tRegister:%d\tReady:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber, currentRing -> selected -> ready,currentRing -> selected -> name);
       break;
     }
-    printf("Id:%d\tTag:%d\tRegister:%d\tReady:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber, currentRing -> selected -> ready,currentRing -> selected -> name);
+    printf("Id:%d\tTag:%d\tRegister:%d\tReady:%d\tName:%s\tValue:%d\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber, currentRing -> selected -> ready,currentRing -> selected -> name, currentRing -> selected -> value);
     next(currentRing);
   }
   printf("Id of first:%d\n", currentRing -> first -> id);
@@ -392,5 +392,23 @@ void deletenodeswithgreaterthanid(int purgeid){
       deletenode(inOrderInstructions);
     }
     else next(inOrderInstructions);
+  }
+}
+
+void addvaluetolast(ring* currentRing, int value){
+  currentRing -> last -> value = value;
+}
+
+int check_tag_for_zero(ring* currentRing, int tagPassed){
+  start(currentRing);
+  while(1){
+    if(currentRing -> selected -> data.registerNumber == -1){
+      return 0;
+    }
+    else if(currentRing -> selected -> data.tagNumber == tagPassed){
+      if(currentRing -> selected -> data.registerNumber == 0)return 1;
+      else return 0;
+    }
+    else next(currentRing);
   }
 }

@@ -241,6 +241,7 @@ int main(int argc, char** argv){
   separator;
 
   run();
-  printring(allInOrder);
+
+
   return 0;
 }

@@ -410,6 +410,7 @@ void increment_units(){
 }
 
 void forward_reservation_stations(int tagPassed, int value){
+    if(check_tag_for_zero(inuseTags, tagPassed))value = 0;
     for(int i = 0; i < RESERVATION_WIDTH; i++){
       if(reservationalu[i].rsource1ready == 0 && reservationalu[i].rsource1 == tagPassed){
         reservationalu[i].rsource1value = value;

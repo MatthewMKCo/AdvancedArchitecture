@@ -12,14 +12,13 @@ int stop = 0;
 
 int instructionid = 0;
 int stall_from_issue = 0;
-int stall_rename = 1;
+int stall_rename = 0;
 int current = 0;
 
 void issue_rename(int current){
-
   if(issue_instruction_struct[current].instruction_type  == 1 || issue_instruction_struct[current].instruction_type == 2 || issue_instruction_struct[current].instruction_type == 3){
     issue_instruction_struct[current].tagDestination = movenode(unusedTags, inuseTags, issue_instruction_struct[current].rdestination);
-    if(issue_instruction_struct[current].tagDestination == -1){
+    if(issue_instruction_struct[current].tagDestination == -1){;
       stall_from_issue = 2;
       stall_rename = 1;
       return;
@@ -32,10 +31,6 @@ void issue_rename(int current){
   else{
     issue_instruction_struct[current].tagDestination = -1;
   }
-
-  printf("hi\n");
-  printf("%d\n", instructionid);
-  printf("%d\n", issue_instruction_struct[current].tagDestination);
   // if(instructionid >= 89 && issue_instruction_struct[current].tagDestination == 3)exit_early();
 
   // if(issue_instruction_struct[current].instruction_type == 4){
@@ -472,7 +467,7 @@ if(issue_unit_type[current] == 2){
   addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData);
   instructionid++;
 }
-
+  stall_from_issue = 0;
   return;
 
 }
@@ -496,7 +491,8 @@ void issue(){
   if(stall_from_issue == 0){
 
   if(issue_instruction_struct[current].instruction_type == 0){
-    return;
+    current = 0;
+    break;
   }
 
   // printf("%d\n", issue_instruction_struct[current].instruction_type);
@@ -515,21 +511,22 @@ void issue(){
     }
     current = 0;
 
-    return;
+    break;
   }
 
   print_issue_summary = 1;
 
   issue_rename(current);
-  if(stall_rename == 1)return;
+  if(stall_rename == 1)break;
 
   issue_add_to_reservation(current);
-  if(stall_from_issue == 2)return;
+  if(stall_from_issue == 2)break;
 
   }
   else if(stall_rename){
     if(issue_instruction_struct[current].instruction_type == 0){
-      return;
+      current = 0;
+      break;
     }
 
     // printf("%d\n", issue_instruction_struct[current].instruction_type);
@@ -548,17 +545,18 @@ void issue(){
       }
       current = 0;
 
-      return;
+      break;
     }
     issue_rename(current);
-    if(stall_rename == 1)return;
+    if(stall_rename == 1)break;
 
     issue_add_to_reservation(current);
-    if(stall_from_issue == 2)return;
+    if(stall_from_issue == 2)break;
   }
   else{
     if(issue_instruction_struct[current].instruction_type == 0){
-      return;
+      current = 0;
+      break;
     }
 
     // printf("%d\n", issue_instruction_struct[current].instruction_type);
@@ -576,14 +574,16 @@ void issue(){
         flush_from_issue = 1;
       }
       current = 0;
-      return;
+      break;
     }
     issue_add_to_reservation(current);
-    if(stall_from_issue == 2)return;
+    if(stall_from_issue == 2)break;
 
   }
 }
-  current = 0;
+  if(current == NWAY){
+    current = 0;
+  }
 
   return;
 }

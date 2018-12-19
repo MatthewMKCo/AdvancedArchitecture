@@ -113,3 +113,5 @@ find find_id(ring *currentRing, int id);
 everything get_everything(ring *currentRing);
 void change_to_ready(ring *currentRing);
 void deletenodeswithgreaterthanid();
+void addvaluetolast(ring* currentRing, int value);
+int check_tag_for_zero(ring* currentRing, int tagPassed);

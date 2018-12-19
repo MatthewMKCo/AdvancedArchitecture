@@ -38,6 +38,7 @@ void graduate(){
           registers[value.tagData.registerNumber] = physRegisters[value.tagData.tagNumber].value;
           // stop = 1;
           // exit_early();
+          // print_reg_summary();
       }
     }
       // printf("%d\n",getinstructionid(inOrderInstructions));
@@ -45,8 +46,14 @@ void graduate(){
       // if(instructionid1 == 115)exit_early();
       // deletenode(inOrderInstructions);
       // printring(inOrderInstructions);
-      if(instructionid1 == 115)exit_early();
+      printf("INSTRUCTION ID:%d\n",instructionid1);
+
+      printf("VALUE:%d\n",registers[value.tagData.registerNumber]);
+      // printring(allInOrder);
+      // printring(allInOrder);
+      // if(instructionid1 == 115)exit_early();
       movenode(inOrderInstructions, allInOrder, value.tagData.registerNumber);
+      addvaluetolast(allInOrder, registers[value.tagData.registerNumber]);
       deletenode(outOfOrderInstructions);
       start(outOfOrderInstructions);
       start(inOrderInstructions);

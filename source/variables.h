@@ -26,7 +26,7 @@
 
 #define LSU_NUM 1
 
-#define TAG_NUM 128
+#define TAG_NUM PHYSREG_NUM
 
 #define NWAY 2
 
@@ -135,6 +135,7 @@ typedef struct Node{
   int id;
   char *name;
   int ready;
+  int value;
 }node;
 
 typedef struct everything{

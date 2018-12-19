@@ -29,7 +29,8 @@ void writebackbranch(int i){
 
 void writebackloadstore(int i){
   tag orderTag;
-
+  printf("%d\n",writebacklsu[i].value);
+  // if(writebacklsu[i].instructionid == 109)exit_early();
   // printf("%d\n",);
   // if(writebacklsu[i].instructionid == 366)exit_early();
 
