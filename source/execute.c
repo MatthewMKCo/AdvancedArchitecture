@@ -768,16 +768,16 @@ void execute(){
 
   // send_for_writeback();
 
-  // if(purge == 1){
-  //   purge = 0;
-  //   first_fetch = 0;
-  //   first_decode = 0;
-  //   first_issue = 0;
-  //   issue_finished = 0;
-  //   flush_from_issue = 0;
-  //   stall_rename = 0;
-  //   purgepipe();
-  // }
+  if(purge == 1){
+    purge = 0;
+    first_fetch = 0;
+    first_decode = 0;
+    first_issue = 0;
+    issue_finished = 0;
+    flush_from_issue = 0;
+    stall_rename = 0;
+    purgepipe();
+  }
 
   increment_units();
 

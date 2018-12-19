@@ -186,6 +186,8 @@ void blt(int reg1, int reg2){
   // printf("%d\t%d\n",reg1,reg2);
 
   if(reg1 < reg2){
+    // printf("%d\n",currentInstruction.instructionid);
+    // exit_early();
     instructionid = currentInstruction.instructionid + 1;
     pc[0] = currentInstruction.pc + currentInstruction.imm;
     branch_flag = 1;

@@ -45,12 +45,11 @@ void graduate(){
       // if(instructionid1 == 115)exit_early();
       // deletenode(inOrderInstructions);
       // printring(inOrderInstructions);
-      // if(instructionid1 == 104)exit_early();
+      if(instructionid1 == 115)exit_early();
       movenode(inOrderInstructions, allInOrder, value.tagData.registerNumber);
       deletenode(outOfOrderInstructions);
       start(outOfOrderInstructions);
       start(inOrderInstructions);
-
 
       instructionid1 = getinstructionid(inOrderInstructions);
 

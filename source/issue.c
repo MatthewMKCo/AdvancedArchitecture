@@ -33,6 +33,11 @@ void issue_rename(int current){
     issue_instruction_struct[current].tagDestination = -1;
   }
 
+  printf("hi\n");
+  printf("%d\n", instructionid);
+  printf("%d\n", issue_instruction_struct[current].tagDestination);
+  // if(instructionid >= 89 && issue_instruction_struct[current].tagDestination == 3)exit_early();
+
   // if(issue_instruction_struct[current].instruction_type == 4){
   //   issue_instruction_struct[current].pctag = movenode(unusedTags, inuseTags, issue_instruction_struct[current].pcDestination);
   // }
