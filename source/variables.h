@@ -8,7 +8,7 @@
 
 #define REG_NUM 32
 
-#define PHYSREG_NUM 32
+#define PHYSREG_NUM 64
 
 #define RESERVATION_WIDTH 64
 
@@ -28,7 +28,7 @@
 
 #define TAG_NUM 128
 
-#define NWAY 1
+#define NWAY 2
 
 #define separator printf("====================================================\n");
 

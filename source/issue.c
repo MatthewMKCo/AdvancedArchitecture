@@ -64,7 +64,7 @@ void issue_rename(int current){
 
 void issue_add_to_reservation(int current){
   find foundtag;
-  if(issue_unit_type == 1){
+  if(issue_unit_type[current] == 1){
     if(reservationIteratorALU >= RESERVATION_WIDTH)reservationIteratorALU = 0;
     int i;
     for(i = 0; i < RESERVATION_WIDTH; i++){
@@ -186,6 +186,11 @@ void issue_add_to_reservation(int current){
     reservationalu[reservationIteratorALU].instruction = issue_instruction_struct[current];
 
     reservationalu[reservationIteratorALU].instructionid = issue_instruction_struct[current].instructionid;
+    if(instructionid == 105){
+      printf("%d\n",current);
+      printf("%d\n", reservationalu[reservationIteratorALU].rdestination);
+      // exit_early();
+    }
     reservationIteratorALU++;
 
     tag tagData;
@@ -199,7 +204,7 @@ void issue_add_to_reservation(int current){
 
 }
 
-if(issue_unit_type == 3){
+if(issue_unit_type[current] == 3){
   if(reservationIteratorBRU >= BRANCH_RESERVATION_WIDTH)reservationIteratorBRU = 0;
   int i;
   for(i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
@@ -328,7 +333,7 @@ if(issue_unit_type == 3){
   // if(instructionid == 22)exit_early();
 }
 
-if(issue_unit_type == 2){
+if(issue_unit_type[current] == 2){
   if(reservationIteratorLSU >= STORE_RESERVATION_WIDTH)reservationIteratorLSU = 0;
   int i;
   for(i = 0; i < STORE_RESERVATION_WIDTH; i++){
@@ -468,20 +473,22 @@ if(issue_unit_type == 2){
 }
 
 void issue(){
-  if(stall_from_issue == 0){
-    if(issue_finished)return;
-    if(pc[0] == 0){
-      if(current_cycle > last_instruction_cycle + 2){
-        issue_finished = 1;
-        return;
-      }
+  if(issue_finished)return;
+  if(pc[0] == 0){
+    if(current_cycle > last_instruction_cycle + 2){
+      issue_finished = 1;
+      return;
     }
+  }
   if(first_decode < 2){
     print_issue_summary = 0;
     return;
   }
 
   if(first_issue < 2)first_issue++;
+
+  for(; current < NWAY; current++){
+  if(stall_from_issue == 0){
 
   if(issue_instruction_struct[current].instruction_type == 0){
     return;
@@ -501,16 +508,18 @@ void issue(){
 
       flush_from_issue = 1;
     }
+    current = 0;
 
     return;
   }
 
   print_issue_summary = 1;
 
-  issue_rename();
+  issue_rename(current);
   if(stall_rename == 1)return;
 
-  issue_add_to_reservation();
+  issue_add_to_reservation(current);
+  if(stall_from_issue == 2)return;
 
   }
   else if(stall_rename){
@@ -532,14 +541,15 @@ void issue(){
 
         flush_from_issue = 1;
       }
-      printf("INSTRUCTIONS EXECUTED FROM ISSUE:%d\n\n\n\n", instructions_executed);
+      current = 0;
 
       return;
     }
-    issue_rename();
+    issue_rename(current);
     if(stall_rename == 1)return;
 
-    issue_add_to_reservation();
+    issue_add_to_reservation(current);
+    if(stall_from_issue == 2)return;
   }
   else{
     if(issue_instruction_struct[current].instruction_type == 0){
@@ -560,11 +570,15 @@ void issue(){
 
         flush_from_issue = 1;
       }
-      printf("INSTRUCTIONS EXECUTED FROM ISSUE:%d\n\n\n\n", instructions_executed);
-
+      current = 0;
       return;
     }
-    issue_add_to_reservation();
+    issue_add_to_reservation(current);
+    if(stall_from_issue == 2)return;
+
   }
+}
+  current = 0;
+
   return;
 }

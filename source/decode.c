@@ -34,46 +34,46 @@ void decode(){
     case 0b0010011:
       decode_instruction_type = 1;
       instruction_type_char = 'I';
-      decode_unit_type = 1;
+      decode_unit_type[i] = 1;
       break;
     case 0b0000011:
       decode_instruction_type = 1;
       instruction_type_char = 'I';
-      decode_unit_type = 2;
+      decode_unit_type[i] = 2;
       break;
     case 0b0110111:
       decode_instruction_type = 2;
       instruction_type_char = 'U';
-      decode_unit_type = 1;
+      decode_unit_type[i] = 1;
       break;
     case 0b0010111:
       decode_instruction_type = 2;
       instruction_type_char = 'U';
-      decode_unit_type = 1;
+      decode_unit_type[i] = 1;
       break;
     case 0b0110011:
       decode_instruction_type = 3;
       instruction_type_char = 'R';
-      decode_unit_type = 1;
+      decode_unit_type[i] = 1;
       break;
     case 0b1101111:
       decode_instruction_type = 4;
       instruction_type_char = 'J';
-      decode_unit_type = 1;
+      decode_unit_type[i] = 1;
       break;
     case 0b1100011:
       decode_instruction_type = 5;
       instruction_type_char = 'B';
-      decode_unit_type = 3;
+      decode_unit_type[i] = 3;
       break;
     case 0b0100011:
       decode_instruction_type = 6;
       instruction_type_char = 'S';
-      decode_unit_type = 2;
+      decode_unit_type[i] = 2;
       break;
     default:
       decode_instruction_type = -1;
-      decode_unit_type = -1;
+      decode_unit_type[i] = -1;
       break;
   }
 

@@ -216,12 +216,17 @@ void print_reg_summary(){
   //     exit_early();
   //   }
   // }
-  // for(int i = 0; i < RESERVATION_WIDTH; i++){
-  //   if(reservationalu[i].instructionid == 21){
-  //     printf("%d\n",i);
-  //     exit_early();
-  //   }
-  // }
+  for(int i = 0; i < RESERVATION_WIDTH; i++){
+    if(reservationalu[i].instructionid == 105 && reservationalu[i].inExecute && current_cycle > 200){
+      printf("%d\n",reservationalu[i].rsource2ready);
+      printf("%d\n",reservationalu[i].rsource2);
+      printf("%d\n",physRegisters[reservationalu[i].rsource2].ready);
+      printf("%d\n",reservationalu[i].rdestination);
+
+      // printring(allInOrder);
+      exit_early();
+    }
+  }
   // for(int i = 0; i < RESERVATION_WIDTH; i++){
   //   if(reservationalu[i].instructionid == 50){
   //     printf("%d\n", i );
