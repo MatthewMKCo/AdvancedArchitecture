@@ -3,25 +3,36 @@
 availNum available;
 instruction currentInstruction;
 int numberOfExecutedInstructions = 0;
-
 int check_execute_and_reservation_units(){
   for(int i = 0; i < RESERVATION_WIDTH; i++){
-    if(reservationalu[i].inuse)return 0;
+    if(reservationalu[i].inuse){
+      return 0;
+    }
   }
   for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
-    if(reservationbru[i].inuse)return 0;
+    if(reservationbru[i].inuse){
+      return 0;
+    }
   }
   for(int i = 0; i < STORE_RESERVATION_WIDTH; i++){
-    if(reservationlsu[i].inuse)return 0;
+    if(reservationlsu[i].inuse){
+      return 0;
+    }
   }
   for(int i = 0; i < ALU_NUM; i++){
-    if(alu[i].ready == 0)return 0;
+    if(alu[i].ready == 0){
+      return 0;
+    }
   }
   for(int i = 0; i < BRU_NUM; i++){
-    if(bru[i].ready == 0)return 0;
+    if(bru[i].ready == 0){
+      return 0;
+    }
   }
   for(int i = 0; i < LSU_NUM; i++){
-    if(lsu[i].ready == 0)return 0;
+    if(lsu[i].ready == 0){
+      return 0;
+    }
   }
   return 1;
 }
@@ -398,14 +409,6 @@ void increment_units(){
       }
     }
   }
-  for(int i = 0; i < AGU_NUM; i++){
-    if(agu[i].ready == 0){
-      agu[i].currentCycles++;
-      if(agu[i].currentCycles == agu[i].cyclesNeeded){
-        agu[i].readyForWriteback = 1;
-      }
-    }
-  }
   return;
 }
 
@@ -534,21 +537,6 @@ availNum find_available_lsu(){
     }
   }
   return available;
-}
-
-int find_available_agu(){
-  int i;
-  for(i = 0; i < AGU_NUM; i++){
-    if(agu[i].ready == 1){
-      break;
-    }
-  }
-  if(i == AGU_NUM){
-    return -1;
-  }
-  else{
-    return i;
-  }
 }
 
 availNum find_available_bru(){

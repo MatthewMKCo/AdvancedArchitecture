@@ -6,7 +6,6 @@
 //execute units
 execute_unit alu[ALU_NUM];
 execute_unit lsu[LSU_NUM];
-execute_unit agu[AGU_NUM];
 execute_unit bru[BRU_NUM];
 
 //reservation station

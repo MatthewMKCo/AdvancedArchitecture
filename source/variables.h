@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define SIZE 1024
+#define SIZE 5096*16
 
 #define XLEN 32
 
@@ -18,9 +18,9 @@
 
 #define NUM_STAGES 10
 
+#define NWAY 4
 #define ALU_NUM 4
 
-#define AGU_NUM 1
 
 #define BRU_NUM 1
 
@@ -28,7 +28,6 @@
 
 #define TAG_NUM PHYSREG_NUM
 
-#define NWAY 2
 
 #define separator printf("====================================================\n");
 
@@ -160,7 +159,6 @@ typedef struct Find{
 
 extern execute_unit alu[ALU_NUM];
 extern execute_unit lsu[LSU_NUM];
-extern execute_unit agu[AGU_NUM];
 extern execute_unit bru[BRU_NUM];
 
 extern instruction currentInstruction;

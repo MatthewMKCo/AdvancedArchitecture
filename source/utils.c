@@ -25,11 +25,6 @@ void set_register(){
     lsu[i].currentCycles = 0;
     lsu[i].ready = 1;
   }
-  for(int i = 0; i < AGU_NUM; i++){
-    agu[i].cyclesNeeded = 0;
-    agu[i].currentCycles = 0;
-    agu[i].ready = 1;
-  }
   for(int i = 0; i < BRU_NUM; i++){
     bru[i].cyclesNeeded = 0;
     bru[i].currentCycles = 0;
@@ -203,6 +198,7 @@ void print_reg_summary(){
     if(lsu[i].ready == 0)printf("LSU %d:INUSE\t", i);
   }
   printf("\n");
+  
   // printf("%d\n", fetch_finished);
   // printf("%d\n", decode_finished);
   // printf("%d\n", issue_finished);
@@ -216,17 +212,6 @@ void print_reg_summary(){
   //     exit_early();
   //   }
   // }
-  for(int i = 0; i < RESERVATION_WIDTH; i++){
-    if(reservationalu[i].instructionid == 105 && reservationalu[i].inExecute && current_cycle > 200){
-      printf("%d\n",reservationalu[i].rsource2ready);
-      printf("%d\n",reservationalu[i].rsource2);
-      printf("%d\n",physRegisters[reservationalu[i].rsource2].ready);
-      printf("%d\n",reservationalu[i].rdestination);
-
-      // printring(allInOrder);
-      exit_early();
-    }
-  }
   // for(int i = 0; i < RESERVATION_WIDTH; i++){
   //   if(reservationalu[i].instructionid == 50){
   //     printf("%d\n", i );

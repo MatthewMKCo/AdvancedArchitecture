@@ -46,9 +46,6 @@ void graduate(){
       // if(instructionid1 == 115)exit_early();
       // deletenode(inOrderInstructions);
       // printring(inOrderInstructions);
-      printf("INSTRUCTION ID:%d\n",instructionid1);
-
-      printf("VALUE:%d\n",registers[value.tagData.registerNumber]);
       // printring(allInOrder);
       // printring(allInOrder);
       // if(instructionid1 == 115)exit_early();
