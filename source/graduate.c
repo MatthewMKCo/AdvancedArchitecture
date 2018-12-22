@@ -1,5 +1,7 @@
 #include "run.h"
 
+int sequencenumber = 0;
+
 void graduate(){
   if(first_writeback < 2)return;
   if(graduate_finished)return;
@@ -11,9 +13,9 @@ void graduate(){
   // tag first = get(inuseTags);
   start(outOfOrderInstructions);
   start(inOrderInstructions);
-  int instructionid1;
+  // int instructionid1;
   find foundid;
-  instructionid1 = getinstructionid(inOrderInstructions);
+  // instructionid1 = getinstructionid(inOrderInstructions);
   // printf("\nInOrderInstructions\n");
   // printring(inOrderInstructions);
   // printf("===\n");
@@ -23,7 +25,7 @@ void graduate(){
   // printf("AllInOrder\n");
   // printring(allInOrder);
   while(1){
-    foundid = find_id(outOfOrderInstructions, instructionid1);
+    foundid = find_id(outOfOrderInstructions, sequencenumber);
     if(foundid.found == 1){
       // if(instructionid1 == 113)exit_early();
       everything value = get_everything(inOrderInstructions);
@@ -55,7 +57,9 @@ void graduate(){
       start(outOfOrderInstructions);
       start(inOrderInstructions);
 
-      instructionid1 = getinstructionid(inOrderInstructions);
+      // instructionid1 = getinstructionid(inOrderInstructions);
+      sequencenumber++;
+      instructions_executed++;
 
     }
     else break;

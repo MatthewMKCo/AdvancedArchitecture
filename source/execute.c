@@ -159,6 +159,7 @@ void execute_rformat(int number){
         executed_instruction_name[numberOfExecutedInstructions] = "Add";
         execute_val = add(currentInstruction.rsource1value, currentInstruction.rsource2value);
         alu[number].cyclesNeeded = 1;
+        printf("%d\n",execute_val);
       }
       else if(currentInstruction.funct7 == 0b0100000){
         // printf("Instruction:Subtract\n");
@@ -373,7 +374,6 @@ void increment_units(){
     if(alu[i].ready == 0){
       alu[i].currentCycles++;
       if(alu[i].currentCycles == alu[i].cyclesNeeded){
-        instructions_executed++;
         alu[i].currentCycles = 0;
         alu[i].ready = 1;
         alu[i].readyForWriteback = 1;
@@ -387,7 +387,6 @@ void increment_units(){
     if(bru[i].ready == 0){
       bru[i].currentCycles++;
       if(bru[i].currentCycles == bru[i].cyclesNeeded){
-        instructions_executed++;
         bru[i].currentCycles = 0;
         bru[i].ready = 1;
         bru[i].readyForWriteback = 1;
@@ -400,7 +399,6 @@ void increment_units(){
     if(lsu[i].ready == 0){
       lsu[i].currentCycles++;
       if(lsu[i].currentCycles == lsu[i].cyclesNeeded){
-        instructions_executed++;
         lsu[i].currentCycles = 0;
         lsu[i].ready = 1;
         lsu[i].readyForWriteback = 1;

@@ -16,10 +16,13 @@
 
 #define STORE_RESERVATION_WIDTH 16
 
+//0 - Static, never takes
+#define BRANCH_PREDICTOR 1
+
 #define NUM_STAGES 10
 
-#define NWAY 4
-#define ALU_NUM 4
+#define NWAY 1
+#define ALU_NUM 1
 
 
 #define BRU_NUM 1
@@ -28,8 +31,17 @@
 
 #define TAG_NUM PHYSREG_NUM
 
+#define sizeOfBranchCache 100
+
 
 #define separator printf("====================================================\n");
+
+typedef struct branchDict{
+  int pc;
+  int branchpc;
+  int accepted_before;
+  int inuse;
+}branchDict;
 
 typedef struct instruction{
   int pcDestination;
@@ -283,3 +295,7 @@ extern int purgeid, purge;
 extern int continue_execute;
 
 extern int numberOfExecutedInstructions;
+
+extern int block_decode_to_issue, block_fetch_to_decode;
+
+extern branchDict branchCache[sizeOfBranchCache];

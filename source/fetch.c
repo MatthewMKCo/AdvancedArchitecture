@@ -28,15 +28,21 @@ void fetch(){
     return;
   }
 
-  for(int i = 0; i < NWAY; i++){
+  int i = 0;
+  for(; i < NWAY; i++){
   fetch_instruction[i] = ld(Icache, pc[0]);
   fetchpc[i] = pc[0];
 
-  pc[0] = pc[0] + 4;
+  // pc[0] = pc[0] + 4;
+  int branch_taken = branch_predictor(pc[0], 0, 0);
+  if(branch_taken)break;
 
   if(fetch_instruction[i] == -1 && last_instruction != 1){
     // last_instruction = 1;
     // last_instruction_cycle = current_cycle - 1;
   }
 }
+  for(i = i + 1; i < NWAY; i++){
+    fetch_instruction[i] = -1;
+  }
 }

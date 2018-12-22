@@ -6,6 +6,7 @@
 
 //fetch functions
 void fetch();
+int branch_predictor(int fedPC, int is_branch, int offset);
 
 //decode functions
 void decode();

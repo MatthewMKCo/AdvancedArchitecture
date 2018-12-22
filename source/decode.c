@@ -1,6 +1,7 @@
 #include "run.h"
 
 int decode_pcDestination;
+int block_fetch_to_decode = 0;
 // instruction decode_instruction[i];
 
 void decode(){
@@ -24,6 +25,11 @@ void decode(){
   }
   if(stall_from_issue != 0){
     // first_decode = 0;
+    return;
+  }
+  if(block_fetch_to_decode){
+    block_fetch_to_decode = 0;
+    block_decode_to_issue = 1;
     return;
   }
   print_decode_summary = 1;
@@ -153,4 +159,24 @@ void decode(){
   decode_instruction_struct[i].instruction_hex = decode_instruction[i];
   decode_instruction_struct[i].pcDestination = decode_pcDestination;
 }
+
+  int branch_taken = 0;
+  for(int i = 0; i < NWAY; i++){
+    if(branch_taken){
+      decode_instruction_struct[i].instruction_type = 0;
+    }
+    if(decode_instruction_struct[i].instruction_type == 5){
+      branch_taken = branch_predictor(decode_instruction_struct[i].pc, 1, decode_instruction_struct[i].imm);
+
+      if(branch_taken){
+        
+      }
+
+      break;
+    }
+  }
+  if(branch_taken){
+
+  }
+
 }

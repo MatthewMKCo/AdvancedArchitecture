@@ -165,6 +165,9 @@ void beq(int reg1, int reg2){
     branch_flag = 1;
     purgeid = currentInstruction.instructionid;
     purge = 1;
+
+    printf("%d\n",pc[0]);
+    // exit_early();
   }
   return;
 }

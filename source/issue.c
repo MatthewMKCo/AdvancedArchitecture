@@ -14,6 +14,7 @@ int instructionid = 0;
 int stall_from_issue = 0;
 int stall_rename = 0;
 int current = 0;
+int block_decode_to_issue = 0;
 
 void issue_rename(int current){
   if(issue_instruction_struct[current].instruction_type  == 1 || issue_instruction_struct[current].instruction_type == 2 || issue_instruction_struct[current].instruction_type == 3){
@@ -487,12 +488,18 @@ void issue(){
 
   if(first_issue < 2)first_issue++;
 
+  if(block_decode_to_issue){
+    block_decode_to_issue = 0;
+    return;
+  }
+
   for(; current < NWAY; current++){
   if(stall_from_issue == 0){
 
   if(issue_instruction_struct[current].instruction_type == 0){
-    current = 0;
-    break;
+    // current = 0;
+    // break;
+    continue;
   }
 
   // printf("%d\n", issue_instruction_struct[current].instruction_type);
@@ -525,8 +532,9 @@ void issue(){
   }
   else if(stall_rename){
     if(issue_instruction_struct[current].instruction_type == 0){
-      current = 0;
-      break;
+      // current = 0;
+      // break;
+      continue;
     }
 
     // printf("%d\n", issue_instruction_struct[current].instruction_type);
@@ -555,8 +563,9 @@ void issue(){
   }
   else{
     if(issue_instruction_struct[current].instruction_type == 0){
-      current = 0;
-      break;
+      // current = 0;
+      // break;
+      continue;
     }
 
     // printf("%d\n", issue_instruction_struct[current].instruction_type);

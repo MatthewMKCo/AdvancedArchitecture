@@ -198,7 +198,7 @@ void print_reg_summary(){
     if(lsu[i].ready == 0)printf("LSU %d:INUSE\t", i);
   }
   printf("\n");
-  
+
   // printf("%d\n", fetch_finished);
   // printf("%d\n", decode_finished);
   // printf("%d\n", issue_finished);
@@ -284,7 +284,7 @@ void move_next_to_current(){
     if(reservationlsu[i].inuse == 1)reservationlsu[i].inExecute = 1;
   }
 
-  if(stall_from_issue == 0 && first_fetch >= 1){
+  if((stall_from_issue == 0 && first_fetch >= 1) || block_fetch_to_decode){
     for(int i = 0; i < NWAY; i++){
       decode_instruction[i] = fetch_instruction[i];
       decodepc[i] = fetchpc[i];
