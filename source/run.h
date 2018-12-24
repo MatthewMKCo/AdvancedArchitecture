@@ -94,8 +94,8 @@ void purgepipe();
 //lists functions
 ring *createring(char* name);
 void addafternode(ring *currentRing, tag data);
-void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, tag tagData);
-int movenode(ring *unused, ring *inuse, int registerNumber);
+void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, tag tagData, int unit_type, int value);
+int movenode(ring *unused, ring *inuse, int registerNumber, int id);
 tag get(ring *currentRing);
 void next(ring *currentRing);
 find find_tag(ring *currentRing, int tagNumber);
@@ -116,3 +116,6 @@ void change_to_ready(ring *currentRing);
 void deletenodeswithgreaterthanid();
 void addvaluetolast(ring* currentRing, int value);
 int check_tag_for_zero(ring* currentRing, int tagPassed);
+int get_register(ring* currentRing);
+int get_register2(ring* currentRing);
+int moveselectednode(ring *unused, ring *inuse, int purgeid);

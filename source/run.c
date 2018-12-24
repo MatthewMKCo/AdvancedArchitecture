@@ -33,6 +33,8 @@ int jump_flag = 0;
 char Icache[SIZE];
 //Data cache
 char Dcache[SIZE];
+//Data memory
+char Dmem[SIZE];
 
 //Registers
 int registers[REG_NUM + 1];

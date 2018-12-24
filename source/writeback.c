@@ -3,25 +3,23 @@ void writeintophysreg(int i){
     physRegisters[writebackalu[i].tag].value = writebackalu[i].value;
     physRegisters[writebackalu[i].tag].ready = 1;
 
-    if(writebackalu[i].instructionid == 116 && writebackalu[i].tag == 91)exit_early();
-
     forward_reservation_stations(writebackalu[i].tag, writebackalu[i].value);
 
     writeback_destination = writebackalu[i].tag;
 
     tag orderTag;
     orderTag.tagNumber = writebackalu[i].tag;
-    orderTag.registerNumber = -1;
-    addafternodeinstruction(outOfOrderInstructions, writebackalu[i].instruction, writebackalu[i].instructionid, orderTag);
+    orderTag.registerNumber = get_register(inuseTags);
+    addafternodeinstruction(outOfOrderInstructions, writebackalu[i].instruction, writebackalu[i].instructionid, orderTag, 1, writebackalu[i].value);
     return;
 }
 
 void writebackbranch(int i){
   tag orderTag;
   orderTag.tagNumber = -2;
-  orderTag.registerNumber = -1;
+  orderTag.registerNumber = get_register(inuseTags);
   // printring(outOfOrderInstructions);
-  addafternodeinstruction(outOfOrderInstructions, writebackbru[i].instruction, writebackbru[i].instructionid, orderTag);
+  addafternodeinstruction(outOfOrderInstructions, writebackbru[i].instruction, writebackbru[i].instructionid, orderTag, 2, writebackbru[i].value);
   // printring(outOfOrderInstructions);
   // exit_early();
   return;
@@ -36,17 +34,19 @@ void writebackloadstore(int i){
 
   if(writebacklsu[i].instruction_type == 1){
     orderTag.tagNumber = writebacklsu[i].tag;
-    orderTag.registerNumber = -1;
+    orderTag.registerNumber = get_register(inuseTags);
     physRegisters[writebacklsu[i].tag].value = writebacklsu[i].value;
     physRegisters[writebacklsu[i].tag].ready = 1;
     forward_reservation_stations(writebacklsu[i].tag, writebacklsu[i].value);
   }
   else{
+    // orderTag.tagNumber = writebacklsu[i].tag;
     orderTag.tagNumber = -2;
-    orderTag.registerNumber = -1;
+
+    orderTag.registerNumber = get_register(inuseTags);
   }
 
-  addafternodeinstruction(outOfOrderInstructions, writebacklsu[i].instruction, writebacklsu[i].instructionid, orderTag);
+  addafternodeinstruction(outOfOrderInstructions, writebacklsu[i].instruction, writebacklsu[i].instructionid, orderTag, 3, writebacklsu[i].value);
   return;
 }
 

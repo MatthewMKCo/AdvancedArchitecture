@@ -38,7 +38,7 @@ void addafternode(ring *currentRing, tag data){
 }
 
 //adds a node after the last node
-void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, tag tagData){
+void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, tag tagData, int unit_type, int value){
   node *newnode = malloc(sizeof(node));
 
   newnode -> name = currentRing -> name;
@@ -46,6 +46,8 @@ void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, ta
   newnode -> instruction = instruction;
   newnode -> id = id;
   newnode -> ready = 0;
+  newnode -> value = value;
+  newnode -> unit_type = unit_type;
   currentRing -> last -> forward = newnode;
   newnode -> forward = currentRing -> sentinel;
   newnode -> back = currentRing -> last;
@@ -78,7 +80,7 @@ void movenode2(ring *inuse, node *oldFirst){
 }
 
 //deletes the first node
-int movenode(ring *unused, ring *inuse, int registerNumber){
+int movenode(ring *unused, ring *inuse, int registerNumber, int id){
   node *before = unused -> first -> back;
   node *after = unused -> first -> forward;
   node *oldFirst = unused -> first;
@@ -103,50 +105,52 @@ int movenode(ring *unused, ring *inuse, int registerNumber){
 
   replacedata(oldFirst, registerNumber);
   oldFirst -> name = inuse -> name;
+  oldFirst -> id = id;
   movenode2(inuse, oldFirst);
 
   return oldFirst -> data.tagNumber;
 }
 
 //deletes the selected node after finding tag
-int moveselectednode(ring *unused, ring *inuse, int registerNumber, int findTagNumber){
+int moveselectednode(ring *unused, ring *inuse, int purgeid){
+
+  node* before, *after, *oldSelected;
   unused -> selected = unused -> first;
+  if(unused -> selected == unused -> sentinel){
+    printring(inuseTags);
+    printring(unusedTags);
+    printf("ERROR in moveselectednode for %s\n", unused -> name);
+    exit_early(1);
+  }
   while(1){
     if(unused -> selected == unused -> sentinel){
-      printring(inuseTags);
-      printring(unusedTags);
-      printf("ERROR in moveselectednode for %s\n", unused -> name);
-      exit_early(1);
+      break;
     }
-    if(unused -> selected -> data.tagNumber == findTagNumber)break;
+    if(unused -> selected -> id > purgeid){
+      before = unused -> selected -> back;
+      after = unused -> selected -> forward;
+      oldSelected = unused -> selected;
+      if(oldSelected -> data.tagNumber == -1){
+        printring(inuseTags);
+        printring(unusedTags);
+        printf("ERROR in movenode for %s\n", unused -> name);
+        exit_early(1);
+      }
+
+      unused -> selected = oldSelected -> forward;
+      unused -> selected -> back = before;
+      before -> forward = after;
+      unused -> first = unused -> sentinel -> forward;
+      unused -> last = unused -> sentinel -> back;
+
+      replacedata(oldSelected, 0);
+      oldSelected -> name = inuse -> name;
+      movenode2(inuse, oldSelected);
+    }
     else next(unused);
   }
 
-  node *before = unused -> selected -> back;
-  node *after = unused -> selected -> forward;
-  node *oldSelected = unused -> selected;
-  if(oldSelected -> data.tagNumber == -1){
-    printring(inuseTags);
-    printring(unusedTags);
-    printf("ERROR in movenode for %s\n", unused -> name);
-    exit_early(1);
-  }
 
-  unused -> selected = oldSelected -> forward;
-  unused -> selected -> back = before;
-  before -> forward = after;
-  unused -> first = unused -> sentinel -> forward;
-  unused -> last = unused -> sentinel -> back;
-  // printf("%d\n", registerNumber);
-  // printf("%s\n", unused -> name);
-  // int ret = strcmp(unused -> name, "inuseTags")
-  // if(oldFirst -> data.tagNumber == 13 ){
-  //   exit_early();
-  // }
-
-  replacedata(oldSelected, registerNumber);
-  oldSelected -> name = inuse -> name;
-  movenode2(inuse, oldSelected);
 
   return oldSelected -> data.tagNumber;
 }
@@ -356,6 +360,8 @@ everything get_everything(ring *currentRing){
   value.tagData = currentRing -> selected -> data;
   value.instruction = currentRing -> selected -> instruction;
   value.ready = currentRing -> selected -> ready;
+  value.unit_type = currentRing -> selected -> unit_type;
+  value.value = currentRing -> selected -> value;
   return value;
 }
 
@@ -375,6 +381,9 @@ void deletenodeswithgreaterthanid(int purgeid){
       break;
     }
     if(outOfOrderInstructions -> selected -> id > purgeid){
+      // if(outOfOrderInstructions -> selected -> data.tagNumber >= 0){
+      //   moveselectednode(inuseTags, unusedTags, -1, outOfOrderInstructions -> selected -> data.tagNumber);
+      // }
       deletenode(outOfOrderInstructions);
     }
     else next(outOfOrderInstructions);
@@ -386,9 +395,9 @@ void deletenodeswithgreaterthanid(int purgeid){
       break;
     }
     if(inOrderInstructions -> selected -> id > purgeid){
-      if(inOrderInstructions -> selected -> data.tagNumber >= 0){
-        moveselectednode(inuseTags, unusedTags, -1, inOrderInstructions -> selected -> data.tagNumber);
-      }
+      // if(inOrderInstructions -> selected -> data.tagNumber >= 0){
+      //   moveselectednode(inuseTags, unusedTags, -1, inOrderInstructions -> selected -> data.tagNumber);
+      // }
       deletenode(inOrderInstructions);
     }
     else next(inOrderInstructions);
@@ -411,4 +420,12 @@ int check_tag_for_zero(ring* currentRing, int tagPassed){
     }
     else next(currentRing);
   }
+}
+
+int get_register(ring* currentRing){
+  return currentRing -> first -> data.registerNumber;
+}
+
+int get_register2(ring* currentRing){
+  return currentRing -> first -> data.tagNumber;
 }

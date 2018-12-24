@@ -345,21 +345,26 @@ void execute_sformat2(int number){
       // printf("Instruction:Store 8-bit\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Store 8-bit";
       sb(Dcache, execute_offset, currentInstruction.rsource2value);
+      execute_val = currentInstruction.rsource2value;
       lsu[number].cyclesNeeded = 1;
       break;
     case(0b001):
       // printf("Instruction:Store 16-bit\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Store 16-bit";
       sh(Dcache, execute_offset, currentInstruction.rsource2value);
+      execute_val = currentInstruction.rsource2value;
       lsu[number].cyclesNeeded = 1;
       break;
     case(0b010):
       // printf("Instruction:Store 32-bit\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Store 32-bit";
       sw(Dcache, execute_offset, currentInstruction.rsource2value);
+      execute_val = currentInstruction.rsource2value;
       lsu[number].cyclesNeeded = 4;
       break;
   }
+  lsu[number].valueInside = execute_val;
+  lsu[number].destinationRegister = execute_offset;
   return;
 }
 
@@ -485,6 +490,7 @@ void send_for_writeback(){
       bru[i].readyForWriteback = 0;
       bru[i].shouldWriteback = 0;
       // writebackbru[i].value = bru[i].valueInside;
+      writebackbru[i].value = bru[i].valueInside;
       writebackbru[i].ready = 1;
       writebackbru[i].instruction = bru[i].instruction.instruction_hex;
       writebackbru[i].instructionid = bru[i].instruction.instructionid;

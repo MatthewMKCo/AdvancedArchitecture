@@ -357,7 +357,14 @@ void purgepipe(){
     }
   }
   deletenodeswithgreaterthanid(purgeid);
+  moveselectednode(inuseTags, unusedTags, purgeid);
   // printring(inOrderInstructions);
+  if(purgeid >= 50){
+    // printf("%d\n", purgeid);
+    // printring(inuseTags);
+
+    // exit_early();
+  }
   // printring(outOfOrderInstructions);
 
   // if(b==7)exit_early();

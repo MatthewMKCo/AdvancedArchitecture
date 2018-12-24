@@ -20,7 +20,7 @@ void graduate(){
   // printring(inOrderInstructions);
   // printf("===\n");
   // printf("OutOfOrderInstructions\n");
-  // printring(outOfOrderInstructions);
+  printring(outOfOrderInstructions);
   // printf("\n");
   // printf("AllInOrder\n");
   // printring(allInOrder);
@@ -31,18 +31,42 @@ void graduate(){
       everything value = get_everything(inOrderInstructions);
       everything value2 = get_everything(outOfOrderInstructions);
       if(value2.ready != 1)break;
-      if(value.tagData.tagNumber != -2){
-        movenode(inuseTags, unusedTags, -1);
-        if(value.tagData.registerNumber != 0){
+      // if(value.unit_type == 1){
+      //   movenode(inuseTags, unusedTags, -1);
+      //   if(value.tagData.registerNumber != 0){
+      //     // printf("%d\n",value.tagData.registerNumber);
+      //     // printf("%d\n",value.tagData.tagNumber);
+      //     // printf("%d\n",physRegisters[value.tagData.tagNumber].value);
+      //     registers[value.tagData.registerNumber] = physRegisters[value.tagData.tagNumber].value;
+      //     // stop = 1;
+      //     // print_reg_summary();
+      // }
+
+      if(value2.unit_type == 1){
+        movenode(inuseTags, unusedTags, -1, 0);
+        if(value2.tagData.registerNumber != 0){
           // printf("%d\n",value.tagData.registerNumber);
           // printf("%d\n",value.tagData.tagNumber);
           // printf("%d\n",physRegisters[value.tagData.tagNumber].value);
-          registers[value.tagData.registerNumber] = physRegisters[value.tagData.tagNumber].value;
-          // stop = 1;
-          // exit_early();
-          // print_reg_summary();
+          registers[value.tagData.registerNumber] = physRegisters[value2.tagData.tagNumber].value;
       }
     }
+
+
+      if(value2.unit_type == 2){
+        if(value2.value == 1){
+
+        }
+      }
+      if(value2.unit_type == 3){
+        if(value2.tagData.tagNumber != -2){
+          if(value2.tagData.registerNumber != 0){
+            registers[value.tagData.registerNumber] = physRegisters[value2.tagData.tagNumber].value;
+          }
+        }
+        else sw(Dmem, value2.tagData.tagNumber, value2.value);
+      }
+    // }
       // printf("%d\n",getinstructionid(inOrderInstructions));
       // printf("%x\n",value.instruction);
       // if(instructionid1 == 115)exit_early();
@@ -51,8 +75,7 @@ void graduate(){
       // printring(allInOrder);
       // printring(allInOrder);
       // if(instructionid1 == 115)exit_early();
-      movenode(inOrderInstructions, allInOrder, value.tagData.registerNumber);
-      addvaluetolast(allInOrder, registers[value.tagData.registerNumber]);
+      movenode(inOrderInstructions, allInOrder, value.tagData.registerNumber, 0);
       deletenode(outOfOrderInstructions);
       start(outOfOrderInstructions);
       start(inOrderInstructions);

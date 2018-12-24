@@ -17,12 +17,12 @@
 #define STORE_RESERVATION_WIDTH 16
 
 //0 - Static, never takes
-#define BRANCH_PREDICTOR 1
+#define BRANCH_PREDICTOR 0
 
 #define NUM_STAGES 10
 
-#define NWAY 1
-#define ALU_NUM 1
+#define NWAY 4
+#define ALU_NUM 4
 
 
 #define BRU_NUM 1
@@ -45,6 +45,7 @@ typedef struct branchDict{
 
 typedef struct instruction{
   int pcDestination;
+
   int pctag;
   int rdestination;
   int tagDestination;
@@ -147,6 +148,7 @@ typedef struct Node{
   char *name;
   int ready;
   int value;
+  int unit_type;
 }node;
 
 typedef struct everything{
@@ -154,6 +156,8 @@ typedef struct everything{
   uint32_t instruction;
   int id;
   int ready;
+  int unit_type;
+  int value;
 }everything;
 
 typedef struct Ring{
@@ -193,6 +197,8 @@ extern int jump_flag;
 extern char Icache[SIZE];
 //Data cache
 extern char Dcache[SIZE];
+//Data Memory
+extern char Dmem[SIZE];
 //Tag array
 extern tag tags[TAG_NUM];
 extern int tagIterator;

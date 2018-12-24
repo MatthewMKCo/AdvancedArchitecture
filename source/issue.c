@@ -18,7 +18,7 @@ int block_decode_to_issue = 0;
 
 void issue_rename(int current){
   if(issue_instruction_struct[current].instruction_type  == 1 || issue_instruction_struct[current].instruction_type == 2 || issue_instruction_struct[current].instruction_type == 3){
-    issue_instruction_struct[current].tagDestination = movenode(unusedTags, inuseTags, issue_instruction_struct[current].rdestination);
+    issue_instruction_struct[current].tagDestination = movenode(unusedTags, inuseTags, issue_instruction_struct[current].rdestination, instructionid);
     if(issue_instruction_struct[current].tagDestination == -1){;
       stall_from_issue = 2;
       stall_rename = 1;
@@ -198,7 +198,7 @@ void issue_add_to_reservation(int current){
     tagData.tagNumber = issue_instruction_struct[current].tagDestination;
     tagData.registerNumber = issue_instruction_struct[current].rdestination;
 
-    addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData);
+    addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData, issue_unit_type[current], 0);
     // printf("%d\n",tagData.registerNumber);
     // if(instructionid == 6)exit_early();
     instructionid++;
@@ -329,7 +329,7 @@ if(issue_unit_type[current] == 3){
   tag tagData;
   tagData.tagNumber = -2;
   tagData.registerNumber = issue_instruction_struct[current].rdestination;
-  addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData);
+  addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData, issue_unit_type[current], 0);
   instructionid++;
   // if(instructionid == 22)exit_early();
 }
@@ -465,7 +465,7 @@ if(issue_unit_type[current] == 2){
     tagData.registerNumber = -2;
   }
 
-  addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData);
+  addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData, issue_unit_type[current], 0);
   instructionid++;
 }
   stall_from_issue = 0;
