@@ -167,16 +167,17 @@ void decode(){
     }
     if(decode_instruction_struct[i].instruction_type == 5){
       branch_taken = branch_predictor(decode_instruction_struct[i].pc, 1, decode_instruction_struct[i].imm);
+      if(decode_instruction_struct[i].pc == 256){
 
-      if(branch_taken){
-        
+        // printf("%d\n", decode_instruction_struct[i].pc);
+        // printf("%d\n", decode_instruction_struct[i].imm);
+        // printf("%d\n",pc[0]);
+        // exit_early();
       }
-
-      break;
+      if(branch_taken){
+        block_fetch_to_decode = 1;
+      }
     }
-  }
-  if(branch_taken){
-
   }
 
 }

@@ -139,7 +139,7 @@ int sra(int reg1, int reg2){
 //jump and link
 int jal(){
   int originalPC = currentInstruction.pc + 4;
-  pc[0] = currentInstruction.pc + currentInstruction.imm;
+  pc[0] = change_pc_execute(currentInstruction.pc, currentInstruction.imm);
   // printf("%d\n",currentInstruction.imm);
   jump_flag = 1;
   return originalPC;
@@ -154,87 +154,112 @@ int jalr(int reg1){
 }
 
 //branch if equal
-void beq(int reg1, int reg2){
+int beq(int reg1, int reg2){
   if(reg1 == reg2){
     // printf("offset:%d\n",currentInstruction.imm);
     // printf("actual pc:%d\n", currentInstruction.pc);
     // printf("actual pc:%d\n", currentpc);
     // printf("%d\n",currentInstruction.imm);
-    instructionid = currentInstruction.instructionid + 1;
-    pc[0] = currentInstruction.pc + currentInstruction.imm;
-    branch_flag = 1;
-    purgeid = currentInstruction.instructionid;
-    purge = 1;
 
-    printf("%d\n",pc[0]);
+    purge = check_purge_accepted(currentInstruction.pc, currentInstruction.imm);
+    // printf("%d\n",pc[0]);
     // exit_early();
   }
-  return;
+  else{
+    purge = check_purge_rejected(currentInstruction.pc, currentInstruction.imm);
+  }
+  if(purge == 1){
+    purgeid = currentInstruction.instructionid;
+    instructionid = currentInstruction.instructionid + 1;
+    pc[0] = change_pc_execute(currentInstruction.pc, currentInstruction.imm);
+  }
+  return purge;
 }
 
 //branch if not equal
-void bne(int reg1, int reg2){
+int bne(int reg1, int reg2){
   if(reg1 != reg2){
-    instructionid = currentInstruction.instructionid + 1;
-    pc[0] = currentInstruction.pc + currentInstruction.imm;
-    branch_flag = 1;
-    purgeid = currentInstruction.instructionid;
-    purge = 1;
+    purge = check_purge_accepted(currentInstruction.pc, currentInstruction.imm);
   }
-  return;
+  else{
+    purge = check_purge_rejected(currentInstruction.pc, currentInstruction.imm);
+  }
+  if(purge == 1){
+    purgeid = currentInstruction.instructionid;
+    instructionid = currentInstruction.instructionid + 1;
+    pc[0] = change_pc_execute(currentInstruction.pc, currentInstruction.imm);
+  }
+  return purge;
 }
 //branch if less than 197
-void blt(int reg1, int reg2){
+int blt(int reg1, int reg2){
   // printf("please\n");
   // printf("%d\t%d\n",reg1,reg2);
 
   if(reg1 < reg2){
-    // printf("%d\n",currentInstruction.instructionid);
-    // exit_early();
-    instructionid = currentInstruction.instructionid + 1;
-    pc[0] = currentInstruction.pc + currentInstruction.imm;
-    branch_flag = 1;
-    purgeid = currentInstruction.instructionid;
-    purge = 1;
+    purge = check_purge_accepted(currentInstruction.pc, currentInstruction.imm);
   }
-  return;
+  else{
+    purge = check_purge_rejected(currentInstruction.pc, currentInstruction.imm);
+  }
+  if(purge == 1){
+    purgeid = currentInstruction.instructionid;
+    instructionid = currentInstruction.instructionid + 1;
+    pc[0] = change_pc_execute(currentInstruction.pc, currentInstruction.imm);
+    // exit_early();
+  }
+  printf("%d\n",purge);
+  // exit_early();
+  return purge;
 }
 
 //branch if less than
-void bltu(int reg1, int reg2){
+int bltu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u < reg2u){
-    instructionid = currentInstruction.instructionid + 1;
-    pc[0] = currentInstruction.pc + currentInstruction.imm;
-    branch_flag = 1;
-    purgeid = currentInstruction.instructionid;
-    purge = 1;
+    purge = check_purge_accepted(currentInstruction.pc, currentInstruction.imm);
   }
-  return;
+  else{
+    purge = check_purge_rejected(currentInstruction.pc, currentInstruction.imm);
+  }
+  if(purge == 1){
+    purgeid = currentInstruction.instructionid;
+    instructionid = currentInstruction.instructionid + 1;
+    pc[0] = change_pc_execute(currentInstruction.pc, currentInstruction.imm);
+  }
+  return purge;
 }
 
 //branch if greater than
-void bge(int reg1, int reg2){
+int bge(int reg1, int reg2){
   if(reg1 >= reg2){
-    instructionid = currentInstruction.instructionid + 1;
-    pc[0] = currentInstruction.pc + currentInstruction.imm;
-    branch_flag = 1;
-    purgeid = currentInstruction.instructionid;
-    purge = 1;
+    purge = check_purge_accepted(currentInstruction.pc, currentInstruction.imm);
   }
-  return;
+  else{
+    purge = check_purge_rejected(currentInstruction.pc, currentInstruction.imm);
+  }
+  if(purge == 1){
+    purgeid = currentInstruction.instructionid;
+    instructionid = currentInstruction.instructionid + 1;
+    pc[0] = change_pc_execute(currentInstruction.pc, currentInstruction.imm);
+  }
+  return purge;
 }
 
-void bgeu(int reg1, int reg2){
+int bgeu(int reg1, int reg2){
   unsigned int reg1u = reg1, reg2u = reg2;
   if(reg1u >= reg2u){
-    instructionid = currentInstruction.instructionid + 1;
-    pc[0] = currentInstruction.pc + currentInstruction.imm;
-    branch_flag = 1;
-    purgeid = currentInstruction.instructionid;
-    purge = 1;
+    purge = check_purge_accepted(currentInstruction.pc, currentInstruction.imm);
   }
-  return;
+  else{
+    purge = check_purge_rejected(currentInstruction.pc, currentInstruction.imm);
+  }
+  if(purge == 1){
+    purgeid = currentInstruction.instructionid;
+    instructionid = currentInstruction.instructionid + 1;
+    pc[0] = change_pc_execute(currentInstruction.pc, currentInstruction.imm);
+  }
+  return purge;
 }
 // =================================================================
 // //branch if equal
@@ -245,7 +270,7 @@ void bgeu(int reg1, int reg2){
 //     // printf("actual pc:%d\n", currentpc);
 //     printf("%d\n",currentInstruction.imm);
 //     // pc[0] = currentInstruction.pc + currentInstruction.imm;
-//     branch_flag = 1;
+//
 //   }
 //   return(currentInstruction.pc + currentInstruction.imm);
 // }
@@ -254,7 +279,7 @@ void bgeu(int reg1, int reg2){
 // int bne(int reg1, int reg2){
 //   if(reg1 != reg2){
 //     // pc[0] = currentInstruction.pc + currentInstruction.imm;
-//     branch_flag = 1;
+//
 //   }
 //   return(currentInstruction.pc + currentInstruction.imm);
 // }
@@ -265,7 +290,7 @@ void bgeu(int reg1, int reg2){
 //   // printf("%d\t%d\n",reg1,reg2);
 //   if(reg1 < reg2){
 //     pc[0] = currentInstruction.pc + currentInstruction.imm;
-//     branch_flag = 1;
+//
 //   }
 //   return(currentInstruction.pc + currentInstruction.imm);
 // }
@@ -275,7 +300,7 @@ void bgeu(int reg1, int reg2){
 //   unsigned int reg1u = reg1, reg2u = reg2;
 //   if(reg1u < reg2u){
 //     pc[0] = currentInstruction.pc + currentInstruction.imm;
-//     branch_flag = 1;
+//
 //   }
 //   return(currentInstruction.pc + currentInstruction.imm);
 // }
@@ -284,7 +309,7 @@ void bgeu(int reg1, int reg2){
 // int bge(int reg1, int reg2){
 //   if(reg1 >= reg2){
 //     pc[0] = currentInstruction.pc + currentInstruction.imm;
-//     branch_flag = 1;
+//
 //   }
 //   return(currentInstruction.pc + currentInstruction.imm);
 // }
@@ -293,7 +318,7 @@ void bgeu(int reg1, int reg2){
 //   unsigned int reg1u = reg1, reg2u = reg2;
 //   if(reg1u >= reg2u){
 //     pc[0] = currentInstruction.pc + currentInstruction.imm;
-//     branch_flag = 1;
+//
 //   }
 //   return(currentInstruction.pc + currentInstruction.imm);
 // }

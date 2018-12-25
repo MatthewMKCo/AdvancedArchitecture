@@ -242,7 +242,7 @@ int main(int argc, char** argv){
   separator;
 
   run();
-
+  // printring(inuseTags);
 
   return 0;
 }

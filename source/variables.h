@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define SIZE 5096*16
+#define SIZE 1024*32
 
 #define XLEN 32
 
@@ -17,6 +17,8 @@
 #define STORE_RESERVATION_WIDTH 16
 
 //0 - Static, never takes
+//1 - Static, always takes
+//2 - Backwards taken, forwards not taken
 #define BRANCH_PREDICTOR 0
 
 #define NUM_STAGES 10
@@ -35,6 +37,11 @@
 
 
 #define separator printf("====================================================\n");
+
+typedef struct acceptOrReject{
+  int accept;
+  int purge;
+}acceptOrReject;
 
 typedef struct branchDict{
   int pc;

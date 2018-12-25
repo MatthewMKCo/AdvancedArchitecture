@@ -15,12 +15,13 @@ void graduate(){
   start(inOrderInstructions);
   // int instructionid1;
   find foundid;
+  // printf("%d\n",sequencenumber);
   // instructionid1 = getinstructionid(inOrderInstructions);
   // printf("\nInOrderInstructions\n");
   // printring(inOrderInstructions);
   // printf("===\n");
   // printf("OutOfOrderInstructions\n");
-  printring(outOfOrderInstructions);
+  // printring(outOfOrderInstructions);
   // printf("\n");
   // printf("AllInOrder\n");
   // printring(allInOrder);
@@ -55,11 +56,14 @@ void graduate(){
 
       if(value2.unit_type == 2){
         if(value2.value == 1){
-
+          for(int j = 0; j < SIZE; j++){
+            Dcache[j] = Dmem[j];
+          }
         }
       }
       if(value2.unit_type == 3){
         if(value2.tagData.tagNumber != -2){
+          movenode(inuseTags, unusedTags, -1, 0);
           if(value2.tagData.registerNumber != 0){
             registers[value.tagData.registerNumber] = physRegisters[value2.tagData.tagNumber].value;
           }
@@ -75,7 +79,7 @@ void graduate(){
       // printring(allInOrder);
       // printring(allInOrder);
       // if(instructionid1 == 115)exit_early();
-      movenode(inOrderInstructions, allInOrder, value.tagData.registerNumber, 0);
+      movenode(inOrderInstructions, allInOrder, value.tagData.registerNumber, sequencenumber);
       deletenode(outOfOrderInstructions);
       start(outOfOrderInstructions);
       start(inOrderInstructions);

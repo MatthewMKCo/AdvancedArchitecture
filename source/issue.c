@@ -506,9 +506,7 @@ void issue(){
   if(issue_instruction_struct[current].instruction_type == 4 && issue_instruction_struct[current].rdestination == 0 && pc[0] != 0){
     issue_instruction_struct[current].instruction_type = 0;
     pc[0] = issue_instruction_struct[current].pc + issue_instruction_struct[current].imm;
-
     instructions_executed++;
-
     if(pc[0] == 0){
       // issue_finished = 1;
     }

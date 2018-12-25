@@ -6,7 +6,6 @@
 
 //fetch functions
 void fetch();
-int branch_predictor(int fedPC, int is_branch, int offset);
 
 //decode functions
 void decode();
@@ -57,12 +56,12 @@ int srl(int reg1, int reg2);
 int sra(int reg1, int reg2);
 int jal();
 int jalr(int reg1);
-void beq(int reg1, int reg2);
-void bne(int reg1, int reg2);
-void blt(int reg1, int reg2);
-void bltu(int reg1, int reg2);
-void bge(int reg1, int reg2);
-void bgeu(int reg1, int reg2);
+int beq(int reg1, int reg2);
+int bne(int reg1, int reg2);
+int blt(int reg1, int reg2);
+int bltu(int reg1, int reg2);
+int bge(int reg1, int reg2);
+int bgeu(int reg1, int reg2);
 int ld(char* cache, int reg1);
 int lw(char* cache, int reg1);
 int lh(char* cache, int reg1);
@@ -119,3 +118,9 @@ int check_tag_for_zero(ring* currentRing, int tagPassed);
 int get_register(ring* currentRing);
 int get_register2(ring* currentRing);
 int moveselectednode(ring *unused, ring *inuse, int purgeid);
+
+//Branch Functions
+int branch_predictor(int fedPC, int is_branch, int offset);
+int check_purge_accepted(int pc, int offset);
+int check_purge_rejected(int pc, int offset);
+int change_pc_execute(int pc, int offset);

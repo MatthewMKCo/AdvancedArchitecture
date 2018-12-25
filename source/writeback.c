@@ -1,4 +1,6 @@
 #include "run.h"
+
+int b3 = 0;
 void writeintophysreg(int i){
     physRegisters[writebackalu[i].tag].value = writebackalu[i].value;
     physRegisters[writebackalu[i].tag].ready = 1;
@@ -11,6 +13,12 @@ void writeintophysreg(int i){
     orderTag.tagNumber = writebackalu[i].tag;
     orderTag.registerNumber = get_register(inuseTags);
     addafternodeinstruction(outOfOrderInstructions, writebackalu[i].instruction, writebackalu[i].instructionid, orderTag, 1, writebackalu[i].value);
+
+    // if(writebackalu[i].instruction == 38 && b3 == 1){
+    //   exit_early();
+    // }
+    // if(writebackalu[i].instruction == 38)b3++;
+
     return;
 }
 
@@ -27,7 +35,6 @@ void writebackbranch(int i){
 
 void writebackloadstore(int i){
   tag orderTag;
-  printf("%d\n",writebacklsu[i].value);
   // if(writebacklsu[i].instructionid == 109)exit_early();
   // printf("%d\n",);
   // if(writebacklsu[i].instructionid == 366)exit_early();

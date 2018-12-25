@@ -325,6 +325,7 @@ void purgepipe(){
       alu[i].ready = 1;
       alu[i].readyForWriteback = 0;
       alu[i].shouldWriteback = 0;
+      alu[i].currentCycles = 0;
     }
   }
   for(int i = 0; i < BRU_NUM; i++){
@@ -332,6 +333,8 @@ void purgepipe(){
       bru[i].ready = 1;
       bru[i].readyForWriteback = 0;
       bru[i].shouldWriteback = 0;
+      bru[i].currentCycles = 0;
+
     }
   }
   for(int i = 0; i < LSU_NUM; i++){
@@ -339,6 +342,8 @@ void purgepipe(){
       lsu[i].ready = 1;
       lsu[i].readyForWriteback = 0;
       lsu[i].shouldWriteback = 0;
+      lsu[i].currentCycles = 0;
+
     }
   }
   for(int i = 0; i < ALU_NUM; i++){
@@ -356,17 +361,13 @@ void purgepipe(){
       writebacklsu[i].ready = 0;
     }
   }
+
   deletenodeswithgreaterthanid(purgeid);
   moveselectednode(inuseTags, unusedTags, purgeid);
-  // printring(inOrderInstructions);
-  if(purgeid >= 50){
-    // printf("%d\n", purgeid);
-    // printring(inuseTags);
-
-    // exit_early();
-  }
+  printring(allInOrder);
+  printf("%d\n",purgeid);
+// exit_early();
   // printring(outOfOrderInstructions);
-
-  // if(b==7)exit_early();
+  // if(b==1)exit_early();
   b++;
 }

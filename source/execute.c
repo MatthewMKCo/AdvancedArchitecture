@@ -36,7 +36,7 @@ int check_execute_and_reservation_units(){
   }
   return 1;
 }
-
+int b2 = 0;
 //execute I format instructions
 void execute_iformat(int number){
   if(currentInstruction.opcode == 0b0010011){
@@ -47,6 +47,14 @@ void execute_iformat(int number){
         executed_instruction_name[numberOfExecutedInstructions] = "Add Immediate";
         execute_val = addi(currentInstruction.rsource1value);
         alu[number].cyclesNeeded = 1;
+        if(currentInstruction.instructionid == 38)b2++;
+        if(currentInstruction.instructionid == 38 && b2 == 2){
+          printf("%d\n",number);
+          // exit_early();
+        }
+        // if(current_cycle == 21 && currentInstruction.instructionid == 38){
+        //   exit_early();
+        // }
         break;
       case(0b111):
         // printf("Instruction:And Immediate\n");
@@ -382,7 +390,6 @@ void increment_units(){
         alu[i].currentCycles = 0;
         alu[i].ready = 1;
         alu[i].readyForWriteback = 1;
-
         // alu[i].wbValueInside = alu[i].valueInside;
         // alu[i].wbDestinationRegister = alu[i].destinationRegister;
       }
