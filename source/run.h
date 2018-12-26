@@ -93,8 +93,8 @@ void purgepipe();
 //lists functions
 ring *createring(char* name);
 void addafternode(ring *currentRing, tag data);
-void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, tag tagData, int unit_type, int value);
-int movenode(ring *unused, ring *inuse, int registerNumber, int id);
+void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, tag tagData, int unit_type, int value, char* instruction_name);
+int movenode(ring *unused, ring *inuse, int registerNumber, int id, int selected);
 tag get(ring *currentRing);
 void next(ring *currentRing);
 find find_tag(ring *currentRing, int tagNumber);

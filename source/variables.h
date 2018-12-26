@@ -26,10 +26,11 @@
 #define NWAY 4
 #define ALU_NUM 4
 
-
 #define BRU_NUM 1
 
 #define LSU_NUM 1
+
+#define JLU_NUM 1
 
 #define TAG_NUM PHYSREG_NUM
 
@@ -90,6 +91,7 @@ typedef struct execute_unit{
   int readyForWriteback;
   int shouldWriteback;
   instruction instruction;
+  char* instruction_name;
 }execute_unit;
 
 typedef struct reg{
@@ -142,6 +144,7 @@ typedef struct execute_to_writeback{
   int instruction;
   int instructionid;
   int instruction_type;
+  char* instruction_name;
 }execute_to_writeback;
 
 // typedef int item;
@@ -156,6 +159,7 @@ typedef struct Node{
   int ready;
   int value;
   int unit_type;
+  char* instruction_name;
 }node;
 
 typedef struct everything{
@@ -183,6 +187,8 @@ typedef struct Find{
 extern execute_unit alu[ALU_NUM];
 extern execute_unit lsu[LSU_NUM];
 extern execute_unit bru[BRU_NUM];
+extern execute_unit jlu[JLU_NUM];
+
 
 extern instruction currentInstruction;
 //
@@ -285,7 +291,7 @@ extern int print_decode_summary, print_execute_summary, print_issue_summary;
 
 extern int writeback_destination, graduate_destination;
 
-extern execute_to_writeback writebackalu[ALU_NUM], writebackbru[BRU_NUM], writebacklsu[LSU_NUM];
+extern execute_to_writeback writebackjlu[JLU_NUM], writebackalu[ALU_NUM], writebackbru[BRU_NUM], writebacklsu[LSU_NUM];
 
 extern int stall_from_issue;
 

@@ -158,6 +158,10 @@ void decode(){
   decode_instruction_struct[i].instruction_type = decode_instruction_type;
   decode_instruction_struct[i].instruction_hex = decode_instruction[i];
   decode_instruction_struct[i].pcDestination = decode_pcDestination;
+  if(decodepc[i] == 268 && decode_instruction_type == 1){
+    // printf("%x\n", decode_instruction_struct[i].instruction_hex);
+    // exit_early();
+  }
 }
 
   int branch_taken = 0;
@@ -167,16 +171,13 @@ void decode(){
     }
     if(decode_instruction_struct[i].instruction_type == 5){
       branch_taken = branch_predictor(decode_instruction_struct[i].pc, 1, decode_instruction_struct[i].imm);
-      if(decode_instruction_struct[i].pc == 256){
-
-        // printf("%d\n", decode_instruction_struct[i].pc);
-        // printf("%d\n", decode_instruction_struct[i].imm);
-        // printf("%d\n",pc[0]);
-        // exit_early();
-      }
       if(branch_taken){
         block_fetch_to_decode = 1;
       }
+    }
+    if(decode_instruction_struct[i].pc == 248 && current_cycle > 286){
+      printf("%d\n",current_cycle);
+      // exit_early();
     }
   }
 

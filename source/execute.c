@@ -110,6 +110,7 @@ void execute_iformat(int number){
     }
     alu[number].valueInside = execute_val;
     alu[number].shouldWriteback = 1;
+    alu[number].instruction_name = executed_instruction_name[numberOfExecutedInstructions];
   }
   else if(currentInstruction.opcode == 0b0000011){
     // printf("Instruction:Offset Calculated for Load\n");
@@ -244,6 +245,7 @@ void execute_rformat(int number){
   }
   alu[number].valueInside = execute_val;
   alu[number].shouldWriteback = 1;
+  alu[number].instruction_name = executed_instruction_name[numberOfExecutedInstructions];
   return;
 }
 
@@ -260,41 +262,55 @@ void execute_bformat(int number){
     case(0b000):
       // printf("Instruction:Branch if Equal\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Equal";
-      beq(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      execute_val = beq(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
+      if(current_cycle == 292){
+        printf("%d\n",currentInstruction.instructionid);
+        printring(inOrderInstructions);
+        // exit_early();
+      }
       break;
     case(0b001):
       // printf("Instruction:Branch if Not Equal\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Not Equal";
-      bne(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      execute_val = bne(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
       break;
     case(0b100):
       // printf("Instruction:Branch if Less Than\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Less Than";
       // exit_early();
-      blt(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      execute_val = blt(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      if(currentInstruction.instructionid == 367){
+        // printring(inOrderInstructions);
+        printf("%d\n", pc[0]);
+        printf("%d\n",purgeid);
+        printf("%d\n",current_cycle);
+        // exit_early();
+      }
       bru[number].cyclesNeeded = 1;
       break;
     case(0b101):
       // printf("Instruction:Branch if Greater Than\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Greater Than";
-      bge(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      execute_val = bge(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
       break;
     case(0b110):
       // printf("Instruction:Branch if Less Than Unsigned\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Less Than Unsigned";
-      bltu(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      execute_val = bltu(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
       break;
     case(0b111):
       // printf("Instruction:Branch if Greater Than Unsigned\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Greater Than Unsigned";
-      bgeu(currentInstruction.rsource1value, currentInstruction.rsource2value);
+      execute_val = bgeu(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
       break;
   }
+  bru[number].valueInside = execute_val;
+  bru[number].instruction_name = executed_instruction_name[numberOfExecutedInstructions];
   return;
 }
 
@@ -343,6 +359,7 @@ void execute_iformat2(int number){
   }
   lsu[number].shouldWriteback = 1;
   lsu[number].valueInside = execute_val;
+  lsu[number].instruction_name = executed_instruction_name[numberOfExecutedInstructions];
   return;
 }
 
@@ -373,6 +390,7 @@ void execute_sformat2(int number){
   }
   lsu[number].valueInside = execute_val;
   lsu[number].destinationRegister = execute_offset;
+  lsu[number].instruction_name = executed_instruction_name[numberOfExecutedInstructions];
   return;
 }
 
@@ -489,6 +507,7 @@ void send_for_writeback(){
       writebackalu[i].instruction = alu[i].instruction.instruction_hex;
       writebackalu[i].instructionid = alu[i].instruction.instructionid;
       writebackalu[i].instruction_type = alu[i].instruction.instruction_type;
+      writebackalu[i].instruction_name = alu[i].instruction_name;
       // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
     }
   }
@@ -502,6 +521,7 @@ void send_for_writeback(){
       writebackbru[i].instruction = bru[i].instruction.instruction_hex;
       writebackbru[i].instructionid = bru[i].instruction.instructionid;
       writebackbru[i].instruction_type = bru[i].instruction.instruction_type;
+      writebackbru[i].instruction_name = bru[i].instruction_name;
 
       // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
     }
@@ -517,9 +537,23 @@ void send_for_writeback(){
       writebacklsu[i].instruction = lsu[i].instruction.instruction_hex;
       writebacklsu[i].instructionid = lsu[i].instruction.instructionid;
       writebacklsu[i].instruction_type = lsu[i].instruction.instruction_type;
+      writebacklsu[i].instruction_name = lsu[i].instruction_name;
 
 
       // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
+    }
+  }
+  for(int i = 0; i < JLU_NUM; i++){
+    if(jlu[i].readyForWriteback == 1){
+      jlu[i].readyForWriteback = 0;
+
+      writebackjlu[i].ready = 1;
+      writebackjlu[i].value = jlu[i].valueInside;
+      writebackjlu[i].instruction = jlu[i].instruction.instruction_hex;
+      writebackjlu[i].instructionid = jlu[i].instruction.instructionid;
+      writebackjlu[i].instruction_type = jlu[i].instruction.instruction_type;
+      writebackjlu[i].instruction_name = jlu[i].instruction_name;
+
     }
   }
   return;
@@ -736,7 +770,6 @@ void execute(){
     lsu[lsu_unit_number].ready = 0;
     lsu[lsu_unit_number].destinationRegister = currentInstruction.tagDestination;
     lsu[lsu_unit_number].instruction = currentInstruction;
-
     if(currentInstruction.instruction_type == 1){
       execute_iformat(lsu_unit_number);
       numberOfExecutedInstructions++;
@@ -776,7 +809,22 @@ void execute(){
     issue_finished = 0;
     flush_from_issue = 0;
     stall_rename = 0;
+    // stall_from_issue = 0;
     purgepipe();
+  }
+
+  if(current_cycle == 290){
+    for(int j = 0; j < STORE_RESERVATION_WIDTH; j++){
+      if(reservationlsu[j].instructionid == 368 && reservationlsu[j].inuse){
+        printf("%d\n",reservationlsu[j].pc);
+        printf("%d\n",purgeid);
+        printring(inOrderInstructions);
+        // exit_early();
+      }
+    }
+    printring(inOrderInstructions);
+    printf("helo%d\n",purgeid);
+    // exit_early();//368 tag -2 reg 14
   }
 
   increment_units();

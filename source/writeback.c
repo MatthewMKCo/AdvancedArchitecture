@@ -12,7 +12,7 @@ void writeintophysreg(int i){
     tag orderTag;
     orderTag.tagNumber = writebackalu[i].tag;
     orderTag.registerNumber = get_register(inuseTags);
-    addafternodeinstruction(outOfOrderInstructions, writebackalu[i].instruction, writebackalu[i].instructionid, orderTag, 1, writebackalu[i].value);
+    addafternodeinstruction(outOfOrderInstructions, writebackalu[i].instruction, writebackalu[i].instructionid, orderTag, 1, writebackalu[i].value, writebackalu[i].instruction_name);
 
     // if(writebackalu[i].instruction == 38 && b3 == 1){
     //   exit_early();
@@ -27,7 +27,7 @@ void writebackbranch(int i){
   orderTag.tagNumber = -2;
   orderTag.registerNumber = get_register(inuseTags);
   // printring(outOfOrderInstructions);
-  addafternodeinstruction(outOfOrderInstructions, writebackbru[i].instruction, writebackbru[i].instructionid, orderTag, 2, writebackbru[i].value);
+  addafternodeinstruction(outOfOrderInstructions, writebackbru[i].instruction, writebackbru[i].instructionid, orderTag, 2, writebackbru[i].value, writebackbru[i].instruction_name);
   // printring(outOfOrderInstructions);
   // exit_early();
   return;
@@ -50,10 +50,28 @@ void writebackloadstore(int i){
     // orderTag.tagNumber = writebacklsu[i].tag;
     orderTag.tagNumber = -2;
 
-    orderTag.registerNumber = get_register(inuseTags);
+    // orderTag.registerNumber = get_register(inuseTags);
+    orderTag.registerNumber = -2;
   }
 
-  addafternodeinstruction(outOfOrderInstructions, writebacklsu[i].instruction, writebacklsu[i].instructionid, orderTag, 3, writebacklsu[i].value);
+  if(writebacklsu[i].instructionid == 368){
+    printring(outOfOrderInstructions);
+    printring(inOrderInstructions);
+    // exit_early();
+  }
+
+  addafternodeinstruction(outOfOrderInstructions, writebacklsu[i].instruction, writebacklsu[i].instructionid, orderTag, 3, writebacklsu[i].value, writebacklsu[i].instruction_name);
+  return;
+}
+
+void writebackjal(int i){
+  tag orderTag;
+  orderTag.tagNumber = -2;
+  orderTag.registerNumber = 0;
+
+  addafternodeinstruction(outOfOrderInstructions, writebackjlu[i].instruction, writebackjlu[i].instructionid, orderTag, 1, writebackjlu[i].value, writebackjlu[i].instruction_name);
+  // if(writebackjlu[i].instructionid == 377)exit_early();
+
   return;
 }
 
@@ -90,6 +108,12 @@ void writeback(){
     if(writebacklsu[i].ready == 1){
       writebacklsu[i].ready = 0;
       writebackloadstore(i);
+    }
+  }
+  for(int i = 0; i < JLU_NUM; i++){
+    if(writebackjlu[i].ready == 1){
+      writebackjlu[i].ready = 0;
+      writebackjal(i);
     }
   }
 }

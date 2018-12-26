@@ -198,7 +198,6 @@ void print_reg_summary(){
     if(lsu[i].ready == 0)printf("LSU %d:INUSE\t", i);
   }
   printf("\n");
-
   // printf("%d\n", fetch_finished);
   // printf("%d\n", decode_finished);
   // printf("%d\n", issue_finished);
@@ -284,7 +283,7 @@ void move_next_to_current(){
     if(reservationlsu[i].inuse == 1)reservationlsu[i].inExecute = 1;
   }
 
-  if((stall_from_issue == 0 && first_fetch >= 1) || block_fetch_to_decode){
+  if((stall_from_issue == 0 && first_fetch >= 1) && block_fetch_to_decode == 0){
     for(int i = 0; i < NWAY; i++){
       decode_instruction[i] = fetch_instruction[i];
       decodepc[i] = fetchpc[i];
@@ -346,6 +345,15 @@ void purgepipe(){
 
     }
   }
+  for(int i = 0; i < JLU_NUM; i++){
+    if((jlu[i].ready == 0 || jlu[i].readyForWriteback == 1) && jlu[i].instruction.instructionid > purgeid){
+      jlu[i].ready = 1;
+      jlu[i].readyForWriteback = 0;
+      jlu[i].shouldWriteback = 0;
+      jlu[i].currentCycles = 0;
+
+    }
+  }
   for(int i = 0; i < ALU_NUM; i++){
     if(writebackalu[i].ready == 1 && writebackalu[i].instructionid > purgeid){
       writebackalu[i].ready = 0;
@@ -361,10 +369,19 @@ void purgepipe(){
       writebacklsu[i].ready = 0;
     }
   }
+  for(int i = 0; i < JLU_NUM; i++){
+    if(writebackjlu[i].ready == 1&& writebackjlu[i].instructionid > purgeid){
+      writebackjlu[i].ready = 0;
+    }
+  }
+  for(int i = 0; i < NWAY; i++){
+    decode_instruction_struct[i].instruction_type = 0;
+    fetch_instruction[i] = -1;
+  }
 
   deletenodeswithgreaterthanid(purgeid);
   moveselectednode(inuseTags, unusedTags, purgeid);
-  printring(allInOrder);
+  // printring(allInOrder);
   printf("%d\n",purgeid);
 // exit_early();
   // printring(outOfOrderInstructions);

@@ -7,6 +7,7 @@
 execute_unit alu[ALU_NUM];
 execute_unit lsu[LSU_NUM];
 execute_unit bru[BRU_NUM];
+execute_unit jlu[JLU_NUM];
 
 //reservation station
 reserve reservationalu[RESERVATION_WIDTH];
@@ -16,6 +17,7 @@ reserve reservationbru[BRANCH_RESERVATION_WIDTH];
 execute_to_writeback writebackalu[ALU_NUM];
 execute_to_writeback writebackbru[BRU_NUM];
 execute_to_writeback writebacklsu[LSU_NUM];
+execute_to_writeback writebackjlu[JLU_NUM];
 
 //Current Cycle
 int current_cycle = 1;
@@ -242,7 +244,7 @@ int main(int argc, char** argv){
   separator;
 
   run();
-  // printring(inuseTags);
+  printring(allInOrder);
 
   return 0;
 }

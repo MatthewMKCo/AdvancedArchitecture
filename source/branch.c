@@ -56,18 +56,17 @@ int branch_predictor(int fedPC, int is_decode, int offset){
       }
 
       else{
-        pc[0] = pc[0] + 4;
+        pc[0] = fedPC + 4;
         return 0;
       }
     }
 
     if(BRANCH_PREDICTOR == 2){
       if(is_decode){
-        if(offset < 0){
-          pc[0] = pc[0] + 4;
+        if(offset > 0){
+          pc[0] = fedPC + 4;
           return 0;
         }
-
         for(int i = 0; i < sizeOfBranchCache; i++){
           if(branchCache[i].pc == fedPC){
             pc[0] = branchCache[i].branchpc;
@@ -106,16 +105,19 @@ int branch_predictor(int fedPC, int is_decode, int offset){
         pc[0] = branchCache[j].branchpc;
         x++;
         return 1;
-      }
 
-      else{
-        pc[0] = pc[0] + 4;
-        return 0;
-      }
-    }
 
+        }
+
+        else{
+          pc[0] = pc[0] + 4;
+          return 0;
+        }
+      }
 
     else{
+      printf("WRONG BRANCH PREDICTOR\n");
+      exit(1);
       pc[0] = pc[0] + 4;
       return 0;
     }
@@ -153,5 +155,8 @@ int check_purge_rejected(int pc, int offset){
 int change_pc_execute(int pc, int offset){
   if(BRANCH_PREDICTOR == 0)return pc + offset;
   if(BRANCH_PREDICTOR == 1)return pc + 4;
-  if(BRANCH_PREDICTOR == 2)return pc + offset;
+  if(BRANCH_PREDICTOR == 2){
+    if(offset < 0)return pc + 4;
+    else return pc + offset;
+  }
 }

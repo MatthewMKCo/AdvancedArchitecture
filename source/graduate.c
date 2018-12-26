@@ -44,7 +44,7 @@ void graduate(){
       // }
 
       if(value2.unit_type == 1){
-        movenode(inuseTags, unusedTags, -1, 0);
+        movenode(inuseTags, unusedTags, -1, 0, 0);
         if(value2.tagData.registerNumber != 0){
           // printf("%d\n",value.tagData.registerNumber);
           // printf("%d\n",value.tagData.tagNumber);
@@ -54,16 +54,17 @@ void graduate(){
     }
 
 
-      if(value2.unit_type == 2){
-        if(value2.value == 1){
-          for(int j = 0; j < SIZE; j++){
-            Dcache[j] = Dmem[j];
-          }
-        }
-      }
+      // if(value2.unit_type == 2){
+      //   if(value2.value == 1){
+      //     for(int j = 0; j < SIZE; j++){
+      //       Dcache[j] = Dmem[j];
+      //     }
+      //     // exit_early();
+      //   }
+      // }
       if(value2.unit_type == 3){
         if(value2.tagData.tagNumber != -2){
-          movenode(inuseTags, unusedTags, -1, 0);
+          movenode(inuseTags, unusedTags, -1, 0, 0);
           if(value2.tagData.registerNumber != 0){
             registers[value.tagData.registerNumber] = physRegisters[value2.tagData.tagNumber].value;
           }
@@ -79,8 +80,8 @@ void graduate(){
       // printring(allInOrder);
       // printring(allInOrder);
       // if(instructionid1 == 115)exit_early();
-      movenode(inOrderInstructions, allInOrder, value.tagData.registerNumber, sequencenumber);
-      deletenode(outOfOrderInstructions);
+      movenode(outOfOrderInstructions, allInOrder, value2.tagData.registerNumber, sequencenumber, 1);
+      deletenode(inOrderInstructions);
       start(outOfOrderInstructions);
       start(inOrderInstructions);
 
@@ -90,6 +91,10 @@ void graduate(){
 
     }
     else break;
+  }
+  if(current_cycle == 290){
+    printf("%d\n",reservationlsu[6].instruction_type);
+    // exit_early();
   }
 
   // while(1){

@@ -38,7 +38,7 @@ void addafternode(ring *currentRing, tag data){
 }
 
 //adds a node after the last node
-void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, tag tagData, int unit_type, int value){
+void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, tag tagData, int unit_type, int value, char* instruction_name){
   node *newnode = malloc(sizeof(node));
 
   newnode -> name = currentRing -> name;
@@ -48,6 +48,7 @@ void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, ta
   newnode -> ready = 0;
   newnode -> value = value;
   newnode -> unit_type = unit_type;
+  newnode -> instruction_name = instruction_name;
   currentRing -> last -> forward = newnode;
   newnode -> forward = currentRing -> sentinel;
   newnode -> back = currentRing -> last;
@@ -80,22 +81,34 @@ void movenode2(ring *inuse, node *oldFirst){
 }
 
 //deletes the first node
-int movenode(ring *unused, ring *inuse, int registerNumber, int id){
-  node *before = unused -> first -> back;
-  node *after = unused -> first -> forward;
-  node *oldFirst = unused -> first;
+int movenode(ring *unused, ring *inuse, int registerNumber, int id, int selected){
+  node* before, *after, *oldFirst;
+  if(selected == 1){
+    before = unused -> selected -> back;
+    after = unused -> selected -> forward;
+    oldFirst = unused -> selected;
+    unused -> selected = oldFirst -> forward;
+    unused -> selected -> back = before;
+    before -> forward = after;
+    unused -> last = unused -> sentinel -> back;
+    unused -> first = unused -> sentinel -> forward;
+  }
+  else{
+    before = unused -> first -> back;
+    after = unused -> first -> forward;
+    oldFirst = unused -> first;
+    unused -> first = oldFirst -> forward;
+    unused -> first -> back = before;
+    before -> forward = after;
+    unused -> last = unused -> sentinel -> back;
+  }
   if(oldFirst -> data.tagNumber == -1){
     // printring(inuseTags);
     // printring(unusedTags);
     // printf("ERROR in movenode for %s\n", unused -> name);
     return oldFirst -> data.tagNumber;
-    // exit_early(1);
+    exit_early(1);
   }
-
-  unused -> first = oldFirst -> forward;
-  unused -> first -> back = before;
-  before -> forward = after;
-  unused -> last = unused -> sentinel -> back;
   // printf("%d\n", registerNumber);
   // printf("%s\n", unused -> name);
   // int ret = strcmp(unused -> name, "inuseTags")
@@ -301,6 +314,8 @@ find second_last(ring *currentRing, int registerDestination){
 
 void deletenode(ring *currentRing){
   if(currentRing -> selected -> data.tagNumber == -1){
+    // printring(inOrderInstructions);
+    // printring(outOfOrderInstructions);
     printf("Deleting Sentinel, error");
     exit(1);
   }
@@ -319,10 +334,10 @@ void printring(ring *currentRing){
   currentRing -> selected = currentRing -> first;
   while(1){
     if(currentRing -> selected -> data.tagNumber == -1){
-      printf("Id:%d\tTag:%d\tRegister:%d\tReady:%d\tName:%s\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber, currentRing -> selected -> ready,currentRing -> selected -> name);
+      printf("Id:%d\tTag:%d\tRegister:%d\tReady:%d\tName:%s\tInstruction:%s\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber, currentRing -> selected -> ready,currentRing -> selected -> name, currentRing -> selected -> instruction_name);
       break;
     }
-    printf("Id:%d\tTag:%d\tRegister:%d\tReady:%d\tName:%s\tValue:%d\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber, currentRing -> selected -> ready,currentRing -> selected -> name, currentRing -> selected -> value);
+    printf("Id:%d\tTag:%d\tRegister:%d\tReady:%d\tName:%s\tInstruction:%*s\tValue:%d\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber, currentRing -> selected -> ready,currentRing -> selected -> name, 20, currentRing -> selected -> instruction_name, currentRing -> selected -> value);
     next(currentRing);
   }
   printf("Id of first:%d\n", currentRing -> first -> id);
