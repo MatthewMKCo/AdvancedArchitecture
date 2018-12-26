@@ -449,7 +449,7 @@ int get_register(ring* currentRing, int tag){
     if(currentRing -> selected == currentRing -> sentinel){
       printf("%d\n", tag);
       printring(currentRing);
-      printring(allInOrder);
+      printring(inOrderInstructions);
       exit_early();
     }
     if(currentRing -> selected -> data.tagNumber == tag){

@@ -44,12 +44,14 @@ void graduate(){
       // }
 
       if(value2.unit_type == 1){
-        movenode(inuseTags, unusedTags, -1, 0, 0);
-        if(value2.tagData.registerNumber != 0){
-          // printf("%d\n",value.tagData.registerNumber);
-          // printf("%d\n",value.tagData.tagNumber);
-          // printf("%d\n",physRegisters[value.tagData.tagNumber].value);
-          registers[value.tagData.registerNumber] = physRegisters[value2.tagData.tagNumber].value;
+        if(value2.tagData.tagNumber != -2){
+          movenode(inuseTags, unusedTags, -1, 0, 0);
+          if(value2.tagData.registerNumber != 0){
+            // printf("%d\n",value.tagData.registerNumber);
+            // printf("%d\n",value.tagData.tagNumber);
+            // printf("%d\n",physRegisters[value.tagData.tagNumber].value);
+            registers[value.tagData.registerNumber] = physRegisters[value2.tagData.tagNumber].value;
+        }
       }
     }
 
@@ -64,6 +66,7 @@ void graduate(){
       // }
       if(value2.unit_type == 3){
         if(value2.tagData.tagNumber != -2){
+          // if(value2.tagData.tagNumber != get_register2(inuseTags))exit_early();
           movenode(inuseTags, unusedTags, -1, 0, 0);
           if(value2.tagData.registerNumber != 0){
             registers[value.tagData.registerNumber] = physRegisters[value2.tagData.tagNumber].value;

@@ -331,7 +331,7 @@ if(issue_unit_type[current] == 3){
 
   tag tagData;
   tagData.tagNumber = -2;
-  tagData.registerNumber = issue_instruction_struct[current].rdestination;
+  tagData.registerNumber = -2;
   addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData, issue_unit_type[current], 0, 0);
   instructionid++;
   rob++;;
@@ -659,7 +659,21 @@ void issue(){
     flush_from_issue = 0;
     stall_rename = 0;
     // stall_from_issue = 0;
+    //   printring(allInOrder);
+    //   printf("%d\n",purgeid);
+    //   printring(inuseTags);
+    //   purgepipe();
+    //   printring(inuseTags);
+    //   exit_early();
+    // }
+
+    // exit_early();
     purgepipe();
+
+  }
+  if(current_cycle == 14){
+
+    // exit_early();
   }
 
   return;

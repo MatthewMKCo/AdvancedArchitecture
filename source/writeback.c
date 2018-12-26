@@ -39,7 +39,7 @@ void writebackloadstore(int i){
   else{
     orderTag.tagNumber = -2;
 
-    orderTag.registerNumber = -2;
+    orderTag.registerNumber = writebacklsu[i].tag;//do not remove, tag is for destination address
   }
 
   if(writebacklsu[i].instructionid == 368){

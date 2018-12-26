@@ -25,7 +25,7 @@
 
 #define NUM_STAGES 10
 
-#define NWAY 4
+#define NWAY 1
 #define ALU_NUM 4
 
 #define BRU_NUM 1
