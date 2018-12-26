@@ -514,6 +514,8 @@ void issue(){
     jlu[0].valueInside = pc[0];
     jlu[0].instruction_name = "jal";
     jlu[0].readyForWriteback = 1;
+    purge = 1;//TODO:try this when you wake up matthew
+    purgeid = instructionid;
 
     instructionid++;
 
@@ -560,7 +562,8 @@ void issue(){
       jlu[0].valueInside = pc[0];
       jlu[0].instruction_name = "jal";
       jlu[0].readyForWriteback = 1;
-
+      purge = 1;//TODO:try this when you wake up matthew
+      purgeid = instructionid;
       instructionid++;
 
       break;
@@ -602,6 +605,8 @@ void issue(){
       jlu[0].valueInside = pc[0];
       jlu[0].instruction_name = "jal";
       jlu[0].readyForWriteback = 1;
+      purge = 1;//TODO:try this when you wake up matthew
+      purgeid = instructionid;
 
       instructionid++;
 
@@ -614,6 +619,18 @@ void issue(){
 }
   if(current == NWAY){
     current = 0;
+  }
+
+  if(purge == 1){
+    purge = 0;
+    first_fetch = 0;
+    first_decode = 0;
+    first_issue = 0;
+    issue_finished = 0;
+    flush_from_issue = 0;
+    stall_rename = 0;
+    // stall_from_issue = 0;
+    purgepipe();
   }
 
   return;

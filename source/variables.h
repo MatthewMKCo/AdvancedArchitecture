@@ -19,11 +19,11 @@
 //0 - Static, never takes
 //1 - Static, always takes
 //2 - Backwards taken, forwards not taken
-#define BRANCH_PREDICTOR 1
+#define BRANCH_PREDICTOR 1//19645
 
 #define NUM_STAGES 10
 
-#define NWAY 4
+#define NWAY 1
 #define ALU_NUM 4
 
 #define BRU_NUM 1

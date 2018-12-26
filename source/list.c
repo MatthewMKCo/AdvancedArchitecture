@@ -130,10 +130,11 @@ int moveselectednode(ring *unused, ring *inuse, int purgeid){
   node* before, *after, *oldSelected;
   unused -> selected = unused -> first;
   if(unused -> selected == unused -> sentinel){
-    printring(inuseTags);
-    printring(unusedTags);
-    printf("ERROR in moveselectednode for %s\n", unused -> name);
-    exit_early(1);
+    // printring(inuseTags);
+    // printring(unusedTags);
+    // printf("ERROR in moveselectednode for %s\n", unused -> name);
+    return 0;
+    // exit_early(1);
   }
   while(1){
     if(unused -> selected == unused -> sentinel){
@@ -158,6 +159,7 @@ int moveselectednode(ring *unused, ring *inuse, int purgeid){
 
       replacedata(oldSelected, 0);
       oldSelected -> name = inuse -> name;
+      oldSelected -> id = 0;
       movenode2(inuse, oldSelected);
     }
     else next(unused);
@@ -446,6 +448,7 @@ int get_register(ring* currentRing, int tag){
     if(currentRing -> selected == currentRing -> sentinel){
       printf("%d\n", tag);
       printring(currentRing);
+      printring(allInOrder);
       exit_early();
     }
     if(currentRing -> selected -> data.tagNumber == tag){

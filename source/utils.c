@@ -384,6 +384,7 @@ void purgepipe(){
 
   deletenodeswithgreaterthanid(purgeid);
   moveselectednode(inuseTags, unusedTags, purgeid);
+  // exit_early();
   // printring(allInOrder);
   // printf("%d\n",purgeid);
 // exit_early();
