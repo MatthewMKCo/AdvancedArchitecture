@@ -415,6 +415,7 @@ void deletenodeswithgreaterthanid(int purgeid){
       // if(inOrderInstructions -> selected -> data.tagNumber >= 0){
       //   moveselectednode(inuseTags, unusedTags, -1, inOrderInstructions -> selected -> data.tagNumber);
       // }
+      rob--;
       deletenode(inOrderInstructions);
     }
     else next(inOrderInstructions);

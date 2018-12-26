@@ -10,20 +10,22 @@
 
 #define PHYSREG_NUM 64
 
-#define RESERVATION_WIDTH 64
+#define RESERVATION_WIDTH 16
 
-#define BRANCH_RESERVATION_WIDTH 16
+#define BRANCH_RESERVATION_WIDTH 8
 
-#define STORE_RESERVATION_WIDTH 16
+#define STORE_RESERVATION_WIDTH 8
+
+#define ROBSIZE (RESERVATION_WIDTH + BRANCH_RESERVATION_WIDTH + STORE_RESERVATION_WIDTH)
 
 //0 - Static, never takes
 //1 - Static, always takes
 //2 - Backwards taken, forwards not taken
-#define BRANCH_PREDICTOR 1
+#define BRANCH_PREDICTOR 0
 
 #define NUM_STAGES 10
 
-#define NWAY 1
+#define NWAY 4
 #define ALU_NUM 4
 
 #define BRU_NUM 1
@@ -318,3 +320,5 @@ extern int numberOfExecutedInstructions;
 extern int block_decode_to_issue, block_fetch_to_decode;
 
 extern branchDict branchCache[sizeOfBranchCache];
+
+extern int rob;

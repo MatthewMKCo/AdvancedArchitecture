@@ -88,13 +88,10 @@ void graduate(){
       // instructionid1 = getinstructionid(inOrderInstructions);
       sequencenumber++;
       instructions_executed++;
+      rob--;
 
     }
     else break;
-  }
-  if(current_cycle == 290){
-    printf("%d\n",reservationlsu[6].instruction_type);
-    // exit_early();
   }
 
   // while(1){

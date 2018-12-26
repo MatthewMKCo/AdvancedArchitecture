@@ -196,6 +196,10 @@ void run(){
     //   pipeline_flush();
     //   // exit(1);
     // }
+    if(rob < 0){
+      printf("ERROR IN ROB");
+      exit(1);
+    }
 
     if(flush_from_issue == 1){
       flush_from_issue = 0;
@@ -205,8 +209,6 @@ void run(){
         decode_instruction_struct[i].instruction_type = 0;
       }
     }
-
-
 
     move_next_to_current();
     current_cycle++;

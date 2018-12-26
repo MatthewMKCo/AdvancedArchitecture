@@ -16,7 +16,14 @@ int stall_rename = 0;
 int current = 0;
 int block_decode_to_issue = 0;
 int b4 = 0;
+int rob = 0;
+
 void issue_rename(int current){
+  if(rob == ROBSIZE){
+    stall_from_issue = 2;
+    stall_rename = 1;
+    return;
+  }
   if(issue_instruction_struct[current].instruction_type  == 1 || issue_instruction_struct[current].instruction_type == 2 || issue_instruction_struct[current].instruction_type == 3){
     issue_instruction_struct[current].tagDestination = movenode(unusedTags, inuseTags, issue_instruction_struct[current].rdestination, instructionid, 0);
     if(issue_instruction_struct[current].tagDestination == -1){
@@ -62,6 +69,10 @@ void issue_rename(int current){
 }
 
 void issue_add_to_reservation(int current){
+  if(rob == ROBSIZE){
+    stall_from_issue = 2;
+    return;
+  }
   find foundtag;
   if(issue_unit_type[current] == 1){
     if(reservationIteratorALU >= RESERVATION_WIDTH)reservationIteratorALU = 0;
@@ -193,6 +204,7 @@ void issue_add_to_reservation(int current){
 
     addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData, issue_unit_type[current], 0, 0);
     instructionid++;
+    rob++;;
 
 }
 
@@ -322,6 +334,7 @@ if(issue_unit_type[current] == 3){
   tagData.registerNumber = issue_instruction_struct[current].rdestination;
   addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData, issue_unit_type[current], 0, 0);
   instructionid++;
+  rob++;;
 }
 
 if(issue_unit_type[current] == 2){
@@ -457,6 +470,7 @@ if(issue_unit_type[current] == 2){
 
   addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData, issue_unit_type[current], 0, 0);
   instructionid++;
+  rob++;;
 }
   stall_from_issue = 0;
   return;
@@ -482,8 +496,18 @@ void issue(){
     block_decode_to_issue = 0;
     return;
   }
+  if(rob == ROBSIZE){
+    stall_from_issue = 2;
+    stall_rename = 1;
+    return;
+  }
 
   for(; current < NWAY; current++){
+    if(rob == ROBSIZE){
+      stall_from_issue = 2;
+      stall_rename = 1;
+      return;
+    }
   if(stall_from_issue == 0){
 
   if(issue_instruction_struct[current].instruction_type == 0){
@@ -518,6 +542,7 @@ void issue(){
     purgeid = instructionid;
 
     instructionid++;
+    rob++;;
 
     break;
   }
@@ -565,6 +590,7 @@ void issue(){
       purge = 1;//TODO:try this when you wake up matthew
       purgeid = instructionid;
       instructionid++;
+      rob++;;
 
       break;
     }
@@ -609,6 +635,7 @@ void issue(){
       purgeid = instructionid;
 
       instructionid++;
+      rob++;;
 
       break;
     }
