@@ -774,6 +774,8 @@ void execute(){
   // send_for_writeback();
 
   if(purge == 1){
+    block_fetch_to_decode = 0;
+    block_decode_to_issue = 0;
     purge = 0;
     first_fetch = 0;
     first_decode = 0;
