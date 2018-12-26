@@ -156,14 +156,7 @@ int jalr(int reg1){
 //branch if equal
 int beq(int reg1, int reg2){
   if(reg1 == reg2){
-    // printf("offset:%d\n",currentInstruction.imm);
-    // printf("actual pc:%d\n", currentInstruction.pc);
-    // printf("actual pc:%d\n", currentpc);
-    // printf("%d\n",currentInstruction.imm);
-
     purge = check_purge_accepted(currentInstruction.pc, currentInstruction.imm);
-    // printf("%d\n",pc[0]);
-    // exit_early();
   }
   else{
     purge = check_purge_rejected(currentInstruction.pc, currentInstruction.imm);
@@ -206,10 +199,7 @@ int blt(int reg1, int reg2){
     purgeid = currentInstruction.instructionid;
     instructionid = currentInstruction.instructionid + 1;
     pc[0] = change_pc_execute(currentInstruction.pc, currentInstruction.imm);
-    // exit_early();
   }
-  printf("%d\n",purge);
-  // exit_early();
   return purge;
 }
 

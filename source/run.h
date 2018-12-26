@@ -115,7 +115,7 @@ void change_to_ready(ring *currentRing);
 void deletenodeswithgreaterthanid();
 void addvaluetolast(ring* currentRing, int value);
 int check_tag_for_zero(ring* currentRing, int tagPassed);
-int get_register(ring* currentRing);
+int get_register(ring* currentRing, int tag);
 int get_register2(ring* currentRing);
 int moveselectednode(ring *unused, ring *inuse, int purgeid);
 

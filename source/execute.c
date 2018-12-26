@@ -47,14 +47,6 @@ void execute_iformat(int number){
         executed_instruction_name[numberOfExecutedInstructions] = "Add Immediate";
         execute_val = addi(currentInstruction.rsource1value);
         alu[number].cyclesNeeded = 1;
-        if(currentInstruction.instructionid == 38)b2++;
-        if(currentInstruction.instructionid == 38 && b2 == 2){
-          printf("%d\n",number);
-          // exit_early();
-        }
-        // if(current_cycle == 21 && currentInstruction.instructionid == 38){
-        //   exit_early();
-        // }
         break;
       case(0b111):
         // printf("Instruction:And Immediate\n");
@@ -264,11 +256,6 @@ void execute_bformat(int number){
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Equal";
       execute_val = beq(currentInstruction.rsource1value, currentInstruction.rsource2value);
       bru[number].cyclesNeeded = 1;
-      if(current_cycle == 292){
-        printf("%d\n",currentInstruction.instructionid);
-        printring(inOrderInstructions);
-        // exit_early();
-      }
       break;
     case(0b001):
       // printf("Instruction:Branch if Not Equal\n");
@@ -279,15 +266,7 @@ void execute_bformat(int number){
     case(0b100):
       // printf("Instruction:Branch if Less Than\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Less Than";
-      // exit_early();
       execute_val = blt(currentInstruction.rsource1value, currentInstruction.rsource2value);
-      if(currentInstruction.instructionid == 367){
-        // printring(inOrderInstructions);
-        printf("%d\n", pc[0]);
-        printf("%d\n",purgeid);
-        printf("%d\n",current_cycle);
-        // exit_early();
-      }
       bru[number].cyclesNeeded = 1;
       break;
     case(0b101):
@@ -447,14 +426,11 @@ void forward_reservation_stations(int tagPassed, int value){
         reservationalu[i].rsource1value = value;
         reservationalu[i].instruction.rsource1value = value;
         reservationalu[i].rsource1ready = 1;
-        // printf("%d\n",value);
-        // if(tagPassed==5)exit_early();
       }
       if(reservationalu[i].rsource2ready == 0 && reservationalu[i].rsource2 == tagPassed){
         reservationalu[i].rsource2value = value;
         reservationalu[i].instruction.rsource2value = value;
         reservationalu[i].rsource2ready = 1;
-        // printf("%d\n",value);
       }
     }
 
@@ -463,8 +439,6 @@ void forward_reservation_stations(int tagPassed, int value){
         reservationbru[i].rsource1value = value;
         reservationbru[i].instruction.rsource1value = value;
         reservationbru[i].rsource1ready = 1;
-        // printf("%d\n",value);
-        // if(tagPassed==5)exit_early();
       }
       if(reservationbru[i].rsource2ready == 0 && reservationbru[i].rsource2 == tagPassed){
         reservationbru[i].rsource2value = value;
@@ -481,7 +455,6 @@ void forward_reservation_stations(int tagPassed, int value){
         reservationlsu[i].instruction.rsource1value = value;
         reservationlsu[i].rsource1ready = 1;
         // printf("%d\n",value);
-        // if(tagPassed==5)exit_early();
       }
       if(reservationlsu[i].rsource2ready == 0 && reservationlsu[i].rsource2 == tagPassed){
         reservationlsu[i].rsource2value = value;
@@ -623,7 +596,6 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
       wrappedListofInstructions.foundInstructions++;
       reservationalu[i].inuse = 0;
 
-      // exit_early();
     }
 
   }
@@ -811,20 +783,6 @@ void execute(){
     stall_rename = 0;
     // stall_from_issue = 0;
     purgepipe();
-  }
-
-  if(current_cycle == 290){
-    for(int j = 0; j < STORE_RESERVATION_WIDTH; j++){
-      if(reservationlsu[j].instructionid == 368 && reservationlsu[j].inuse){
-        printf("%d\n",reservationlsu[j].pc);
-        printf("%d\n",purgeid);
-        printring(inOrderInstructions);
-        // exit_early();
-      }
-    }
-    printring(inOrderInstructions);
-    printf("helo%d\n",purgeid);
-    // exit_early();//368 tag -2 reg 14
   }
 
   increment_units();

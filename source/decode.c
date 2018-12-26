@@ -83,6 +83,10 @@ void decode(){
       break;
   }
 
+  if(decode_instruction[i] == -1){
+    decode_unit_type[i] = 0;
+  }
+
   //I type instructions
   if(decode_instruction_type == 1){
     decode_rdestination = (decode_instruction[i] & 0x00000F80) >> 7;
@@ -158,10 +162,6 @@ void decode(){
   decode_instruction_struct[i].instruction_type = decode_instruction_type;
   decode_instruction_struct[i].instruction_hex = decode_instruction[i];
   decode_instruction_struct[i].pcDestination = decode_pcDestination;
-  if(decodepc[i] == 268 && decode_instruction_type == 1){
-    // printf("%x\n", decode_instruction_struct[i].instruction_hex);
-    // exit_early();
-  }
 }
 
   int branch_taken = 0;
@@ -174,10 +174,6 @@ void decode(){
       if(branch_taken){
         block_fetch_to_decode = 1;
       }
-    }
-    if(decode_instruction_struct[i].pc == 248 && current_cycle > 286){
-      printf("%d\n",current_cycle);
-      // exit_early();
     }
   }
 

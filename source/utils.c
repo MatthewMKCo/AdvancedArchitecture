@@ -375,14 +375,17 @@ void purgepipe(){
     }
   }
   for(int i = 0; i < NWAY; i++){
-    decode_instruction_struct[i].instruction_type = 0;
     fetch_instruction[i] = -1;
+    decode_instruction_struct[i].instruction_type = 0;
+    decode_instruction[i] = -1;
+    issue_instruction_struct[i].instruction_type = 0;
+    issue_instruction_struct[i].rdestination = 30;
   }
 
   deletenodeswithgreaterthanid(purgeid);
   moveselectednode(inuseTags, unusedTags, purgeid);
   // printring(allInOrder);
-  printf("%d\n",purgeid);
+  // printf("%d\n",purgeid);
 // exit_early();
   // printring(outOfOrderInstructions);
   // if(b==1)exit_early();

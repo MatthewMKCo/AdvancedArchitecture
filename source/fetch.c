@@ -14,24 +14,13 @@ void fetch(){
     fetch_finished = 1;
     last_instruction_cycle = current_cycle - 1;
     first_fetch = 0;
-    // if(last_instruction != 1)last_instruction = 1;
     return;
   }
 
   if(first_fetch < 2){
     first_fetch = first_fetch + 1;
   }
-  // if(current_cycle == 288){
-  //   for(int j = 0; j < NWAY; j++){
-  //     printf("%d\n", fetchpc[j]);
-  //   }
-  //   printf("%d\n",stall_from_issue);
-  //   exit_early();
-  // }
-
-  // if(last_instruction == 1)return;
   if(stall_from_issue != 0){
-    // first_fetch = 0;
     return;
   }
 
@@ -43,18 +32,8 @@ void fetch(){
 
   int branch_taken = branch_predictor(pc[0], 0, 0);
   if(branch_taken)break;
-  if(fetch_instruction[i] == -1 && last_instruction != 1){
-    // last_instruction = 1;
-    // last_instruction_cycle = current_cycle - 1;
-  }
 }
 
-// if(current_cycle == 288){
-//   for(int j = 0; j < NWAY; j++){
-//     printf("%d\n", fetchpc[j]);
-//   }
-//     exit_early();
-// }
   for(i = i + 1; i < NWAY; i++){
     fetch_instruction[i] = -1;
   }

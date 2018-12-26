@@ -437,8 +437,23 @@ int check_tag_for_zero(ring* currentRing, int tagPassed){
   }
 }
 
-int get_register(ring* currentRing){
-  return currentRing -> first -> data.registerNumber;
+int get_register(ring* currentRing, int tag){
+  start(currentRing);
+  if(currentRing -> selected == currentRing -> sentinel){
+    exit_early();
+  }
+  while(1){
+    if(currentRing -> selected == currentRing -> sentinel){
+      printf("%d\n", tag);
+      printring(currentRing);
+      exit_early();
+    }
+    if(currentRing -> selected -> data.tagNumber == tag){
+      return currentRing -> selected -> data.registerNumber;
+    }
+    else next(currentRing);
+  }
+  return currentRing -> selected -> data.registerNumber;
 }
 
 int get_register2(ring* currentRing){

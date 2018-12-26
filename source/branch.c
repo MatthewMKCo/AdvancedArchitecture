@@ -64,7 +64,7 @@ int branch_predictor(int fedPC, int is_decode, int offset){
     if(BRANCH_PREDICTOR == 2){
       if(is_decode){
         if(offset > 0){
-          pc[0] = fedPC + 4;
+          pc[0] = pc[0];
           return 0;
         }
         for(int i = 0; i < sizeOfBranchCache; i++){

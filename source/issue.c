@@ -19,7 +19,7 @@ int b4 = 0;
 void issue_rename(int current){
   if(issue_instruction_struct[current].instruction_type  == 1 || issue_instruction_struct[current].instruction_type == 2 || issue_instruction_struct[current].instruction_type == 3){
     issue_instruction_struct[current].tagDestination = movenode(unusedTags, inuseTags, issue_instruction_struct[current].rdestination, instructionid, 0);
-    if(issue_instruction_struct[current].tagDestination == -1){;
+    if(issue_instruction_struct[current].tagDestination == -1){
       stall_from_issue = 2;
       stall_rename = 1;
       return;
@@ -32,11 +32,6 @@ void issue_rename(int current){
   else{
     issue_instruction_struct[current].tagDestination = -1;
   }
-  // if(instructionid >= 89 && issue_instruction_struct[current].tagDestination == 3)exit_early();
-
-  // if(issue_instruction_struct[current].instruction_type == 4){
-  //   issue_instruction_struct[current].pctag = movenode(unusedTags, inuseTags, issue_instruction_struct[current].pcDestination);
-  // }
 
   find foundtag = find_register_last(inuseTags, issue_instruction_struct[current].rsource1);
 
@@ -59,6 +54,9 @@ void issue_rename(int current){
       issue_isPhys2 = 0;
     }
   }
+
+  stall_from_issue = 0;
+  stall_rename = 0;
 
   return;
 }
@@ -187,11 +185,6 @@ void issue_add_to_reservation(int current){
     reservationalu[reservationIteratorALU].instruction = issue_instruction_struct[current];
 
     reservationalu[reservationIteratorALU].instructionid = issue_instruction_struct[current].instructionid;
-    if(instructionid == 105){
-      printf("%d\n",current);
-      printf("%d\n", reservationalu[reservationIteratorALU].rdestination);
-      // exit_early();
-    }
     reservationIteratorALU++;
 
     tag tagData;
@@ -199,8 +192,6 @@ void issue_add_to_reservation(int current){
     tagData.registerNumber = issue_instruction_struct[current].rdestination;
 
     addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData, issue_unit_type[current], 0, 0);
-    // printf("%d\n",tagData.registerNumber);
-    // if(instructionid == 6)exit_early();
     instructionid++;
 
 }
@@ -331,7 +322,6 @@ if(issue_unit_type[current] == 3){
   tagData.registerNumber = issue_instruction_struct[current].rdestination;
   addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, instructionid, tagData, issue_unit_type[current], 0, 0);
   instructionid++;
-  // if(instructionid == 22)exit_early();
 }
 
 if(issue_unit_type[current] == 2){
@@ -454,19 +444,7 @@ if(issue_unit_type[current] == 2){
 
   reservationlsu[reservationIteratorLSU].instructionid = issue_instruction_struct[current].instructionid;
   reservationIteratorLSU++;
-  if(instructionid == 368 && current_cycle == 290){
-    printf("%d\n",issue_instruction_struct[current].pc);
-    printf("%d\n",issue_instruction_struct[current].instructionid);
-    printf("%d\n",issue_instruction_struct[current].funct3);
-    printf("%d\n",reservationIteratorLSU-1);
-    // exit_early();
-    b4++;
-  }
-  if(instructionid > 368 && reservationIteratorLSU == 6){
 
-
-    // exit_early();
-  }
   tag tagData;
   if(issue_instruction_struct[current].instruction_type == 1){
     tagData.tagNumber = issue_instruction_struct[current].tagDestination;

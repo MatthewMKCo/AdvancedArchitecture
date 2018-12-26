@@ -11,13 +11,9 @@ void writeintophysreg(int i){
 
     tag orderTag;
     orderTag.tagNumber = writebackalu[i].tag;
-    orderTag.registerNumber = get_register(inuseTags);
+    orderTag.registerNumber = get_register(inuseTags, orderTag.tagNumber);
     addafternodeinstruction(outOfOrderInstructions, writebackalu[i].instruction, writebackalu[i].instructionid, orderTag, 1, writebackalu[i].value, writebackalu[i].instruction_name);
 
-    // if(writebackalu[i].instruction == 38 && b3 == 1){
-    //   exit_early();
-    // }
-    // if(writebackalu[i].instruction == 38)b3++;
 
     return;
 }
@@ -25,39 +21,30 @@ void writeintophysreg(int i){
 void writebackbranch(int i){
   tag orderTag;
   orderTag.tagNumber = -2;
-  orderTag.registerNumber = get_register(inuseTags);
-  // printring(outOfOrderInstructions);
+  orderTag.registerNumber = -2;
   addafternodeinstruction(outOfOrderInstructions, writebackbru[i].instruction, writebackbru[i].instructionid, orderTag, 2, writebackbru[i].value, writebackbru[i].instruction_name);
-  // printring(outOfOrderInstructions);
-  // exit_early();
   return;
 }
 
 void writebackloadstore(int i){
   tag orderTag;
-  // if(writebacklsu[i].instructionid == 109)exit_early();
-  // printf("%d\n",);
-  // if(writebacklsu[i].instructionid == 366)exit_early();
 
   if(writebacklsu[i].instruction_type == 1){
     orderTag.tagNumber = writebacklsu[i].tag;
-    orderTag.registerNumber = get_register(inuseTags);
+    orderTag.registerNumber = get_register(inuseTags, orderTag.tagNumber);
     physRegisters[writebacklsu[i].tag].value = writebacklsu[i].value;
     physRegisters[writebacklsu[i].tag].ready = 1;
     forward_reservation_stations(writebacklsu[i].tag, writebacklsu[i].value);
   }
   else{
-    // orderTag.tagNumber = writebacklsu[i].tag;
     orderTag.tagNumber = -2;
 
-    // orderTag.registerNumber = get_register(inuseTags);
     orderTag.registerNumber = -2;
   }
 
   if(writebacklsu[i].instructionid == 368){
     printring(outOfOrderInstructions);
     printring(inOrderInstructions);
-    // exit_early();
   }
 
   addafternodeinstruction(outOfOrderInstructions, writebacklsu[i].instruction, writebacklsu[i].instructionid, orderTag, 3, writebacklsu[i].value, writebacklsu[i].instruction_name);
@@ -70,7 +57,6 @@ void writebackjal(int i){
   orderTag.registerNumber = 0;
 
   addafternodeinstruction(outOfOrderInstructions, writebackjlu[i].instruction, writebackjlu[i].instructionid, orderTag, 1, writebackjlu[i].value, writebackjlu[i].instruction_name);
-  // if(writebackjlu[i].instructionid == 377)exit_early();
 
   return;
 }
@@ -80,10 +66,6 @@ void writeback(){
     if(first_writeback < 2)first_writeback++;
     if(writeback_finished)return;
     if(execute_finished){
-      // printf("%d\n",current_cycle);
-      // printf("%d\n",execute_cycle_finished);
-
-      // exit_early();
       if(current_cycle == (execute_cycle_finished + 1)){
         writeback_finished = 1;
       }

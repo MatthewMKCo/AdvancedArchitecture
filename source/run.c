@@ -183,6 +183,7 @@ void run(){
       issue_finished = 0;
       flush_from_issue = 0;
       stall_rename = 0;
+      stall_from_issue = 0;
       purgepipe();
     }
     // if(branch_flag == 1){
