@@ -354,7 +354,10 @@ if(issue_unit_type[current] == 2){
     return;
   }
 
-  reservationlsu[reservationIteratorLSU].rdestination = issue_instruction_struct[current].tagDestination;
+  if(issue_instruction_struct[current].instruction_type == 6){
+    reservationlsu[reservationIteratorLSU].rdestination = -1;
+  }
+  else reservationlsu[reservationIteratorLSU].rdestination = issue_instruction_struct[current].tagDestination;
   reservationlsu[reservationIteratorLSU].rsource1 = issue_instruction_struct[current].tagsource1;
 
   if(issue_isPhys == 0){
@@ -451,6 +454,7 @@ if(issue_unit_type[current] == 2){
   reservationlsu[reservationIteratorLSU].instruction_type = issue_instruction_struct[current].instruction_type;
   reservationlsu[reservationIteratorLSU].inuse = 1;
   reservationlsu[reservationIteratorLSU].inExecute = 0;
+  reservationlsu[reservationIteratorLSU].notExecuted = 1;
   reservationlsu[reservationIteratorLSU].instruction_hex = issue_instruction_struct[current].instruction_hex;
   issue_instruction_struct[current].instructionid = instructionid;
   reservationlsu[reservationIteratorLSU].instruction = issue_instruction_struct[current];

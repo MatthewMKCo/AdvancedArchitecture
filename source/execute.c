@@ -320,6 +320,17 @@ void execute_iformat2(int number){
     case(0b010):
       // printf("Instruction:Load 32-bit\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Load 32-bit";
+      int i = 0;
+      for(; i < STORE_RESERVATION_WIDTH; i++){
+        if(reservationlsu[i].rdestination == execute_offset){
+          execute_val = reservationlsu[i].value;
+          break;
+        }
+      }
+      if(i != STORE_RESERVATION_WIDTH){
+        lsu[number].cyclesNeeded = 1;
+        break;
+      }
       execute_val = lw(Dcache, execute_offset);
       lsu[number].cyclesNeeded = 4;
       break;
@@ -363,6 +374,18 @@ void execute_sformat2(int number){
       // printf("Instruction:Store 32-bit\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Store 32-bit";
       sw(Dcache, execute_offset, currentInstruction.rsource2value);
+      int i = 0;
+      for(; i < STORE_RESERVATION_WIDTH; i++){
+        if(reservationlsu[i].instructionid == currentInstruction.instructionid){
+          reservationlsu[i].value = currentInstruction.rsource2value;
+          reservationlsu[i].rdestination = execute_offset;
+          break;
+        }
+      }
+      if(i == STORE_RESERVATION_WIDTH){
+        printf("ERROR in Store Word");
+        exit_early();
+      }
       execute_val = currentInstruction.rsource2value;
       lsu[number].cyclesNeeded = 4;
       break;
@@ -595,6 +618,7 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
       wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
       wrappedListofInstructions.foundInstructions++;
       reservationalu[i].inuse = 0;
+      reservationalu[i].inExecute = 0;
 
     }
 
@@ -619,7 +643,10 @@ instructionwrapper check_reservation_bru(int numberOfAvailableUnits){
             newInstruction.index = i;
             wrappedListofInstructions.instruction[j] = newInstruction;
             reservationbru[i].inuse = 0;
+            reservationbru[i].inExecute = 0;
             reservationbru[x].inuse = 1;
+            reservationbru[x].inExecute = 1;
+
           }
         }
       }
@@ -630,6 +657,7 @@ instructionwrapper check_reservation_bru(int numberOfAvailableUnits){
         wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
         wrappedListofInstructions.foundInstructions++;
         reservationbru[i].inuse = 0;
+        reservationbru[i].inExecute = 0;
     }
     }
   }
@@ -644,7 +672,7 @@ instructionwrapper check_reservation_lsu(int numberOfAvailableUnits){
   if(numberOfAvailableUnits == 0)return wrappedListofInstructions;
   for(int j = 0; j < numberOfAvailableUnits; j++){
     for(int i = 0; i < STORE_RESERVATION_WIDTH; i++){
-      if(reservationlsu[i].inuse && reservationlsu[i].inExecute){
+      if(reservationlsu[i].inuse && reservationlsu[i].inExecute && reservationlsu[i].notExecuted){
         if(first_time == 1){
           first_time = 0;
           newInstruction = reservationlsu[i].instruction;
@@ -663,7 +691,16 @@ instructionwrapper check_reservation_lsu(int numberOfAvailableUnits){
       first_time = 1;
       if(reservationlsu[newInstruction.index].rsource1ready && reservationlsu[newInstruction.index].rsource2ready){
         wrappedListofInstructions.foundInstructions++;
-        reservationlsu[newInstruction.index].inuse = 0;
+        if(reservationlsu[newInstruction.index].instruction_type == 6){
+          reservationlsu[newInstruction.index].inuse = 1;
+          reservationlsu[newInstruction.index].inExecute = 1;
+        }
+        else{
+          reservationlsu[newInstruction.index].inuse = 0;
+          reservationlsu[newInstruction.index].inExecute = 0;
+        }
+        reservationlsu[newInstruction.index].notExecuted = 0;
+
       }
     }
     else break;

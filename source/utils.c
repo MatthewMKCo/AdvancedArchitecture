@@ -74,6 +74,7 @@ void print_reg_summary(){
     }
   }
 
+  if(NOTPRINT != 1){
   printf("Architectural Registers\n");
   //Print all register values
   for(int i = 0; i < 31; i++){
@@ -219,7 +220,7 @@ void print_reg_summary(){
   //     exit_early();
   //   }
   // }
-
+}
 }
 
 void move_next_to_current(){

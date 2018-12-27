@@ -72,7 +72,21 @@ void graduate(){
             registers[value.tagData.registerNumber] = physRegisters[value2.tagData.tagNumber].value;
           }
         }
-        else sw(Dmem, value2.tagData.tagNumber, value2.value);
+        else{
+          int j = 0;
+          for(; j < STORE_RESERVATION_WIDTH; j++){
+            if(reservationlsu[j].instructionid == sequencenumber){
+              reservationlsu[j].rdestination = -1;
+              reservationlsu[j].inuse = 0;
+              reservationlsu[j].inExecute = 0;
+              break;
+            }
+          }
+          if(j == STORE_RESERVATION_WIDTH){
+            printf("ERROR when removing from load store reservation station in graduate\n");
+          }
+          sw(Dcache, value2.tagData.tagNumber, value2.value);
+        }
       }
     // }
       // printf("%d\n",getinstructionid(inOrderInstructions));

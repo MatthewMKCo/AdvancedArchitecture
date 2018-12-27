@@ -21,7 +21,7 @@
 //0 - Static, never takes
 //1 - Static, always takes
 //2 - Backwards taken, forwards not taken
-#define BRANCH_PREDICTOR 0
+#define BRANCH_PREDICTOR 2
 
 #define NUM_STAGES 10
 
@@ -37,6 +37,8 @@
 #define TAG_NUM PHYSREG_NUM
 
 #define sizeOfBranchCache 100
+
+#define NOTPRINT 0
 
 
 #define separator printf("====================================================\n");
@@ -55,7 +57,6 @@ typedef struct branchDict{
 
 typedef struct instruction{
   int pcDestination;
-
   int pctag;
   int rdestination;
   int tagDestination;
@@ -123,8 +124,10 @@ typedef struct reserve{
   int inuse;
   int instruction_type;
   int inExecute;
+  int notExecuted;
   int instruction_hex;
   int instructionid;
+  int value;
   instruction instruction;
 }reserve;
 
