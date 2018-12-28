@@ -482,6 +482,7 @@ if(issue_unit_type[current] == 2){
 }
 
 void issue(){
+
   if(issue_finished)return;
   if(pc[0] == 0){
     if(current_cycle > last_instruction_cycle + 2){
@@ -495,7 +496,6 @@ void issue(){
   }
 
   if(first_issue < 2)first_issue++;
-
   if(block_decode_to_issue){
     block_decode_to_issue = 0;
     return;
@@ -520,8 +520,11 @@ void issue(){
     continue;
   }
 
+
+
   // printf("%d\n", issue_instruction_struct[current].instruction_type);
   if(issue_instruction_struct[current].instruction_type == 4 && issue_instruction_struct[current].rdestination == 0 && pc[0] != 0){
+
     issue_instruction_struct[current].instruction_type = 0;
     pc[0] = issue_instruction_struct[current].pc + issue_instruction_struct[current].imm;
     if(pc[0] == 0){
@@ -531,12 +534,14 @@ void issue(){
 
       flush_from_issue = 1;
     }
-    current = 0;
+
 
     tag tagData;
     tagData.tagNumber = -2;
     tagData.registerNumber = 0;
     addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, "jal");
+
+
     //issue_instruction_struct[current].instructionid = instructionid;
     jlu[0].instruction = issue_instruction_struct[current];
     jlu[0].valueInside = pc[0];
@@ -546,7 +551,8 @@ void issue(){
     purgeid = issue_instruction_struct[current].instructionid;
     instructionid = issue_instruction_struct[current].instructionid + 1;
     rob++;;
-
+    current = 0;
+// exit_early();
     break;
   }
 
@@ -557,7 +563,10 @@ void issue(){
 
   issue_add_to_reservation(current);
   if(stall_from_issue == 2)break;
-
+  if(current_cycle == 77){//64
+    printf("%d\n",issue_instruction_struct[current].instruction_type);
+    // exit_early();
+  }
   }
   else if(stall_rename){
     if(issue_instruction_struct[current].instruction_type == 0){
@@ -579,7 +588,6 @@ void issue(){
 
         flush_from_issue = 1;
       }
-      current = 0;
 
       tag tagData;
       tagData.tagNumber = -2;
@@ -595,6 +603,7 @@ void issue(){
       instructionid = issue_instruction_struct[current].instructionid + 1;
       //instructionid++;
       rob++;;
+      current = 0;
 
       break;
     }
@@ -624,7 +633,6 @@ void issue(){
 
         flush_from_issue = 1;
       }
-      current = 0;
 
       tag tagData;
       tagData.tagNumber = -2;
@@ -639,7 +647,8 @@ void issue(){
       purgeid = issue_instruction_struct[current].instructionid;
       instructionid = issue_instruction_struct[current].instructionid + 1;
       //instructionid++;
-      rob++;;
+      rob++;
+      current = 0;
 
       break;
     }
@@ -662,6 +671,7 @@ void issue(){
     issue_finished = 0;
     flush_from_issue = 0;
     stall_rename = 0;
+    current = 0;
     // stall_from_issue = 0;
     //   printring(allInOrder);
     //   printf("%d\n",purgeid);

@@ -315,6 +315,7 @@ void run(){
       flush_from_issue = 0;
       stall_rename = 0;
       stall_from_issue = 0;
+      current = 0;
       purgepipe();
     }
 
@@ -340,7 +341,21 @@ void run(){
       }
     }
 
+    // printf("%d\n",issue_instruction_struct[0].instruction_type);
     move_next_to_current();
+    // printring(allInOrder);
+    // printring(inuseTags);
+    // printring(outOfOrderInstructions);
+    // printring(inOrderInstructions);
+
+    if(current_cycle == 11){
+      printf("%d\n",instructionid);
+      // exit_early();
+    }
+    if(purgeid == 63){
+      printf("%d\n",current_cycle);
+      // exit_early();
+    }
     current_cycle++;
     separator;
 
@@ -379,7 +394,6 @@ int main(int argc, char** argv){
   separator;
 
   run();
-  // printring(allInOrder);
 
   return 0;
 }

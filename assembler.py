@@ -493,6 +493,7 @@ def main():
             if(z[0] == "addi"):
                 if(int(z[3]) > 2047 or int(z[3]) < -2048):
                     count = count - 1
+                    exit()
             if(lines2[i][0] == '.'):
                 addr = lines2[i]
                 x = [(i + 1 - count), addr[:-2]]

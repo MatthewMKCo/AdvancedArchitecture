@@ -259,6 +259,7 @@ void move_next_to_current(){
     for(int i = 0; i < NWAY; i ++){
       issue_unit_type[i] = decode_unit_type[i];
       issue_instruction_struct[i] = decode_instruction_struct[i];
+      decode_instruction_struct[i].instruction_type = 0;
     }
   }
 
@@ -289,6 +290,7 @@ void move_next_to_current(){
   if((stall_from_issue == 0 && first_fetch >= 1) && block_fetch_to_decode == 0){
     for(int i = 0; i < NWAY; i++){
       decode_instruction[i] = fetch_instruction[i];
+      fetch_instruction[i] = -1;
       decodepc[i] = fetchpc[i];
     }
 
@@ -373,7 +375,7 @@ void purgepipe(){
     }
   }
   for(int i = 0; i < JLU_NUM; i++){
-    if(writebackjlu[i].ready == 1&& writebackjlu[i].instructionid > purgeid){
+    if(writebackjlu[i].ready == 1 && writebackjlu[i].instructionid > purgeid){
       writebackjlu[i].ready = 0;
     }
   }
@@ -382,7 +384,9 @@ void purgepipe(){
     decode_instruction_struct[i].instruction_type = 0;
     decode_instruction[i] = -1;
     issue_instruction_struct[i].instruction_type = 0;
-    issue_instruction_struct[i].rdestination = 30;
+    issue_instruction_struct[i].rdestination = 0;
+    decode_instruction_struct[i].instructionid = -1;
+    issue_instruction_struct[i].instructionid = -1;
   }
 
   deletenodeswithgreaterthanid(purgeid);

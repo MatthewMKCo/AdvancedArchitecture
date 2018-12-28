@@ -5,6 +5,7 @@ int block_fetch_to_decode = 0;
 // instruction decode_instruction[i];
 
 void decode(){
+
   if(decode_finished)return;
   if(pc[0] == 0){
     if(current_cycle > last_instruction_cycle + 1){
@@ -32,6 +33,7 @@ void decode(){
     block_decode_to_issue = 1;
     return;
   }
+
   print_decode_summary = 1;
 
   for(int i = 0; i < NWAY; i++){
@@ -85,6 +87,7 @@ void decode(){
 
   if(decode_instruction[i] == -1){
     decode_unit_type[i] = 0;
+    return;
   }
 
   //I type instructions
@@ -150,6 +153,7 @@ void decode(){
       decode_imm = (decode_imm | 0xFFFFF000);
     }
   }
+
   decode_instruction_struct[i].rdestination = decode_rdestination;
   decode_instruction_struct[i].rsource1 = decode_rsource1;
   decode_instruction_struct[i].rsource2 = decode_rsource2;
@@ -166,6 +170,7 @@ void decode(){
   instructionid++;
 }
 
+
   int branch_taken = 0;
   for(int i = 0; i < NWAY; i++){
     if(branch_taken){
@@ -174,12 +179,19 @@ void decode(){
       instructionid--;
       continue;
     }
-    if(decode_instruction_struct[i].instruction_type == 5){
+    if(decode_instruction_struct[i].instruction_type == 5 && branch_taken == 0){
       branch_taken = branch_predictor(decode_instruction_struct[i].pc, 1, decode_instruction_struct[i].imm);
       if(branch_taken){
-        block_fetch_to_decode = 1;
+        for(int j = 0; j < NWAY; j++){
+          fetch_instruction[j] = -1;
+        }
       }
     }
   }
-
+  if(current_cycle == 10){
+    printf("%d\n",decode_instruction_struct[0].instructionid);
+    printf("%d\n",decode_instruction_struct[1].instructionid);
+    printf("%d\n",decode_instruction_struct[2].instructionid);
+    // exit_early();
+  }
 }

@@ -427,6 +427,11 @@ void increment_units(){
           purgeid = bru[i].instruction.instructionid;
           instructionid = bru[i].instruction.instructionid + 1;
           pc[0] = change_pc_execute(bru[i].instruction.pc, bru[i].instruction.imm);
+          printf("%d\n",pc[0]);
+          printf("%d\n",purgeid);
+          // exit_early();
+          // printf("%d\n",purgeid);
+          // if(bru[i].instruction.instructionid == 88)exit_early();
         }
         // alu[i].wbValueInside = alu[i].valueInside;
         // alu[i].wbDestinationRegister = alu[i].destinationRegister;
@@ -826,6 +831,7 @@ void execute(){
     issue_finished = 0;
     flush_from_issue = 0;
     stall_rename = 0;
+    current = 0;
     // stall_from_issue = 0;
     purgepipe();
   }
