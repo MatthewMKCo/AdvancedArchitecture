@@ -21,7 +21,7 @@
 //0 - Static, never takes
 //1 - Static, always takes
 //2 - Backwards taken, forwards not taken
-#define BRANCH_PREDICTOR 2
+#define BRANCH_PREDICTOR 0
 
 #define NUM_STAGES 10
 
@@ -38,7 +38,7 @@
 
 #define sizeOfBranchCache 100
 
-#define NOTPRINT 0
+#define NOTPRINT 1
 
 
 #define separator printf("====================================================\n");

@@ -162,12 +162,17 @@ void decode(){
   decode_instruction_struct[i].instruction_type = decode_instruction_type;
   decode_instruction_struct[i].instruction_hex = decode_instruction[i];
   decode_instruction_struct[i].pcDestination = decode_pcDestination;
+  decode_instruction_struct[i].instructionid = instructionid;
+  instructionid++;
 }
 
   int branch_taken = 0;
   for(int i = 0; i < NWAY; i++){
     if(branch_taken){
       decode_instruction_struct[i].instruction_type = 0;
+      decode_instruction_struct[i].instructionid = -1;
+      instructionid--;
+      continue;
     }
     if(decode_instruction_struct[i].instruction_type == 5){
       branch_taken = branch_predictor(decode_instruction_struct[i].pc, 1, decode_instruction_struct[i].imm);

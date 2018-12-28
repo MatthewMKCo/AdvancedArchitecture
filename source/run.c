@@ -139,6 +139,135 @@ void run(){
 
       // printf("LASTINSTRUCTION:%d\n",last_instruction_cycle);
       if(pc[0] == 0 && graduate_finished == 1){
+          if(NOTPRINT){
+            printf("Architectural Registers\n");
+            //Print all register values
+            for(int i = 0; i < 31; i++){
+              switch(i){
+                case(0):
+                  printf("zero:%-6d\t", registers[i]);
+                  break;
+                case(1):
+                  printf("ra:%-6d\t", registers[i]);
+                  break;
+                case(2):
+                  printf("sp:%-6d\t", registers[i]);
+                  break;
+                case(3):
+                  printf("gp:%-6d\t", registers[i]);
+                  break;
+                case(4):
+                  printf("tp:%-6d\t", registers[i]);
+                  break;
+                case(5):
+                  printf("t0:%-6d\t", registers[i]);
+                  break;
+                case(6):
+                  printf("t1:%-6d\t", registers[i]);
+                  break;
+                case(7):
+                  printf("t2:%-6d\t", registers[i]);
+                  break;
+                case(8):
+                  printf("s0:%-6d\t", registers[i]);
+                  break;
+                case(9):
+                  printf("s1:%-6d\t", registers[i]);
+                  break;
+                case(10):
+                  printf("a0:%-6d\t", registers[i]);
+                  break;
+                case(11):
+                  printf("a1:%-6d\t", registers[i]);
+                  break;
+                case(12):
+                  printf("a2:%-6d\t", registers[i]);
+                  break;
+                case(13):
+                  printf("a3:%-6d\t", registers[i]);
+                  break;
+                case(14):
+                  printf("a4:%-6d\t", registers[i]);
+                  break;
+                case(15):
+                  printf("a5:%-6d\t", registers[i]);
+                  break;
+                case(16):
+                  printf("a6:%-6d\t", registers[i]);
+                  break;
+                case(17):
+                  printf("a7:%-6d\t", registers[i]);
+                  break;
+                case(18):
+                  printf("s2:%-6d\t", registers[i]);
+                  break;
+                case(19):
+                  printf("s3:%-6d\t", registers[i]);
+                  break;
+                case(20):
+                  printf("s4:%-6d\t", registers[i]);
+                  break;
+                case(21):
+                  printf("s5:%-6d\t", registers[i]);
+                  break;
+                case(22):
+                  printf("s6:%-6d\t", registers[i]);
+                  break;
+                case(23):
+                  printf("s7:%-6d\t", registers[i]);
+                  break;
+                case(24):
+                  printf("s8:%-6d\t", registers[i]);
+                  break;
+                case(25):
+                  printf("s9:%-6d\t", registers[i]);
+                  break;
+                case(26):
+                  printf("s10:%-6d\t", registers[i]);
+                  break;
+                case(27):
+                  printf("s11:%-6d\t", registers[i]);
+                  break;
+                case(28):
+                  printf("t3:%-6d\t", registers[i]);
+                  break;
+                case(29):
+                  printf("t4:%-6d\t", registers[i]);
+                  break;
+                case(30):
+                  printf("t5:%-6d\t", registers[i]);
+                  break;
+                case(31):
+                  printf("t6:%-d\t", registers[i]);
+                  break;
+              }
+              if((i+1) % 5 == 0)printf("\n");
+            }
+            printf("pc:%-d\t", pc[0]);
+            printf("\n");
+            printf("Physical Registers\n");
+            for(int i = 0; i < PHYSREG_NUM; i++){
+              printf("Register %d; %-6d\t", i, physRegisters[i].value);
+              if((i + 1) % 5 == 0)printf("\n");
+            }
+            printf("\n");
+            for(int i = 0; i < ALU_NUM; i++){
+              if(alu[i].ready == 1)printf("ALU %d:FREE\t", i);
+              if(alu[i].ready == 0)printf("ALU %d:INUSE\t", i);
+            }
+            printf("\n");
+            for(int i = 0; i < BRU_NUM; i++){
+              if(bru[i].ready == 1)printf("BRU %d:FREE\t", i);
+              if(bru[i].ready == 0)printf("BRU %d:INUSE\t", i);
+            }
+            printf("\n");
+            for(int i = 0; i < LSU_NUM; i++){
+              if(lsu[i].ready == 1)printf("LSU %d:FREE\t", i);
+              if(lsu[i].ready == 0)printf("LSU %d:INUSE\t", i);
+            }
+            printf("\n");
+
+          }
           printf("End of program\n");
           printf("Number of Cycles to complete:%d\n",current_cycle - 1);
           printf("Number of Instructions executed:%d\n",instructions_executed);
@@ -188,6 +317,7 @@ void run(){
       stall_from_issue = 0;
       purgepipe();
     }
+
     // if(branch_flag == 1){
     //   pipeline_flush();
     // }

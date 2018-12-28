@@ -373,7 +373,7 @@ void execute_sformat2(int number){
     case(0b010):
       // printf("Instruction:Store 32-bit\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Store 32-bit";
-      sw(Dcache, execute_offset, currentInstruction.rsource2value);
+      // sw(Dcache, execute_offset, currentInstruction.rsource2value);
       int i = 0;
       for(; i < STORE_RESERVATION_WIDTH; i++){
         if(reservationlsu[i].instructionid == currentInstruction.instructionid){

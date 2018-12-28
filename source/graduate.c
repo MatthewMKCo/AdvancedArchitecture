@@ -84,8 +84,9 @@ void graduate(){
           }
           if(j == STORE_RESERVATION_WIDTH){
             printf("ERROR when removing from load store reservation station in graduate\n");
+            exit_early();
           }
-          sw(Dcache, value2.tagData.tagNumber, value2.value);
+          sw(Dcache, value2.tagData.registerNumber, value2.value);
         }
       }
     // }
