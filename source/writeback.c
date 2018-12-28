@@ -42,11 +42,6 @@ void writebackloadstore(int i){
     orderTag.registerNumber = writebacklsu[i].tag;//do not remove, tag is for destination address
   }
 
-  if(writebacklsu[i].instructionid == 368){
-    printring(outOfOrderInstructions);
-    printring(inOrderInstructions);
-  }
-
   addafternodeinstruction(outOfOrderInstructions, writebacklsu[i].instruction, writebacklsu[i].instructionid, orderTag, 3, writebacklsu[i].value, writebacklsu[i].instruction_name);
   return;
 }

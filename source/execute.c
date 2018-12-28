@@ -249,7 +249,7 @@ void execute_jformat(int number){
 }
 
 void execute_bformat(int number){
-  bru[number].instruction.instructionid = currentInstruction.instructionid;
+  bru[number].instruction = currentInstruction;
   switch(currentInstruction.funct3){
     case(0b000):
       // printf("Instruction:Branch if Equal\n");
@@ -422,6 +422,12 @@ void increment_units(){
         bru[i].currentCycles = 0;
         bru[i].ready = 1;
         bru[i].readyForWriteback = 1;
+        if(bru[i].valueInside == 1){
+          purge = 1;
+          purgeid = bru[i].instruction.instructionid;
+          instructionid = bru[i].instruction.instructionid + 1;
+          pc[0] = change_pc_execute(bru[i].instruction.pc, bru[i].instruction.imm);
+        }
         // alu[i].wbValueInside = alu[i].valueInside;
         // alu[i].wbDestinationRegister = alu[i].destinationRegister;
       }

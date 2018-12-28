@@ -38,7 +38,7 @@
 
 #define sizeOfBranchCache 100
 
-#define NOTPRINT 1
+#define NOTPRINT 0
 
 
 #define separator printf("====================================================\n");

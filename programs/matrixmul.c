@@ -1,5 +1,9 @@
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 void matrixmul() {
-    int x[3][3] = {{1, 2, 3},{4,5,6},{7,8,9}};
+    int x[3][3] = {{10, 2, 3},{4,5,6},{7,8,9}};
     int y[3] = {5,2,1};
     int z[3] = {0,0,0};
 
@@ -9,4 +13,8 @@ void matrixmul() {
             z[i] = z[i] + count;
         }
     }
+}
+
+int main(){
+  matrixmul();
 }

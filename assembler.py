@@ -198,7 +198,6 @@ dict_jump = {
 
 }
 
-
 def Itype(x, linenumber, f2, check):
     if(len(x) != 4):
         print(x)
@@ -269,7 +268,6 @@ def complicated_procedure(x, f2):
     Utype(x2, -1, f2)
     x3 = ["addi", x[1], x[1], imm]
     Itype(x3, -1, f2, 1)
-
     return
 
 def Utype(x, linenumber, f2):
@@ -489,7 +487,12 @@ def main():
             lines2.append(lines[i])
 
         count = 0
+        count3 = 0
         for i in range(0, len(lines2)):
+            z = lines2[i].split(" ")
+            if(z[0] == "addi"):
+                if(int(z[3]) > 2047 or int(z[3]) < -2048):
+                    count = count - 1
             if(lines2[i][0] == '.'):
                 addr = lines2[i]
                 x = [(i + 1 - count), addr[:-2]]
@@ -499,8 +502,12 @@ def main():
             lines3.append(lines2[i])
         for i in range(0, len(lines3)):
             x = lines3[i].split(" ")
+            z = lines2[i].split(" ")
+            if(z[0] == "addi"):
+                if(int(z[3]) > 2047 or int(z[3]) < -2048):
+                    count3 = count3 + 1
             if(x[2] == "return\n"):
-                addr = i * (-2) - 2
+                addr = (i + count3) * (-2) - 2
                 x[2] = str(addr)
                 y = x[0] + " " + x[1] + " " + x[2]
                 lines4.append(y)
@@ -509,11 +516,13 @@ def main():
                 if(x[2] != "return\n"):
                     lines4.append(lines3[i])
                     i = i + 1
-                    addr = i * (-2) - 2
+                    addr = (i + count3) * (-2) - 2
                     y = "jal zero " + str(addr)
                     lines4.append(y)
                     continue
             lines4.append(lines3[i])
+
+        count2 = 0
 
         for i in range(0, len(lines4)):
             x = lines4[i].split(" ")
@@ -525,16 +534,19 @@ def main():
                 x[-1] = x[-1].strip('\n')
             opcode = dict[x[0]]
             if(opcode == 1):
-                Itype(x, (i+1), f2, 0)
+                Itype(x, (i+1+count2), f2, 0)
             elif(opcode == 2):
-                Utype(x, (i+1), f2)
+                Utype(x, (i+1+count2), f2)
             elif(opcode == 3):
-                Rtype(x, (i+1), f2)
+                Rtype(x, (i+1+count2), f2)
             elif(opcode == 4):
-                Jtype(x, (i+1), f2)
+                Jtype(x, (i+1+count2), f2)
             elif(opcode == 5):
-                Btype(x, (i+1), f2)
+                Btype(x, (i+1+count2), f2)
             elif(opcode == 6):
-                Stype(x, (i+1), f2)
+                Stype(x, (i+1+count2), f2)
+            if(x[0] == "addi"):
+                if(int(x[3]) > 2047 or int(x[3]) < -2048):
+                    count2 = count2 + 1
 
 main()

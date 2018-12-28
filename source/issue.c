@@ -545,7 +545,6 @@ void issue(){
     purge = 1;//TODO:try this when you wake up matthew
     purgeid = issue_instruction_struct[current].instructionid;
     instructionid = issue_instruction_struct[current].instructionid + 1;
-    //instructionid++;
     rob++;;
 
     break;

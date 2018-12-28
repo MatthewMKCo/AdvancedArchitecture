@@ -81,4 +81,5 @@ beq zero zero .LBB0_1
 lw t0 s0 -60
 lw t1 s0 -64
 lw t2 s0 -68
+lw t2 s0 -68
 jal zero return
