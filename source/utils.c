@@ -292,6 +292,8 @@ void move_next_to_current(){
       decode_instruction[i] = fetch_instruction[i];
       fetch_instruction[i] = -1;
       decodepc[i] = fetchpc[i];
+      decode_branch[i] = fetch_branch[i];
+      fetch_branch[i] = 0;
     }
 
   }

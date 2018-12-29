@@ -325,7 +325,7 @@ if(issue_unit_type[current] == 3){
   reservationbru[reservationIteratorBRU].instruction_hex = issue_instruction_struct[current].instruction_hex;
   //issue_instruction_struct[current].instructionid = instructionid;
   reservationbru[reservationIteratorBRU].instruction = issue_instruction_struct[current];
-
+  reservationbru[reservationIteratorBRU].branchTaken = issue_instruction_struct[current].branchTaken;
   reservationbru[reservationIteratorBRU].instructionid = issue_instruction_struct[current].instructionid;
   reservationIteratorBRU++;
 

@@ -56,6 +56,12 @@ int branch_predictor(int fedPC, int is_decode, int offset){
       }
 
       else{
+        for(int j = 0; j < sizeOfBranchCache; j++){
+          if(branchCache[j].pc == fedPC){
+            pc[0] = branchCache[j].branchpc;
+            return 1;
+          }
+        }
         pc[0] = fedPC + 4;
         return 0;
       }
@@ -110,6 +116,15 @@ int branch_predictor(int fedPC, int is_decode, int offset){
         }
 
         else{
+          for(int j = 0; j < sizeOfBranchCache; j++){
+            if(branchCache[j].pc == fedPC){
+              if(branchCache[j].branchpc < fedPC){
+                pc[0] = branchCache[j].branchpc;
+                return 1;
+              }
+              else break;
+            }
+          }
           pc[0] = pc[0] + 4;
           return 0;
         }

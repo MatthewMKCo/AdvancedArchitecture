@@ -76,6 +76,7 @@ typedef struct instruction{
   uint32_t instruction_hex;
   int instructionid;
   int index;
+  int branchTaken;
 }instruction;
 
 //ALU struct
@@ -128,6 +129,7 @@ typedef struct reserve{
   int instruction_hex;
   int instructionid;
   int value;
+  int branchTaken;
   instruction instruction;
 }reserve;
 
@@ -327,3 +329,5 @@ extern branchDict branchCache[sizeOfBranchCache];
 extern int rob;
 
 extern int current;
+
+extern int fetch_branch[NWAY], decode_branch[NWAY];

@@ -1,7 +1,7 @@
-addi sp sp -96
+addi sp sp -140
 sw sp ra 92
 sw sp s0 88
-addi s0 sp 96
+addi s0 sp 140
 addi a0 zero 1
 sw s0 a0 -12
 addi a0 zero 2
@@ -80,6 +80,5 @@ beq zero zero .LBB0_1
 .LBB0_7:
 lw t0 s0 -60
 lw t1 s0 -64
-lw t2 s0 -68
 lw t2 s0 -68
 jal zero return

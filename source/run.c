@@ -121,6 +121,8 @@ int purgeid = 0, purge = 0;
 
 int continue_execute = 0;
 
+int fetch_branch[NWAY], decode_branch[NWAY];
+
 void pipeline_flush(){
   first_fetch = 0;
   first_decode = 0;
@@ -269,6 +271,18 @@ void run(){
 
           }
           printf("End of program\n");
+          printf("Branch Predictor:");
+          switch(BRANCH_PREDICTOR){
+            case(0):
+              printf("Branch Never Taken\n");
+              break;
+            case(1):
+              printf("Branch Always Taken\n");
+              break;
+            case(2):
+              printf("Backwards taken, forwards not taken\n");
+              break;
+          }
           printf("Number of Cycles to complete:%d\n",current_cycle - 1);
           printf("Number of Instructions executed:%d\n",instructions_executed);
           printf("Number of instructions per cycle:%.2f\n",((float)instructions_executed / (float)(current_cycle - 1)));
@@ -394,6 +408,7 @@ int main(int argc, char** argv){
   separator;
 
   run();
+  // printring(allInOrder);
 
   return 0;
 }

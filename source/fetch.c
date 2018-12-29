@@ -31,7 +31,12 @@ void fetch(){
   // pc[0] = pc[0] + 4;
 
   int branch_taken = branch_predictor(pc[0], 0, 0);
-  if(branch_taken)break;
+  if(branch_taken){
+    fetch_branch[i] = 1;
+    break;
+  }
+  else fetch_branch[i] = 0;
+
 }
 
   for(i = i + 1; i < NWAY; i++){

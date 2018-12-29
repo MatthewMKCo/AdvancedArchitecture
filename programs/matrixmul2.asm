@@ -22,6 +22,7 @@ addi a0 zero 8
 sw s0 a0 -44
 addi a0 zero 7
 sw s0 a0 -48
+
 addi a0 zero 4
 sw s0 a0 -52
 addi a0 zero 5
@@ -42,6 +43,7 @@ addi a0 zero 1
 sw s0 a0 -84
 addi a0 zero 3
 sw s0 a0 -88
+
 addi a0 zero 7
 sw s0 a0 -92
 addi a0 zero 8
@@ -62,6 +64,7 @@ addi a0 zero 2
 sw s0 a0 -124
 addi a0 zero 4
 sw s0 a0 -128
+
 addi a0 zero 22
 sw s0 a0 -132
 addi a0 zero 5
@@ -82,6 +85,7 @@ addi a0 zero 3
 sw s0 a0 -164
 addi a0 zero 10
 sw s0 a0 -168
+
 addi a0 zero 8
 sw s0 a0 -172
 addi a0 zero 1
@@ -102,6 +106,7 @@ addi a0 zero 22
 sw s0 a0 -204
 addi a0 zero 28
 sw s0 a0 -208
+
 addi a0 zero 11
 sw s0 a0 -212
 addi a0 zero 2
@@ -122,6 +127,7 @@ addi a0 zero 21
 sw s0 a0 -244
 addi a0 zero 3
 sw s0 a0 -248
+
 addi a0 zero 2
 sw s0 a0 -252
 addi a0 zero 23
@@ -142,6 +148,7 @@ addi a0 zero 5
 sw s0 a0 -284
 addi a0 zero 6
 sw s0 a0 -288
+
 addi a0 zero 10
 sw s0 a0 -292
 addi a0 zero 16
@@ -162,6 +169,7 @@ addi a0 zero 19
 sw s0 a0 -324
 addi a0 zero 7
 sw s0 a0 -328
+
 addi a0 zero 2
 sw s0 a0 -332
 addi a0 zero 12
@@ -182,6 +190,7 @@ addi a0 zero 9
 sw s0 a0 -364
 addi a0 zero 24
 sw s0 a0 -368
+
 addi a0 zero 4
 sw s0 a0 -372
 addi a0 zero 30
@@ -202,6 +211,7 @@ addi a0 zero 27
 sw s0 a0 -404
 addi a0 zero 6
 sw s0 a0 -408
+
 addi a0 zero 5
 sw s0 a0 -412
 addi a0 zero 2
@@ -222,6 +232,7 @@ addi a0 zero 1
 sw s0 a0 -444
 addi a0 zero 3
 sw s0 a0 -448
+
 addi t5 zero 0
 sw s0 t5 -452
 sw s0 t5 -456
@@ -239,7 +250,7 @@ addi a4 zero 0
 addi a5 zero 0
 
 .LBB0_1:
-addi a1 zero 10
+addi a1 zero 9
 blt a1 a3 .LBB0_7
 
 .LBB0_2:
