@@ -426,9 +426,7 @@ void increment_units(){
           purge = 1;
           purgeid = bru[i].instruction.instructionid;
           instructionid = bru[i].instruction.instructionid + 1;
-          pc[0] = change_pc_execute(bru[i].instruction.pc, bru[i].instruction.imm);
-          printf("%d\n",pc[0]);
-          printf("%d\n",purgeid);
+          pc[0] = change_pc_execute(bru[i].instruction.pc, bru[i].instruction.imm, bru[i].instruction.branchTaken);
           // exit_early();
           // printf("%d\n",purgeid);
           // if(bru[i].instruction.instructionid == 88)exit_early();

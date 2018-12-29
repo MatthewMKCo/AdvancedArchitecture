@@ -121,6 +121,6 @@ int moveselectednode(ring *unused, ring *inuse, int purgeid);
 
 //Branch Functions
 int branch_predictor(int fedPC, int is_branch, int offset);
-int check_purge_accepted(int pc, int offset);
-int check_purge_rejected(int pc, int offset);
-int change_pc_execute(int pc, int offset);
+int check_purge_accepted(int pc, int offset, int accepted);
+int check_purge_rejected(int pc, int offset, int accepted);
+int change_pc_execute(int pc, int offset, int accepted);

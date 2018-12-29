@@ -38,6 +38,12 @@ void set_register(){
     reservationalu[i].rsource2ready = 0;
   }
 
+  for(int i = 0; i < sizeOfBranchCache; i++){
+    branchCache[i].bit = 0;
+    branchCache[i].history[0] = -1;
+    branchCache[i].history[1] = -1;
+  }
+
 }
 
 void load_program(char* file){

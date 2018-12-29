@@ -21,11 +21,13 @@
 //0 - Static, never takes
 //1 - Static, always takes
 //2 - Backwards taken, forwards not taken
-#define BRANCH_PREDICTOR 2
+//3 - 2-bit Saturating Counter
+//4 - 2-level Adaptive Predictor
+#define BRANCH_PREDICTOR 4
 
 #define NUM_STAGES 10
 
-#define NWAY 4
+#define NWAY 1
 #define ALU_NUM 4
 
 #define BRU_NUM 1
@@ -53,6 +55,9 @@ typedef struct branchDict{
   int branchpc;
   int accepted_before;
   int inuse;
+  int accepted_twolevel[4][1];//0 is 00, 1 is 01, 2 is 10, 3 is 11
+  int history[2];
+  int bit;
 }branchDict;
 
 typedef struct instruction{

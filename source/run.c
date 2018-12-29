@@ -282,6 +282,12 @@ void run(){
             case(2):
               printf("Backwards taken, forwards not taken\n");
               break;
+            case(3):
+              printf("2-bit Saturating Counter\n");
+              break;
+            case(4):
+              printf("2-level Adaptive Predictor\n");
+              break;
           }
           printf("Number of Cycles to complete:%d\n",current_cycle - 1);
           printf("Number of Instructions executed:%d\n",instructions_executed);
