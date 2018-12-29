@@ -160,7 +160,6 @@ void execute_rformat(int number){
         executed_instruction_name[numberOfExecutedInstructions] = "Add";
         execute_val = add(currentInstruction.rsource1value, currentInstruction.rsource2value);
         alu[number].cyclesNeeded = 1;
-        printf("%d\n",execute_val);
       }
       else if(currentInstruction.funct7 == 0b0100000){
         // printf("Instruction:Subtract\n");
@@ -321,10 +320,13 @@ void execute_iformat2(int number){
       // printf("Instruction:Load 32-bit\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Load 32-bit";
       int i = 0;
+      int old_instructionid = -1;
       for(; i < STORE_RESERVATION_WIDTH; i++){
         if(reservationlsu[i].rdestination == execute_offset){
-          execute_val = reservationlsu[i].value;
-          break;
+          if(reservationlsu[i].instructionid > old_instructionid){
+            old_instructionid = reservationlsu[i].instructionid;
+            execute_val = reservationlsu[i].value;
+          }
         }
       }
       if(i != STORE_RESERVATION_WIDTH){

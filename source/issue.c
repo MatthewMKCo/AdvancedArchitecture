@@ -563,10 +563,7 @@ void issue(){
 
   issue_add_to_reservation(current);
   if(stall_from_issue == 2)break;
-  if(current_cycle == 77){//64
-    printf("%d\n",issue_instruction_struct[current].instruction_type);
-    // exit_early();
-  }
+
   }
   else if(stall_rename){
     if(issue_instruction_struct[current].instruction_type == 0){

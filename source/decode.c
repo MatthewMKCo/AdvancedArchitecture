@@ -169,12 +169,7 @@ void decode(){
   decode_instruction_struct[i].instructionid = instructionid;
   decode_instruction_struct[i].branchTaken = decode_branch[i];
   decode_branch[i] = 0;
-  if(current_cycle > 702){
-    if(instructionid == 524){
-      printf("%d\n", decode_instruction_struct[i].pc);
-      // exit_early();
-    }
-  }
+
   instructionid++;
 }
 
@@ -187,14 +182,7 @@ void decode(){
       instructionid--;
       continue;
     }
-    if(decode_instruction_struct[i].instructionid == 523 && decode_instruction_struct[i].branchTaken == 1){
-      printf("%d\n",pc[0]);
-      printf("%d\n",decode_instruction_struct[i].pc + decode_instruction_struct[i].imm);
-
-      // exit_early();
-    }
     if(decode_instruction_struct[i].instruction_type == 5 && branch_taken == 0 && decode_instruction_struct[i].branchTaken == 0){
-      // if(decode_instruction_struct[i].instructionid == 525)exit_early();
       branch_taken = branch_predictor(decode_instruction_struct[i].pc, 1, decode_instruction_struct[i].imm);
       if(branch_taken){
         for(int j = 0; j < NWAY; j++){
