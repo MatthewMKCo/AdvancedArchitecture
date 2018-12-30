@@ -482,7 +482,6 @@ if(issue_unit_type[current] == 2){
 }
 
 void issue(){
-
   if(issue_finished)return;
   if(pc[0] == 0){
     if(current_cycle > last_instruction_cycle + 2){
@@ -505,7 +504,6 @@ void issue(){
     stall_rename = 1;
     return;
   }
-
   for(; current < NWAY; current++){
     if(rob == ROBSIZE){
       stall_from_issue = 2;
@@ -650,6 +648,7 @@ void issue(){
       break;
     }
     issue_add_to_reservation(current);
+
     if(stall_from_issue == 2)break;
 
   }

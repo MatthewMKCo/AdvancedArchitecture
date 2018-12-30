@@ -368,16 +368,10 @@ void run(){
     // printring(outOfOrderInstructions);
     // printring(inOrderInstructions);
 
-    if(current_cycle == 11){
-      printf("%d\n",instructionid);
-      // exit_early();
-    }
-    if(purgeid == 63){
-      printf("%d\n",current_cycle);
-      // exit_early();
-    }
     current_cycle++;
     separator;
+
+    // printring(allInOrder);
 
     // if(current_cycle == 160) exit(1);
 }

@@ -23,11 +23,11 @@
 //2 - Backwards taken, forwards not taken
 //3 - 2-bit Saturating Counter
 //4 - 2-level Adaptive Predictor
-#define BRANCH_PREDICTOR 4
+#define BRANCH_PREDICTOR 0
 
 #define NUM_STAGES 10
 
-#define NWAY 1
+#define NWAY 4
 #define ALU_NUM 4
 
 #define BRU_NUM 1
@@ -99,6 +99,7 @@ typedef struct execute_unit{
   int wbSourceRegister2;
   int readyForWriteback;
   int shouldWriteback;
+  int instructionid;
   instruction instruction;
   char* instruction_name;
 }execute_unit;
@@ -198,6 +199,7 @@ typedef struct Find{
 
 extern execute_unit alu[ALU_NUM];
 extern execute_unit lsu[LSU_NUM];
+extern execute_unit lsu2[1];
 extern execute_unit bru[BRU_NUM];
 extern execute_unit jlu[JLU_NUM];
 

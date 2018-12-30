@@ -389,7 +389,7 @@ void execute_sformat2(int number){
         exit_early();
       }
       execute_val = currentInstruction.rsource2value;
-      lsu[number].cyclesNeeded = 4;
+      lsu[number].cyclesNeeded = 1;
       break;
   }
   lsu[number].valueInside = execute_val;

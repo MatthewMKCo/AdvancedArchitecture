@@ -1,6 +1,10 @@
 #include "run.h"
 
 int sequencenumber = 0;
+int b5 = 0;
+
+execute_unit lsu2[1];
+reserve reservationlsu2[4];
 
 void graduate(){
   if(first_writeback < 2)return;
@@ -73,20 +77,39 @@ void graduate(){
           }
         }
         else{
-          int j = 0;
-          for(; j < STORE_RESERVATION_WIDTH; j++){
-            if(reservationlsu[j].instructionid == sequencenumber){
-              reservationlsu[j].rdestination = -1;
-              reservationlsu[j].inuse = 0;
-              reservationlsu[j].inExecute = 0;
+          // sw(Dcache, value2.tagData.registerNumber, value2.value);
+          // printf("%d\n",value2.tagData.registerNumber);
+          // printf("%d\n",value2.value);
+          //
+          // exit_early();
+          int empty = 1;
+          for(int k = 0; k < 4; k++){
+            if(reservationlsu2[k].inuse == 1)empty = 0;
+            if(empty == 0)break;
+          }
+          if(empty && lsu2[0].ready == 1){
+            lsu2[0].ready = 0;
+            lsu2[0].destinationRegister = value2.tagData.registerNumber;
+            lsu2[0].sourceRegister1 = value2.value;
+            lsu2[0].cyclesNeeded = 4;
+            lsu2[0].currentCycles = 0;
+            lsu2[0].instructionid = sequencenumber;
+          }
+          else{
+            int k = 0;
+            for(; k < 4; k++){
+              if(reservationlsu2[k].inuse == 0){
+                reservationlsu2[k].inuse = 1;
+                reservationlsu2[k].rdestination = value2.tagData.registerNumber;
+                reservationlsu2[k].rsource1value = value2.value;
+                reservationlsu2[k].instructionid = sequencenumber;
+                break;
+              }
+            }
+            if(k == 4){
               break;
             }
           }
-          if(j == STORE_RESERVATION_WIDTH){
-            printf("ERROR when removing from load store reservation station in graduate\n");
-            exit_early();
-          }
-          sw(Dcache, value2.tagData.registerNumber, value2.value);
         }
       }
     // }
@@ -112,6 +135,80 @@ void graduate(){
     else break;
   }
 
+  int x = -1;
+  int idx = -1;
+  if(lsu2[0].ready == 1){
+    for(int j = 0; j < 4; j++){
+      if(reservationlsu2[j].inuse && x == -1){
+        x = j;
+        idx = reservationlsu2[j].instructionid;
+      }
+      else if(reservationlsu2[j].inuse && idx > reservationlsu2[j].instructionid){
+        x = j;
+        idx = reservationlsu2[j].instructionid;
+      }
+    }
+    if(x != -1){
+      reservationlsu2[x].inuse = 0;
+      lsu2[0].ready = 0;
+      lsu2[0].destinationRegister = reservationlsu2[x].rdestination;
+      lsu2[0].sourceRegister1 = reservationlsu2[x].rsource1value;
+      lsu2[0].cyclesNeeded = 4;
+      lsu2[0].currentCycles = 0;
+      lsu2[0].instructionid = reservationlsu2[x].instructionid;
+    }
+  }
+  if(lsu2[0].ready == 0){
+    lsu2[0].currentCycles++;
+    // exit_early();
+    if(lsu2[0].currentCycles == lsu2[0].cyclesNeeded){
+      // if(issue_instruction_struct[0].instructionid == 41 && current_cycle == 59){
+        // sw(Dcache, -60, 6);
+        sw(Dcache, lsu2[0].destinationRegister, lsu2[0].sourceRegister1);
+
+      // }
+      // printf("%d\n",lsu2[0].destinationRegister);
+      // printf("%d\n",lsu2[0].sourceRegister1);
+      // printf("%d\n",lsu2[0].instructionid);
+      // if(b5== 20)exit_early();
+      b5++;
+      // sw(Dcache, value2.tagData.registerNumber, value2.value);
+
+      lsu2[0].ready = 1;
+      lsu2[0].currentCycles = 0;
+
+      int j = 0;
+      for(; j < STORE_RESERVATION_WIDTH; j++){
+        if(reservationlsu[j].instructionid == lsu2[0].instructionid){
+          reservationlsu[j].rdestination = -1;
+          reservationlsu[j].inuse = 0;
+          reservationlsu[j].inExecute = 0;
+          break;
+        }
+      }
+      if(j == STORE_RESERVATION_WIDTH){
+        printf("%d\n",lsu2[0].instructionid);
+        for(int i = 0; i < STORE_RESERVATION_WIDTH; i++){
+          if(reservationlsu[i].inuse == 1)printf("%d\n", reservationlsu[i].instructionid);
+        }
+        printf("ERROR when removing from load store reservation station in graduate\n");
+        exit_early();
+      }
+    }
+  }
+
+  printf("B:%d\n",b5);
+
+  // printring(allInOrder);
+  int i = 0;
+  for(; i < STORE_RESERVATION_WIDTH; i++){
+    if(reservationlsu[i].inuse){
+      continue;
+    }
+  }
+  if(i == STORE_RESERVATION_WIDTH && b5 == 20){
+    // exit_early();
+  }
   // while(1){
   //   // tag value = getSelected(outOfOrderInstructions);
   //   if(value.tagNumber == -1)break;

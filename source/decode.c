@@ -5,7 +5,6 @@ int block_fetch_to_decode = 0;
 // instruction decode_instruction[i];
 
 void decode(){
-
   if(decode_finished)return;
   if(pc[0] == 0){
     if(current_cycle > last_instruction_cycle + 1){
@@ -25,7 +24,6 @@ void decode(){
     first_decode = first_decode + 1;
   }
   if(stall_from_issue != 0){
-    // first_decode = 0;
     return;
   }
   if(block_fetch_to_decode){
@@ -191,6 +189,5 @@ void decode(){
       }
     }
   }
-
 
 }

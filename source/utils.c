@@ -25,6 +25,11 @@ void set_register(){
     lsu[i].currentCycles = 0;
     lsu[i].ready = 1;
   }
+  for(int i = 0; i < LSU_NUM; i++){
+    lsu2[i].cyclesNeeded = 0;
+    lsu2[i].currentCycles = 0;
+    lsu2[i].ready = 1;
+  }
   for(int i = 0; i < BRU_NUM; i++){
     bru[i].cyclesNeeded = 0;
     bru[i].currentCycles = 0;
