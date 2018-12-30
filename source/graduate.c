@@ -183,6 +183,7 @@ void graduate(){
           reservationlsu[j].rdestination = -1;
           reservationlsu[j].inuse = 0;
           reservationlsu[j].inExecute = 0;
+          reservationlsu[j].instructionid = -1;
           break;
         }
       }

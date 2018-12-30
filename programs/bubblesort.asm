@@ -31,7 +31,7 @@ addi s1 zero 0
 addi a6 zero 4
 
 .LBB0_1:
-addi t0 zero 9
+addi t0 zero 8
 blt t0 t1 .LBB0_7
 
 .LBB0_2:
@@ -39,7 +39,7 @@ addi s1 zero 0
 addi t3 zero 0
 
 .LBB0_3:
-addi t2 zero 9
+addi t2 zero 8
 sub t2 t2 t1
 blt t2 t3 .LBB0_6
 
@@ -53,11 +53,11 @@ lw a1 s3 0
 blt a1 a0 .LBB0_8
 
 .LBB0_5:
-beq s1 zero .LBB0_7
 addi t3 t3 1
 beq zero zero .LBB0_3
 
 .LBB0_6:
+beq s1 zero .LBB0_7
 addi t1 t1 1
 beq zero zero .LBB0_1
 

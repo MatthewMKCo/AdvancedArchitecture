@@ -321,15 +321,17 @@ void execute_iformat2(int number){
       executed_instruction_name[numberOfExecutedInstructions] = "Load 32-bit";
       int i = 0;
       int old_instructionid = -1;
+      int found_id_flag = 0;
       for(; i < STORE_RESERVATION_WIDTH; i++){
         if(reservationlsu[i].rdestination == execute_offset){
-          if(reservationlsu[i].instructionid > old_instructionid){
+          if(reservationlsu[i].instructionid < currentInstruction.instructionid && reservationlsu[i].instructionid > old_instructionid && reservationlsu[i].inuse){
             old_instructionid = reservationlsu[i].instructionid;
             execute_val = reservationlsu[i].value;
+            found_id_flag = 1;
           }
         }
       }
-      if(i != STORE_RESERVATION_WIDTH){
+      if(found_id_flag == 1){
         lsu[number].cyclesNeeded = 1;
         break;
       }
