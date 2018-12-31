@@ -25,7 +25,7 @@ void set_register(){
     lsu[i].currentCycles = 0;
     lsu[i].ready = 1;
   }
-  for(int i = 0; i < LSU_NUM; i++){
+  for(int i = 0; i < LSU2_NUM; i++){
     lsu2[i].cyclesNeeded = 0;
     lsu2[i].currentCycles = 0;
     lsu2[i].ready = 1;
@@ -273,6 +273,9 @@ void move_next_to_current(){
       decode_instruction_struct[i].instruction_type = 0;
     }
   }
+  // else if(first_decode >=1){
+  //   for(int i = 0; i < NWAY; i++)
+  // }
 
   for(int i = 0; i < RESERVATION_WIDTH; i++){
     if(reservationalu[i].inuse == 1)reservationalu[i].inExecute = 1;

@@ -508,12 +508,13 @@ void issue(){
     if(rob == ROBSIZE){
       stall_from_issue = 2;
       stall_rename = 1;
-      return;
+      break;
+      // return;
     }
   if(stall_from_issue == 0){
 
   if(issue_instruction_struct[current].instruction_type == 0){
-    // current = 0;
+    // //current = 0;
     // break;
     continue;
   }
@@ -549,7 +550,7 @@ void issue(){
     purgeid = issue_instruction_struct[current].instructionid;
     instructionid = issue_instruction_struct[current].instructionid + 1;
     rob++;;
-    current = 0;
+    //current = 0;
 // exit_early();
     break;
   }
@@ -565,7 +566,7 @@ void issue(){
   }
   else if(stall_rename){
     if(issue_instruction_struct[current].instruction_type == 0){
-      // current = 0;
+      // //current = 0;
       // break;
       continue;
     }
@@ -598,7 +599,7 @@ void issue(){
       instructionid = issue_instruction_struct[current].instructionid + 1;
       //instructionid++;
       rob++;;
-      current = 0;
+      //current = 0;
 
       break;
     }
@@ -610,7 +611,7 @@ void issue(){
   }
   else{
     if(issue_instruction_struct[current].instruction_type == 0){
-      // current = 0;
+      // //current = 0;
       // break;
       continue;
     }
@@ -643,7 +644,7 @@ void issue(){
       instructionid = issue_instruction_struct[current].instructionid + 1;
       //instructionid++;
       rob++;
-      current = 0;
+      //current = 0;
 
       break;
     }
@@ -653,9 +654,24 @@ void issue(){
 
   }
 }
-  if(current == NWAY){
-    current = 0;
+
+  if(current != NWAY){
+    for(int i = 0; i < NWAY; i++){
+      if(current == NWAY){
+        issue_unit_type[i] = 0;
+        issue_instruction_struct[i].instruction_type = 0;
+      }
+      if(current != NWAY){
+        issue_instruction_struct[i] = issue_instruction_struct[current];
+        issue_unit_type[i] = issue_unit_type[current];
+        current++;
+      }
+    }
   }
+
+  // if(current == NWAY){
+    current = 0;
+  // }
 
   if(purge == 1){
     block_fetch_to_decode = 0;
@@ -667,7 +683,7 @@ void issue(){
     issue_finished = 0;
     flush_from_issue = 0;
     stall_rename = 0;
-    current = 0;
+    //current = 0;
     // stall_from_issue = 0;
     //   printring(allInOrder);
     //   printf("%d\n",purgeid);
@@ -680,10 +696,7 @@ void issue(){
     purgepipe();
 
   }
-  if(current_cycle == 14){
 
-    // exit_early();
-  }
 
   return;
 }

@@ -8,7 +8,6 @@
 
 #define REG_NUM 32
 
-#define PHYSREG_NUM 64
 
 #define RESERVATION_WIDTH 16
 
@@ -16,27 +15,32 @@
 
 #define STORE_RESERVATION_WIDTH 8
 
+#define STORE_RESERVATION_WIDTH_TWO 0
+
 #define ROBSIZE (RESERVATION_WIDTH + BRANCH_RESERVATION_WIDTH + STORE_RESERVATION_WIDTH)
 
+#define PHYSREG_NUM ROBSIZE
 //0 - Static, never takes
 //1 - Static, always takes
 //2 - Backwards taken, forwards not taken
 //3 - 2-bit Saturating Counter
 //4 - 2-level Adaptive Predictor
-#define BRANCH_PREDICTOR 4
+#define BRANCH_PREDICTOR 3
 
 #define NUM_STAGES 10
 
 #define NWAY 4
-#define ALU_NUM 4
+#define ALU_NUM 3
 
 #define BRU_NUM 1
 
 #define LSU_NUM 1
 
+#define LSU2_NUM 1
+
 #define JLU_NUM 1
 
-#define TAG_NUM PHYSREG_NUM
+#define TAG_NUM 64
 
 #define sizeOfBranchCache 100
 
@@ -199,7 +203,7 @@ typedef struct Find{
 
 extern execute_unit alu[ALU_NUM];
 extern execute_unit lsu[LSU_NUM];
-extern execute_unit lsu2[1];
+extern execute_unit lsu2[LSU2_NUM];
 extern execute_unit bru[BRU_NUM];
 extern execute_unit jlu[JLU_NUM];
 

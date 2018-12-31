@@ -78,8 +78,8 @@ void decode(){
       decode_unit_type[i] = 2;
       break;
     default:
-      decode_instruction_type = -1;
-      decode_unit_type[i] = -1;
+      decode_instruction_type = 0;
+      decode_unit_type[i] = 0;
       break;
   }
 
