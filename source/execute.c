@@ -328,6 +328,7 @@ void execute_iformat2(int number){
             old_instructionid = reservationlsu[i].instructionid;
             execute_val = reservationlsu[i].value;
             found_id_flag = 1;
+            // break;
           }
         }
       }
@@ -616,18 +617,6 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
     if(reservationalu[i].rsource1ready && reservationalu[i].rsource2ready && reservationalu[i].inuse && reservationalu[i].inExecute){
       instruction newInstruction;
       newInstruction = reservationalu[i].instruction;
-      // newInstruction.rdestination = reservationalu[i].rdestination;
-      // newInstruction.rsource1value = reservationalu[i].rsource1value;
-      // newInstruction.rsource2value = reservationalu[i].rsource2value;
-      // newInstruction.opcode = reservationalu[i].opcode;
-      // newInstruction.funct3 = reservationalu[i].funct3;
-      // newInstruction.funct7 = reservationalu[i].funct7;
-      // newInstruction.shamt = reservationalu[i].shamt;
-      // newInstruction.imm = reservationalu[i].imm;
-      // newInstruction.pc = reservationalu[i].pc;
-      // newInstruction.instruction_type = reservationalu[i].instruction_type;
-      // newInstruction.instruction_hex = reservationalu[i].instruction_hex;
-      // newInstruction.instructionid = reservationalu[i].instructionid;
       wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
       wrappedListofInstructions.foundInstructions++;
       reservationalu[i].inuse = 0;
@@ -642,37 +631,55 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
 
 //Fetches instructions from Reservation Stations
 instructionwrapper check_reservation_bru(int numberOfAvailableUnits){
+  // instructionwrapper wrappedListofInstructions;
+  // wrappedListofInstructions.foundInstructions = 0;
+  // if(numberOfAvailableUnits == 0)return wrappedListofInstructions;
+  // for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
+  //   if(reservationbru[i].rsource1ready && reservationbru[i].rsource2ready && reservationbru[i].inuse && reservationbru[i].inExecute){
+  //     if(wrappedListofInstructions.foundInstructions == numberOfAvailableUnits){
+  //       instruction newInstruction;
+  //       newInstruction = reservationbru[i].instruction;
+  //       for(int j = 0; j < numberOfAvailableUnits; j++){
+  //         if(newInstruction.instructionid < wrappedListofInstructions.instruction[j].instructionid){
+  //           int x = wrappedListofInstructions.instruction[j].index;
+  //           newInstruction.index = i;
+  //           wrappedListofInstructions.instruction[j] = newInstruction;
+  //           reservationbru[i].inuse = 0;
+  //           reservationbru[i].inExecute = 0;
+  //           reservationbru[x].inuse = 1;
+  //           reservationbru[x].inExecute = 1;
+  //
+  //         }
+  //       }
+  //     }
+  //     else{
+  //       instruction newInstruction;
+  //       newInstruction = reservationbru[i].instruction;
+  //       newInstruction.index = i;
+  //       wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
+  //       wrappedListofInstructions.foundInstructions++;
+  //       reservationbru[i].inuse = 0;
+  //       reservationbru[i].inExecute = 0;
+  //   }
+  //   }
+  // }
   instructionwrapper wrappedListofInstructions;
   wrappedListofInstructions.foundInstructions = 0;
   if(numberOfAvailableUnits == 0)return wrappedListofInstructions;
-  for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
+  for(int i = 0; i < RESERVATION_WIDTH; i++){
+    if(wrappedListofInstructions.foundInstructions == numberOfAvailableUnits){
+      return wrappedListofInstructions;
+    }
     if(reservationbru[i].rsource1ready && reservationbru[i].rsource2ready && reservationbru[i].inuse && reservationbru[i].inExecute){
-      if(wrappedListofInstructions.foundInstructions == numberOfAvailableUnits){
-        instruction newInstruction;
-        newInstruction = reservationbru[i].instruction;
-        for(int j = 0; j < numberOfAvailableUnits; j++){
-          if(newInstruction.instructionid < wrappedListofInstructions.instruction[j].instructionid){
-            int x = wrappedListofInstructions.instruction[j].index;
-            newInstruction.index = i;
-            wrappedListofInstructions.instruction[j] = newInstruction;
-            reservationbru[i].inuse = 0;
-            reservationbru[i].inExecute = 0;
-            reservationbru[x].inuse = 1;
-            reservationbru[x].inExecute = 1;
+      instruction newInstruction;
+      newInstruction = reservationbru[i].instruction;
+      wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
+      wrappedListofInstructions.foundInstructions++;
+      reservationbru[i].inuse = 0;
+      reservationbru[i].inExecute = 0;
 
-          }
-        }
-      }
-      else{
-        instruction newInstruction;
-        newInstruction = reservationbru[i].instruction;
-        newInstruction.index = i;
-        wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
-        wrappedListofInstructions.foundInstructions++;
-        reservationbru[i].inuse = 0;
-        reservationbru[i].inExecute = 0;
     }
-    }
+
   }
   return wrappedListofInstructions;
 }

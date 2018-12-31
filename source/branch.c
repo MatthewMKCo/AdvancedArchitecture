@@ -132,6 +132,16 @@ int branch_predictor(int fedPC, int is_decode, int offset){
 
       if(BRANCH_PREDICTOR == 3){
         if(is_decode){
+          for(int j = 0; j < sizeOfBranchCache; j++){
+            if(branchCache[j].pc == fedPC){
+              return 0;
+              if(branchCache[j].accepted_before == 2 || branchCache[j].accepted_before == 3){
+                pc[0] = branchCache[j].branchpc;
+                return 1;
+              }
+              else return 0;
+            }
+          }
           if(offset > 0){
             pc[0] = pc[0];
             for(int i = 0; i < sizeOfBranchCache; i++){
@@ -208,6 +218,62 @@ int branch_predictor(int fedPC, int is_decode, int offset){
 
       if(BRANCH_PREDICTOR == 4){
         if(is_decode){
+          for(int j = 0; j < sizeOfBranchCache; j++){
+            if(branchCache[j].inuse == 1){
+              if(branchCache[j].pc == fedPC){
+                return 0;
+
+
+                  if(branchCache[j].history[0] == -1){
+                    if(branchCache[j].history[1] == 1){
+                      if(branchCache[j].accepted_twolevel[1][0] == 2 || branchCache[j].accepted_twolevel[1][0] == 3 || branchCache[j].accepted_twolevel[3][0] == 2 || branchCache[j].accepted_twolevel[3][0] == 3){
+                        pc[0] = branchCache[j].branchpc;
+                        return 1;
+                      }
+                    }
+                    else if(branchCache[j].history[1] == 0){
+                      if(branchCache[j].accepted_twolevel[0][0] == 2 || branchCache[j].accepted_twolevel[0][0] == 3 || branchCache[j].accepted_twolevel[2][0] == 2 || branchCache[j].accepted_twolevel[2][0] == 3){
+                        pc[0] = branchCache[j].branchpc;
+                        return 1;
+                      }
+                    }
+                    else return 0;
+                  }
+                  else if(branchCache[j].history[0] == 0 && branchCache[j].history[1] == 0){
+                    if(branchCache[j].accepted_twolevel[0][0] == 2 || branchCache[j].accepted_twolevel[0][0] == 3){
+                      pc[0] = branchCache[j].branchpc;
+                      return 1;
+                    }
+                    else return 0;
+                  }
+                  else if(branchCache[j].history[0] == 0 && branchCache[j].history[1] == 1){
+                    if(branchCache[j].accepted_twolevel[1][0] == 2 || branchCache[j].accepted_twolevel[1][0] == 3){
+                      pc[0] = branchCache[j].branchpc;
+                      return 1;
+                    }
+                    else return 0;
+                  }
+                  else if(branchCache[j].history[0] == 1 && branchCache[j].history[1] == 0){
+                    if(branchCache[j].accepted_twolevel[2][0] == 2 || branchCache[j].accepted_twolevel[2][0] == 3){
+                      pc[0] = branchCache[j].branchpc;
+                      return 1;
+                    }
+                    else return 0;
+                  }
+                  else if(branchCache[j].history[0] == 1 && branchCache[j].history[1] == 1){
+                    if(branchCache[j].accepted_twolevel[3][0] == 2 || branchCache[j].accepted_twolevel[3][0] == 3){
+                      pc[0] = branchCache[j].branchpc;
+                      return 1;
+                    }
+                    else return 0;
+                  }
+                  else{
+                    pc[0] = pc[0];
+                    return 0;
+                  }
+              }
+            }
+          }
           if(offset > 0){
             pc[0] = pc[0];
             for(int i = 0; i < sizeOfBranchCache; i++){
@@ -367,27 +433,35 @@ int check_purge_accepted(int pc, int offset, int accepted){
   if(BRANCH_PREDICTOR == 4){
     for(int i = 0; i < sizeOfBranchCache; i ++){
       if(branchCache[i].pc == pc){
-        if(branchCache[i].bit == 1){
+
+        if(branchCache[i].bit == 2){
+            if(branchCache[i].history[0] == 1 && branchCache[i].history[1] == 1){
+              if(branchCache[i].accepted_twolevel[3][0] != 3)branchCache[i].accepted_twolevel[3][0]++;
+            }
+            else if(branchCache[i].history[0] == 0 && branchCache[i].history[1] == 0){
+              if(branchCache[i].accepted_twolevel[0][0] != 3)branchCache[i].accepted_twolevel[0][0]++;
+            }
+            else if(branchCache[i].history[0] == 1 && branchCache[i].history[1] == 0){
+              if(branchCache[i].accepted_twolevel[2][0] != 3)branchCache[i].accepted_twolevel[2][0]++;
+            }
+            else if(branchCache[i].history[0] == 0 && branchCache[i].history[1] == 1){
+              if(branchCache[i].accepted_twolevel[1][0] != 3)branchCache[i].accepted_twolevel[1][0]++;
+            }
+            else{
+              printf("%d\n",branchCache[i].history[1]);
+              printf("%d\n",branchCache[i].history[0]);
+
+              printf("ERROR IN BRANCH PREDICTOR 4 ON ACCEPTED\n");
+              exit_early();
+            }
+        }
+        if(branchCache[i].bit == 1 || branchCache[i].bit == 2){
           branchCache[i].history[0] = branchCache[i].history[1];
         }
         branchCache[i].history[1] = 1;
+        if(branchCache[i].bit == 1)branchCache[i].bit = 2;
         if(branchCache[i].bit == 0)branchCache[i].bit = 1;
-        if(branchCache[i].history[0] == -1 || branchCache[i].history[0] == -1){
-          if(branchCache[i].accepted_twolevel[1][0] != 3)branchCache[i].accepted_twolevel[0][0]++;
-          if(branchCache[i].accepted_twolevel[3][0] != 3)branchCache[i].accepted_twolevel[2][0]++;
-        }
-        else{
-          if(branchCache[i].history[0] == 1 && branchCache[i].history[1] == 1){
-            if(branchCache[i].accepted_twolevel[3][0] != 3)branchCache[i].accepted_twolevel[0][0]++;
-          }
-          else if(branchCache[i].history[0] == 0 && branchCache[i].history[1] == 1){
-            if(branchCache[i].accepted_twolevel[3][0] != 3)branchCache[i].accepted_twolevel[2][0]++;
-          }
-          else{
-            printf("ERROR IN BRANCH PREDICTOR 4 ON ACCEPTED\n");
-            exit_early();
-          }
-        }
+
         if(accepted)return 0;
         else return 1;
       }
@@ -423,32 +497,35 @@ int check_purge_rejected(int pc, int offset, int accepted){
   if(BRANCH_PREDICTOR == 4){
     for(int i = 0; i < sizeOfBranchCache; i ++){
       if(branchCache[i].pc == pc){
-        if(branchCache[i].bit == 1){
-          branchCache[i].history[0] = branchCache[i].history[1];
-        }
-        branchCache[i].history[1] = 0;
-        if(branchCache[i].bit == 0)branchCache[i].bit = 1;
-        if(branchCache[i].history[0] == -1 || branchCache[i].history[0] == -1){
-          if(branchCache[i].accepted_twolevel[0][0] != 0)branchCache[i].accepted_twolevel[1][0]--;
-          if(branchCache[i].accepted_twolevel[2][0] != 0)branchCache[i].accepted_twolevel[3][0]--;
-        }
-        else{
+        if(branchCache[i].bit == 2){
           if(branchCache[i].history[0] == 1 && branchCache[i].history[1] == 0){
-            if(branchCache[i].accepted_twolevel[2][0] != 3)branchCache[i].accepted_twolevel[0][0]--;
+            if(branchCache[i].accepted_twolevel[2][0] != 0)branchCache[i].accepted_twolevel[2][0]--;
+          }
+          else if(branchCache[i].history[0] == 1 && branchCache[i].history[1] == 1){
+            if(branchCache[i].accepted_twolevel[3][0] != 0)branchCache[i].accepted_twolevel[2][0]--;
+          }
+          else if(branchCache[i].history[0] == 0 && branchCache[i].history[1] == 1){
+            if(branchCache[i].accepted_twolevel[1][0] != 0)branchCache[i].accepted_twolevel[2][0]--;
           }
           else if(branchCache[i].history[0] == 0 && branchCache[i].history[1] == 0){
-            if(branchCache[i].accepted_twolevel[0][0] != 3)branchCache[i].accepted_twolevel[2][0]--;
+            if(branchCache[i].accepted_twolevel[0][0] != 0)branchCache[i].accepted_twolevel[0][0]--;
           }
           else{
-            printf("ERROR IN BRANCH PREDICTOR 4 ON ACCEPTED\n");
+            printf("ERROR IN BRANCH PREDICTOR 4 ON REJECTED\n");
             exit_early();
           }
         }
+        if(branchCache[i].bit == 1 || branchCache[i].bit == 2){
+          branchCache[i].history[0] = branchCache[i].history[1];
+        }
+        branchCache[i].history[1] = 0;
+        if(branchCache[i].bit == 1)branchCache[i].bit = 2;
+        if(branchCache[i].bit == 0)branchCache[i].bit = 1;
         if(accepted)return 1;
         else return 0;
       }
     }
-    printf("ERROR IN BRANCH PREDICTOR 4 ON ACCEPTED\n");
+    printf("ERROR IN BRANCH PREDICTOR 4 ON REJECTED\n");
     exit_early();
     return 0;
   }

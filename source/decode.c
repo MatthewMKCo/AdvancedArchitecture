@@ -85,7 +85,7 @@ void decode(){
 
   if(decode_instruction[i] == -1){
     decode_unit_type[i] = 0;
-    return;
+    break;
   }
 
   //I type instructions
@@ -167,20 +167,22 @@ void decode(){
   decode_instruction_struct[i].instructionid = instructionid;
   decode_instruction_struct[i].branchTaken = decode_branch[i];
   decode_branch[i] = 0;
-
   instructionid++;
+
 }
+
 
 
   int branch_taken = 0;
   for(int i = 0; i < NWAY; i++){
-    if(branch_taken){
+    if(branch_taken && decode_instruction_struct[i].instruction_type != 0){
       decode_instruction_struct[i].instruction_type = 0;
       decode_instruction_struct[i].instructionid = -1;
       instructionid--;
       continue;
     }
     if(decode_instruction_struct[i].instruction_type == 5 && branch_taken == 0 && decode_instruction_struct[i].branchTaken == 0){
+
       branch_taken = branch_predictor(decode_instruction_struct[i].pc, 1, decode_instruction_struct[i].imm);
       if(branch_taken){
         for(int j = 0; j < NWAY; j++){

@@ -488,12 +488,12 @@ def main():
 
         count = 0
         count3 = 0
+
         for i in range(0, len(lines2)):
             z = lines2[i].split(" ")
             if(z[0] == "addi"):
                 if(int(z[3]) > 2047 or int(z[3]) < -2048):
                     count = count - 1
-                    exit()
             if(lines2[i][0] == '.'):
                 addr = lines2[i]
                 x = [(i + 1 - count), addr[:-2]]
@@ -501,6 +501,7 @@ def main():
                 dict_jump[str(x[1])] = str(x[0])
                 continue
             lines3.append(lines2[i])
+
         for i in range(0, len(lines3)):
             x = lines3[i].split(" ")
             z = lines2[i].split(" ")
@@ -524,7 +525,6 @@ def main():
             lines4.append(lines3[i])
 
         count2 = 0
-
         for i in range(0, len(lines4)):
             x = lines4[i].split(" ")
             if(x[0] == '\n'):

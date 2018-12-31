@@ -28,7 +28,8 @@ beq zero zero .LBB0_0
 
 .LBB0_2:
 addi a1 a1 1
-addi t0 t0 1
+addi t0 zero 1
+addi t3 t3 1
 beq zero zero .LBB0_0
 
 .LBB0_3:

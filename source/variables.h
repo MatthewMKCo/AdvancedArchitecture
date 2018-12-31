@@ -23,7 +23,7 @@
 //2 - Backwards taken, forwards not taken
 //3 - 2-bit Saturating Counter
 //4 - 2-level Adaptive Predictor
-#define BRANCH_PREDICTOR 0
+#define BRANCH_PREDICTOR 4
 
 #define NUM_STAGES 10
 

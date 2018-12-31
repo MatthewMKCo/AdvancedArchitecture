@@ -33,7 +33,7 @@ void fetch(){
   int branch_taken = branch_predictor(pc[0], 0, 0);
   if(branch_taken){
     fetch_branch[i] = 1;
-    break;
+    // break;
   }
   else fetch_branch[i] = 0;
 

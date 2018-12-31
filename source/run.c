@@ -408,6 +408,18 @@ int main(int argc, char** argv){
   separator;
 
   run();
+  // for(int i = 0; i < sizeOfBranchCache; i++){
+  //   if(branchCache[i].inuse){
+  //     separator;
+  //     printf("%d\n",branchCache[i].accepted_twolevel[0][0]);
+  //     printf("%d\n",branchCache[i].accepted_twolevel[1][0]);
+  //     printf("%d\n",branchCache[i].accepted_twolevel[2][0]);
+  //     printf("%d\n",branchCache[i].accepted_twolevel[3][0]);
+  //     printf("%d\n",branchCache[i].pc);
+  //     separator;
+  //
+  //   }
+  // }
   // printring(allInOrder);
 
   return 0;
