@@ -251,7 +251,7 @@ void run(){
             printf("\n");
             printf("Physical Registers\n");
             for(int i = 0; i < PHYSREG_NUM; i++){
-              printf("Register %d; %-6d\t", i, physRegisters[i].value);
+              printf("Register %d: %-6d\t", i, physRegisters[i].value);
               if((i + 1) % 5 == 0)printf("\n");
             }
             printf("\n");
@@ -295,18 +295,11 @@ void run(){
           printf("Number of Instructions executed:%d\n",instructions_executed);
           printf("Number of instructions per cycle:%.2f\n",((float)instructions_executed / (float)(current_cycle - 1)));
           separator;
-          // printring(inOrderInstructions);
           break;
       }
 
 
     fetch();
-
-    // if(instruction == -1){
-    //   printf("End at address:%d\n",pc[0]);
-    //   separator;
-    //   break;
-    // }
 
     decode();
 
@@ -314,11 +307,22 @@ void run(){
 
     execute();
 
-    // if(execute_rdestination != 0 && first_execute == 1){
-    //   registers[execute_rdestination] = execute_val;
-    //   // printf("desitnation:%d\n",execute_rdestination);
-    //   // printf("total:%d\n", execute_val);
+    // if(purge == 1){
+    //   exit_early();
+    //   block_fetch_to_decode = 0;
+    //   block_decode_to_issue = 0;
+    //   purge = 0;
+    //   first_fetch = 0;
+    //   first_decode = 0;
+    //   first_issue = 0;
+    //   issue_finished = 0;
+    //   flush_from_issue = 0;
+    //   stall_rename = 0;
+    //   stall_from_issue = 0;
+    //   current = 0;
+    //   purgepipe();
     // }
+
     writeback();
 
     graduate();
@@ -326,62 +330,19 @@ void run(){
     // print_reg_summary();
 
 
-    if(purge == 1){
-      block_fetch_to_decode = 0;
-      block_decode_to_issue = 0;
-      purge = 0;
-      first_fetch = 0;
-      first_decode = 0;
-      first_issue = 0;
-      issue_finished = 0;
-      flush_from_issue = 0;
-      stall_rename = 0;
-      stall_from_issue = 0;
-      current = 0;
-      purgepipe();
-    }
 
-    // if(branch_flag == 1){
-    //   pipeline_flush();
-    // }
-    //
-    // if(jump_flag == 1){
-    //   pipeline_flush();
-    //   // exit(1);
-    // }
     if(rob < 0){
       printf("ERROR IN ROB");
       exit(1);
     }
 
-    if(flush_from_issue == 1){
-      flush_from_issue = 0;
-      first_fetch = 0;
-      first_decode = 0;
-      for(int i = 0; i < NWAY; i++){
-        decode_instruction_struct[i].instruction_type = 0;
-      }
-    }
     print_reg_summary();
 
-    // printf("%d\n",issue_instruction_struct[0].instruction_type);
     move_next_to_current();
-    print_reg_summary();
-    printf("%d\n\n\n",execute_finished);
-    printf("%d\n",list_empty(inOrderInstructions));
-    // printring(allInOrder);
-    // printring(inuseTags);
-    // printring(outOfOrderInstructions);
-    // printring(inOrderInstructions);
 
     current_cycle++;
     separator;
 
-    // printring(allInOrder);
-    // printring(inOrderInstructions);
-
-
-    // if(current_cycle == 160) exit(1);
 }
 }
 
@@ -408,7 +369,6 @@ int main(int argc, char** argv){
     addafternode(unusedTags, tagPlaceholder);
   }
 
-  // printf("Tag:%d\n", x);
   separator;
   printf("Loading Program\n");
   load_program(argv[1]);
@@ -416,18 +376,7 @@ int main(int argc, char** argv){
   separator;
 
   run();
-  // for(int i = 0; i < sizeOfBranchCache; i++){
-  //   if(branchCache[i].inuse){
-  //     separator;
-  //     printf("%d\n",branchCache[i].accepted_twolevel[0][0]);
-  //     printf("%d\n",branchCache[i].accepted_twolevel[1][0]);
-  //     printf("%d\n",branchCache[i].accepted_twolevel[2][0]);
-  //     printf("%d\n",branchCache[i].accepted_twolevel[3][0]);
-  //     printf("%d\n",branchCache[i].pc);
-  //     separator;
-  //
-  //   }
-  // }
+
   // printring(allInOrder);
 
   return 0;

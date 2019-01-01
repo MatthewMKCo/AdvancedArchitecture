@@ -200,10 +200,13 @@ void print_reg_summary(){
   printf("\n");
   printf("Physical Registers\n");
   for(int i = 0; i < PHYSREG_NUM; i++){
-    printf("Register %d; %-6d\t", i, physRegisters[i].value);
+    printf("Register %d", i);
+    if(i < 10)printf(" ");
+    printf(": %-6d\t", physRegisters[i].value);
     if((i + 1) % 5 == 0)printf("\n");
   }
   printf("\n");
+  printf("Execution Units\n");
   for(int i = 0; i < ALU_NUM; i++){
     if(alu[i].ready == 1)printf("ALU %d:FREE\t", i);
     if(alu[i].ready == 0)printf("ALU %d:INUSE\t", i);
@@ -219,18 +222,19 @@ void print_reg_summary(){
     if(lsu[i].ready == 0)printf("LSU %d:INUSE\t", i);
   }
   printf("\n");
-  for(int i = 0; i < NWAY; i++){
-    printf("FETCH INUSE %d:%d\t", i, fetch_inuse[i]);
-  }
-  printf("\n");
-  for(int i = 0; i < NWAY; i++){
-    printf("DECODE INUSE %d:%d ID:%d\t", i, decode_inuse[i], decode_instruction_struct[i].instructionid);
-  }
-  printf("\n");
-  for(int i = 0; i < NWAY; i++){
-    printf("ISSUE INUSE %d:%d ID:%d\t", i, issue_inuse[i], issue_instruction_struct[i].instructionid);
-  }
-  printf("\n");
+  // for(int i = 0; i < NWAY; i++){
+  //   printf("FETCH INUSE %d:%d\t", i, fetch_inuse[i]);
+  // }
+  // printf("\n");
+  // for(int i = 0; i < NWAY; i++){
+  //   printf("DECODE INUSE %d:%d ID:%-3d\t", i, decode_inuse[i], decode_instruction_struct[i].instructionid);
+  // }
+  // printf("\n");
+  // for(int i = 0; i < NWAY; i++){
+  //   printf("ISSUE INUSE %d :%d ID:%-3d\t", i, issue_inuse[i], issue_instruction_struct[i].instructionid);
+  // }
+  // printf("\n");
+
   // printf("%d\n", fetch_finished);
   // printf("%d\n", decode_finished);
   // printf("%d\n", issue_finished);
@@ -323,7 +327,6 @@ void move_next_to_current(){
     if(reservationlsu[i].inuse == 1)reservationlsu[i].inExecute = 1;
   }
 
-
     if((first_fetch >= 1) && block_fetch_to_decode == 0){
       for(int i = 0; i < NWAY; i++){
         if(fetch_inuse[i] == 1){
@@ -348,6 +351,7 @@ void move_next_to_current(){
               fetch_inuse[j] = 0;
               fetch_instruction[i] = fetch_instruction[j];
               fetchpc[i] = fetchpc[j];
+              fetch_branch[i] = fetch_branch[j];
               break;
             }
           }

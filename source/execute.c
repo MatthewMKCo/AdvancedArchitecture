@@ -830,6 +830,9 @@ void execute(){
 
   // send_for_writeback();
 
+
+  increment_units();
+  
   if(purge == 1){
     block_fetch_to_decode = 0;
     block_decode_to_issue = 0;
@@ -844,8 +847,6 @@ void execute(){
     // stall_from_issue = 0;
     purgepipe();
   }
-
-  increment_units();
 
   if(issue_finished == 1 && execute_finished != 1 && current_cycle > last_instruction_cycle + 3){
     execute_finished = check_execute_and_reservation_units();

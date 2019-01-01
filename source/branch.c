@@ -15,6 +15,7 @@ int branch_predictor(int fedPC, int is_decode, int offset){
     if(is_decode){
       for(int i = 0; i < sizeOfBranchCache; i++){
         if(branchCache[i].pc == fedPC){
+          return 0;
           pc[0] = branchCache[i].branchpc;
           return 1;
         }
@@ -69,14 +70,21 @@ int branch_predictor(int fedPC, int is_decode, int offset){
 
     if(BRANCH_PREDICTOR == 2){
       if(is_decode){
+        int return_flag = 0;
+        for(int i = 0; i < sizeOfBranchCache; i++){
+          if(branchCache[i].pc == fedPC){
+            return 0;
+          }
+        }
         if(offset > 0){
           pc[0] = pc[0];
-          return 0;
+          return_flag = 1;
         }
         for(int i = 0; i < sizeOfBranchCache; i++){
           if(branchCache[i].pc == fedPC){
             pc[0] = branchCache[i].branchpc;
-            return 1;
+            if(return_flag == 0)return 1;
+            else return 0;
           }
         }
 
@@ -88,7 +96,8 @@ int branch_predictor(int fedPC, int is_decode, int offset){
           branchCache[x].branchpc = fedPC + offset;
           pc[0] = branchCache[x].branchpc;
           x++;
-          return 1;
+          if(return_flag == 0)return 1;
+          else return 0;
         }
 
         int j = 0;
@@ -97,8 +106,11 @@ int branch_predictor(int fedPC, int is_decode, int offset){
             branchCache[j].pc = fedPC;
             branchCache[j].branchpc = fedPC + offset;
             branchCache[j].inuse = 1;
-            pc[0] = branchCache[j].branchpc;
-            return 1;
+            if(return_flag == 0){
+              pc[0] = branchCache[j].branchpc;
+              return 1;
+            }
+            else return 0;
           }
         }
 
@@ -108,9 +120,12 @@ int branch_predictor(int fedPC, int is_decode, int offset){
 
         branchCache[x].pc = fedPC;
         branchCache[x].branchpc = fedPC + offset;
-        pc[0] = branchCache[j].branchpc;
         x++;
-        return 1;
+        if(return_flag == 0){
+          pc[0] = branchCache[j].branchpc;
+          return 1;
+        }
+        else return 0;
 
 
         }
