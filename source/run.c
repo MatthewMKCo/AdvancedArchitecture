@@ -123,6 +123,8 @@ int continue_execute = 0;
 
 int fetch_branch[NWAY], decode_branch[NWAY];
 
+int fetch_inuse[NWAY], decode_inuse[NWAY], decode_decoded[NWAY], issue_inuse[NWAY];
+
 void pipeline_flush(){
   first_fetch = 0;
   first_decode = 0;
@@ -321,7 +323,7 @@ void run(){
 
     graduate();
 
-    print_reg_summary();
+    // print_reg_summary();
 
 
     if(purge == 1){
@@ -360,9 +362,13 @@ void run(){
         decode_instruction_struct[i].instruction_type = 0;
       }
     }
+    print_reg_summary();
 
     // printf("%d\n",issue_instruction_struct[0].instruction_type);
     move_next_to_current();
+    print_reg_summary();
+    printf("%d\n\n\n",execute_finished);
+    printf("%d\n",list_empty(inOrderInstructions));
     // printring(allInOrder);
     // printring(inuseTags);
     // printring(outOfOrderInstructions);
@@ -372,6 +378,8 @@ void run(){
     separator;
 
     // printring(allInOrder);
+    // printring(inOrderInstructions);
+
 
     // if(current_cycle == 160) exit(1);
 }

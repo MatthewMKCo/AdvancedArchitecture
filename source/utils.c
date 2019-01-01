@@ -49,6 +49,13 @@ void set_register(){
     branchCache[i].history[1] = -1;
   }
 
+  for(int i = 0; i < NWAY; i++){
+    fetch_inuse[i] = 0;
+    decode_inuse[i] = 0;
+    issue_inuse[i] = 0;
+    decode_decoded[i] = 0;
+  }
+
 }
 
 void load_program(char* file){
@@ -212,6 +219,18 @@ void print_reg_summary(){
     if(lsu[i].ready == 0)printf("LSU %d:INUSE\t", i);
   }
   printf("\n");
+  for(int i = 0; i < NWAY; i++){
+    printf("FETCH INUSE %d:%d\t", i, fetch_inuse[i]);
+  }
+  printf("\n");
+  for(int i = 0; i < NWAY; i++){
+    printf("DECODE INUSE %d:%d ID:%d\t", i, decode_inuse[i], decode_instruction_struct[i].instructionid);
+  }
+  printf("\n");
+  for(int i = 0; i < NWAY; i++){
+    printf("ISSUE INUSE %d:%d ID:%d\t", i, issue_inuse[i], issue_instruction_struct[i].instructionid);
+  }
+  printf("\n");
   // printf("%d\n", fetch_finished);
   // printf("%d\n", decode_finished);
   // printf("%d\n", issue_finished);
@@ -255,44 +274,47 @@ void move_next_to_current(){
 
   send_for_writeback();
 
-  if(stall_from_issue == 0 && first_decode >= 1){
-    // issue_instruction = decode_instruction;
-    // issue_rsource1 = decode_rsource1;
-    // issue_rsource2 = decode_rsource2;
-    // issue_rdestination = decode_rdestination;
-    // issue_instruction_type = decode_instruction_type;
-    // issue_opcode = decode_opcode;
-    // issue_funct3 = decode_funct3;
-    // issue_funct7 = decode_funct7;
-    // issue_shamt = decode_shamt;
-    // issue_imm = decode_imm;
-    // issuepc = decodepc;
-    for(int i = 0; i < NWAY; i ++){
-      issue_unit_type[i] = decode_unit_type[i];
-      issue_instruction_struct[i] = decode_instruction_struct[i];
-      decode_instruction_struct[i].instruction_type = 0;
+  if(first_decode >= 1){
+    for(int i = 0; i < NWAY; i++){
+      if(decode_inuse[i] == 1){
+        for(int j = 0; j < NWAY; j++){
+          if(issue_inuse[j] == 0){
+            decode_decoded[i] = 0;
+            decode_inuse[i] = 0;
+            issue_inuse[j] = 1;
+            issue_unit_type[j] = decode_unit_type[i];
+            issue_instruction_struct[j] = decode_instruction_struct[i];
+            break;
+          }
+        }
+      }
     }
+
+    for(int i = 0; i < NWAY; i++){
+      if(decode_inuse[i] == 0){
+        for(int j = i + 1; j < NWAY; j++){
+          if(decode_inuse[j] == 1){
+
+            decode_inuse[i] = 1;
+            decode_inuse[j] = 0;
+            decode_branch[i] = decode_branch[j];
+            decode_instruction_struct[i] = decode_instruction_struct[j];
+            decode_unit_type[i] = decode_unit_type[j];
+            decode_decoded[i] = decode_decoded[j];
+            decode_decoded[j] = 0;
+            // if(current_cycle == 14 && j == 3)exit_early();
+            break;
+          }
+        }
+      }
+    }
+
   }
-  // else if(first_decode >=1){
-  //   for(int i = 0; i < NWAY; i++)
-  // }
 
   for(int i = 0; i < RESERVATION_WIDTH; i++){
     if(reservationalu[i].inuse == 1)reservationalu[i].inExecute = 1;
-    // if(reservationalu[i].instruction.tagDestination == 22 && reservationalu[i].inuse == 1){
-    //   printf("%d\n",i);
-    //   exit_early();
-    // }
-    if(reservationalu[i].rdestination == 69){
-    // if(i == 13){
-      // printf("%d\n", reservationalu[i].inuse);
-      // printf("Destination:%d\n",reservationalu[i].rdestination);
-      // printf("Source1 ready:%d\tSource is:%d\tPhysReg1 is ready:%d\n", reservationalu[i].rsource1ready, reservationalu[i].rsource1, physRegisters[reservationalu[i].rsource1].ready);
-      // printf("Source2 ready:%d\tSource is:%d\tPhysReg2 is ready:%d\n", reservationalu[i].rsource2ready, reservationalu[i].rsource2, physRegisters[reservationalu[i].rsource2].ready);
-      // printf("Physical:%d\n\n",physRegisters[9].ready);
-      // exit_early();
-    }
   }
+
   for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
     if(reservationbru[i].inuse == 1)reservationbru[i].inExecute = 1;
   }
@@ -301,17 +323,37 @@ void move_next_to_current(){
     if(reservationlsu[i].inuse == 1)reservationlsu[i].inExecute = 1;
   }
 
-  if((stall_from_issue == 0 && first_fetch >= 1) && block_fetch_to_decode == 0){
-    for(int i = 0; i < NWAY; i++){
-      decode_instruction[i] = fetch_instruction[i];
-      fetch_instruction[i] = -1;
-      decodepc[i] = fetchpc[i];
-      decode_branch[i] = fetch_branch[i];
-      fetch_branch[i] = 0;
-    }
 
-  }
-  // if(stop == 1)exit_early();
+    if((first_fetch >= 1) && block_fetch_to_decode == 0){
+      for(int i = 0; i < NWAY; i++){
+        if(fetch_inuse[i] == 1){
+          for(int j = 0; j < NWAY; j++){
+            if(decode_inuse[j] == 0){
+              decode_inuse[j] = 1;
+              fetch_inuse[i] = 0;
+              decode_instruction[j] = fetch_instruction[i];
+              decodepc[j] = fetchpc[i];
+              decode_branch[j] = fetch_branch[i];
+              break;
+            }
+          }
+        }
+      }
+
+      for(int i = 0; i < NWAY; i++){
+        if(fetch_inuse[i] == 0){
+          for(int j = i + 1; j < NWAY; j++){
+            if(fetch_inuse[j] == 1){
+              fetch_inuse[i] = 1;
+              fetch_inuse[j] = 0;
+              fetch_instruction[i] = fetch_instruction[j];
+              fetchpc[i] = fetchpc[j];
+              break;
+            }
+          }
+        }
+      }
+    }
 
   return;
 }
@@ -396,13 +438,17 @@ void purgepipe(){
     }
   }
   for(int i = 0; i < NWAY; i++){
-    fetch_instruction[i] = -1;
-    decode_instruction_struct[i].instruction_type = 0;
-    decode_instruction[i] = -1;
-    issue_instruction_struct[i].instruction_type = 0;
+    // fetch_instruction[i] = -1;
+    // decode_instruction_struct[i].instruction_type = 0;
+    // decode_instruction[i] = -1;
+    // issue_instruction_struct[i].instruction_type = 0;
     issue_instruction_struct[i].rdestination = 0;
     decode_instruction_struct[i].instructionid = -1;
     issue_instruction_struct[i].instructionid = -1;
+    fetch_inuse[i] = 0;
+    decode_inuse[i] = 0;
+    issue_inuse[i] = 0;
+    decode_decoded[i] = 0;
   }
 
   deletenodeswithgreaterthanid(purgeid);

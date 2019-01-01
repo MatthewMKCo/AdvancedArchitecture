@@ -23,18 +23,29 @@ void decode(){
   if(first_decode < 2){
     first_decode = first_decode + 1;
   }
-  if(stall_from_issue != 0){
-    return;
-  }
+  // if(stall_from_issue != 0){
+  //   return;
+  // }
   if(block_fetch_to_decode){
     block_fetch_to_decode = 0;
     block_decode_to_issue = 1;
     return;
   }
 
-  print_decode_summary = 1;
+  int i = 0;
 
-  for(int i = 0; i < NWAY; i++){
+  for(; i < NWAY; i++){
+    if(decode_inuse[i] == 1)break;
+  }
+
+  if(i != NWAY)print_decode_summary = 1;
+  if(i == NWAY)return;
+
+
+
+  for(; i < NWAY; i++){
+    if(decode_decoded[i] == 1)continue;
+    if(decode_inuse[i] == 0)break;
   decode_opcode = (decode_instruction[i] & 0x0000007F);
   switch(decode_opcode){
     case 0b0010011:
@@ -167,10 +178,11 @@ void decode(){
   decode_instruction_struct[i].instructionid = instructionid;
   decode_instruction_struct[i].branchTaken = decode_branch[i];
   decode_branch[i] = 0;
+  decode_inuse[i] = 1;
+  decode_decoded[i] = 1;
   instructionid++;
 
 }
-
 
 
   int branch_taken = 0;
@@ -178,6 +190,7 @@ void decode(){
     if(branch_taken && decode_instruction_struct[i].instruction_type != 0){
       decode_instruction_struct[i].instruction_type = 0;
       decode_instruction_struct[i].instructionid = -1;
+      decode_inuse[i] = 0;
       instructionid--;
       continue;
     }

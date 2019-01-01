@@ -3,6 +3,10 @@
 
 void replacedata(node *node, int registerNumber);
 
+int list_empty(ring* currentRing){
+  if(currentRing -> sentinel -> forward -> data.tagNumber == -1)return 1;
+  else return 0;
+}
 //creates a new ring
 ring *createring(char* name){
   ring *r = malloc(sizeof(ring));

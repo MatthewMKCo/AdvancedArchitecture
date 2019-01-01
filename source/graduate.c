@@ -10,7 +10,7 @@ void graduate(){
   if(first_writeback < 2)return;
   if(graduate_finished)return;
   if(execute_finished){
-    if(current_cycle == (execute_cycle_finished + 2)){
+    if(current_cycle > (execute_cycle_finished + 2) && list_empty(inOrderInstructions)){
       graduate_finished = 1;
     }
   }

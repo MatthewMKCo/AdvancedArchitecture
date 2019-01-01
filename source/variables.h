@@ -9,7 +9,7 @@
 #define REG_NUM 32
 
 
-#define RESERVATION_WIDTH 16
+#define RESERVATION_WIDTH 4
 
 #define BRANCH_RESERVATION_WIDTH 8
 
@@ -30,7 +30,7 @@
 #define NUM_STAGES 10
 
 #define NWAY 4
-#define ALU_NUM 3
+#define ALU_NUM 2
 
 #define BRU_NUM 1
 
@@ -40,11 +40,11 @@
 
 #define JLU_NUM 1
 
-#define TAG_NUM 64
+#define TAG_NUM PHYSREG_NUM
 
 #define sizeOfBranchCache 100
 
-#define NOTPRINT 1
+#define NOTPRINT 0
 
 
 #define separator printf("====================================================\n");
@@ -342,3 +342,5 @@ extern int rob;
 extern int current;
 
 extern int fetch_branch[NWAY], decode_branch[NWAY];
+
+extern int fetch_inuse[NWAY], decode_inuse[NWAY], decode_decoded[NWAY], issue_inuse[NWAY];

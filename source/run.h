@@ -118,6 +118,7 @@ int check_tag_for_zero(ring* currentRing, int tagPassed);
 int get_register(ring* currentRing, int tag);
 int get_register2(ring* currentRing);
 int moveselectednode(ring *unused, ring *inuse, int purgeid);
+int list_empty(ring* currentRing);
 
 //Branch Functions
 int branch_predictor(int fedPC, int is_branch, int offset);

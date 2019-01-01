@@ -476,6 +476,7 @@ if(issue_unit_type[current] == 2){
   //instructionid++;
   rob++;;
 }
+  issue_inuse[current] = 0;
   stall_from_issue = 0;
   return;
 
@@ -506,14 +507,20 @@ void issue(){
   }
   for(; current < NWAY; current++){
     if(rob == ROBSIZE){
-      stall_from_issue = 2;
-      stall_rename = 1;
+      // stall_from_issue = 2;
+      // stall_rename = 1;
       break;
       // return;
     }
+    if(issue_inuse[current] == 0){
+      break;
+    }
+
   if(stall_from_issue == 0){
 
   if(issue_instruction_struct[current].instruction_type == 0){
+    issue_inuse[current] = 0;
+    // exit_early();
     // //current = 0;
     // break;
     continue;
@@ -549,7 +556,8 @@ void issue(){
     purge = 1;//TODO:try this when you wake up matthew
     purgeid = issue_instruction_struct[current].instructionid;
     instructionid = issue_instruction_struct[current].instructionid + 1;
-    rob++;;
+    rob++;
+    issue_inuse[current] = 0;
     //current = 0;
 // exit_early();
     break;
@@ -566,6 +574,7 @@ void issue(){
   }
   else if(stall_rename){
     if(issue_instruction_struct[current].instruction_type == 0){
+      issue_inuse[current] = 0;
       // //current = 0;
       // break;
       continue;
@@ -599,6 +608,8 @@ void issue(){
       instructionid = issue_instruction_struct[current].instructionid + 1;
       //instructionid++;
       rob++;;
+      issue_inuse[current] = 0;
+
       //current = 0;
 
       break;
@@ -611,6 +622,7 @@ void issue(){
   }
   else{
     if(issue_instruction_struct[current].instruction_type == 0){
+      issue_inuse[current] = 0;
       // //current = 0;
       // break;
       continue;
@@ -644,30 +656,36 @@ void issue(){
       instructionid = issue_instruction_struct[current].instructionid + 1;
       //instructionid++;
       rob++;
+      issue_inuse[current] = 0;
+
       //current = 0;
 
       break;
     }
     issue_add_to_reservation(current);
-
     if(stall_from_issue == 2)break;
 
   }
 }
 
+
   if(current != NWAY){
     for(int i = 0; i < NWAY; i++){
-      if(current == NWAY){
-        issue_unit_type[i] = 0;
-        issue_instruction_struct[i].instruction_type = 0;
-      }
-      if(current != NWAY){
-        issue_instruction_struct[i] = issue_instruction_struct[current];
-        issue_unit_type[i] = issue_unit_type[current];
-        current++;
+      if(issue_inuse[i] == 0){
+        for(int j = i + 1; j < NWAY; j++){
+          if(issue_inuse[j] == 1){
+            issue_inuse[j] = 0;
+            issue_inuse[i] = 1;
+            issue_instruction_struct[i] = issue_instruction_struct[j];
+            issue_unit_type[i] = issue_unit_type[j];
+            break;
+          }
+        }
       }
     }
   }
+
+
 
   // if(current == NWAY){
     current = 0;

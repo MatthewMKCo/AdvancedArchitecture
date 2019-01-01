@@ -20,12 +20,19 @@ void fetch(){
   if(first_fetch < 2){
     first_fetch = first_fetch + 1;
   }
-  if(stall_from_issue != 0){
-    return;
-  }
-
+  // if(stall_from_issue != 0){
+  //   return;
+  // }
   int i = 0;
   for(; i < NWAY; i++){
+    if(fetch_inuse[i] == 0){
+      break;
+    }
+  }
+
+  // int i = 0;
+  for(; i < NWAY; i++){
+
   fetch_instruction[i] = ld(Icache, pc[0]);
   fetchpc[i] = pc[0];
   // pc[0] = pc[0] + 4;
@@ -36,6 +43,8 @@ void fetch(){
     // break;
   }
   else fetch_branch[i] = 0;
+
+  fetch_inuse[i] = 1;
 
 }
 
