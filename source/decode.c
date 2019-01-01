@@ -180,19 +180,6 @@ void decode(){
   decode_branch[i] = 0;
   decode_inuse[i] = 1;
   decode_decoded[i] = 1;
-  // printf("%d\n",i);
-  // printf("%d\n",decode_instruction_struct[i].pc);
-  // printf("inuse:%d\n",decode_inuse[i]);
-  // printf("%d\n",decode_instruction_struct[i + 1].pc);
-  // printf("inuse:%d\n",decode_inuse[i+1]);
-  //
-  // // printf("%d\n",decode_instruction_struct[i].imm);
-  // // printf("%d\n",pc[0]);
-  // printf("%d\n",decode_instruction_struct[i].instruction_type);
-  // // if(instructionid == 363 && current_cycle > 399)exit_early();
-  // printf("%d\n",decode_instruction_struct[i].branchTaken);
-  // if(instructionid == 362)exit_early();
-
   instructionid++;
 
 }

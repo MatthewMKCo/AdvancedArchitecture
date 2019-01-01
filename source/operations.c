@@ -156,9 +156,6 @@ int jalr(int reg1){
 //branch if equal
 int beq(int reg1, int reg2){
   int x = 0;
-  printf("%d\n",reg1);
-  printf("%d\n",reg2);
-
   if(reg1 == reg2){
     x = check_purge_accepted(currentInstruction.pc, currentInstruction.imm, currentInstruction.branchTaken);
   }
