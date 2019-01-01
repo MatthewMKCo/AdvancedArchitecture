@@ -202,7 +202,7 @@ void issue_add_to_reservation(int current){
     tagData.tagNumber = issue_instruction_struct[current].tagDestination;
     tagData.registerNumber = issue_instruction_struct[current].rdestination;
 
-    addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, 0);
+    addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, 0, 0);
     //instructionid++;
     rob++;;
 
@@ -332,7 +332,7 @@ if(issue_unit_type[current] == 3){
   tag tagData;
   tagData.tagNumber = -2;
   tagData.registerNumber = -2;
-  addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, 0);
+  addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, 0 , 0);
   //instructionid++;
   rob++;;
 }
@@ -472,7 +472,7 @@ if(issue_unit_type[current] == 2){
     tagData.registerNumber = -2;
   }
 
-  addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, 0);
+  addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, 0, 0);
   //instructionid++;
   rob++;;
 }
@@ -545,7 +545,7 @@ void issue(){
     tag tagData;
     tagData.tagNumber = -2;
     tagData.registerNumber = 0;
-    addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, "jal");
+    addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, "jal", 0);
 
 
     //issue_instruction_struct[current].instructionid = instructionid;
@@ -597,7 +597,7 @@ void issue(){
       tag tagData;
       tagData.tagNumber = -2;
       tagData.registerNumber = 0;
-      addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, "jal");
+      addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, "jal", 0);
       //issue_instruction_struct[current].instructionid = instructionid;
       jlu[0].instruction = issue_instruction_struct[current];
       jlu[0].valueInside = pc[0];
@@ -645,7 +645,7 @@ void issue(){
       tag tagData;
       tagData.tagNumber = -2;
       tagData.registerNumber = 0;
-      addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, "jal");
+      addafternodeinstruction(inOrderInstructions, issue_instruction_struct[current].instruction_hex, issue_instruction_struct[current].instructionid, tagData, issue_unit_type[current], 0, "jal", 0);
       //issue_instruction_struct[current].instructionid = instructionid;
       jlu[0].instruction = issue_instruction_struct[current];
       jlu[0].valueInside = pc[0];

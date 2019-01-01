@@ -25,7 +25,7 @@
 //2 - Backwards taken, forwards not taken
 //3 - 2-bit Saturating Counter
 //4 - 2-level Adaptive Predictor
-#define BRANCH_PREDICTOR 0
+#define BRANCH_PREDICTOR 4
 
 #define NUM_STAGES 10
 
@@ -45,6 +45,8 @@
 #define sizeOfBranchCache 100
 
 #define NOTPRINT 0
+
+#define INORDER_BRANCH 0
 
 
 #define separator printf("====================================================\n");
@@ -106,6 +108,7 @@ typedef struct execute_unit{
   int instructionid;
   instruction instruction;
   char* instruction_name;
+  int branch_taken;
 }execute_unit;
 
 typedef struct reg{
@@ -162,6 +165,7 @@ typedef struct execute_to_writeback{
   int instructionid;
   int instruction_type;
   char* instruction_name;
+  int pc;
 }execute_to_writeback;
 
 // typedef int item;
@@ -176,6 +180,7 @@ typedef struct Node{
   int ready;
   int value;
   int unit_type;
+  int pc;
   char* instruction_name;
 }node;
 
@@ -186,6 +191,7 @@ typedef struct everything{
   int ready;
   int unit_type;
   int value;
+  int pc;
 }everything;
 
 typedef struct Ring{

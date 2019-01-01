@@ -45,6 +45,10 @@ void graduate(){
         }
       }
     }
+      if(value2.unit_type == 2 && (BRANCH_PREDICTOR == 3 || BRANCH_PREDICTOR == 4) && INORDER_BRANCH == 0){
+        if(value2.value == 1)check_purge_accepted2(value2.pc);
+        if(value2.value == 0)check_purge_rejected2(value2.pc);
+      }
 
 
       if(value2.unit_type == 3){
@@ -66,7 +70,7 @@ void graduate(){
             lsu2[k].ready = 0;
             lsu2[k].destinationRegister = value2.tagData.registerNumber;
             lsu2[k].sourceRegister1 = value2.value;
-            lsu2[k].cyclesNeeded = 4;
+            lsu2[k].cyclesNeeded = 5;
             lsu2[k].currentCycles = 0;
             lsu2[k].instructionid = sequencenumber;
             break;
@@ -131,7 +135,7 @@ void graduate(){
         lsu2[k].ready = 0;
         lsu2[k].destinationRegister = reservationlsu2[x].rdestination;
         lsu2[k].sourceRegister1 = reservationlsu2[x].rsource1value;
-        lsu2[k].cyclesNeeded = 4;
+        lsu2[k].cyclesNeeded = 5;
         lsu2[k].currentCycles = 0;
         lsu2[k].instructionid = reservationlsu2[x].instructionid;
       }

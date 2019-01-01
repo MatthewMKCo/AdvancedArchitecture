@@ -171,7 +171,7 @@ void execute_rformat(int number){
         // printf("Instruction:Multiply\n");
         executed_instruction_name[numberOfExecutedInstructions] = "Multiply";
         execute_val = mul(currentInstruction.rsource1value, currentInstruction.rsource2value);
-        alu[number].cyclesNeeded = 5;
+        alu[number].cyclesNeeded = 3;
       }
       break;
     case(0b001):
@@ -197,7 +197,7 @@ void execute_rformat(int number){
         // printf("Instruction:Divide\n");
         executed_instruction_name[numberOfExecutedInstructions] = "Divide";
         execute_val = divide(currentInstruction.rsource1value, currentInstruction.rsource2value);
-        alu[number].cyclesNeeded = 1;
+        alu[number].cyclesNeeded = 10;
         break;
       }
       else if(currentInstruction.funct7 == 0b0000000){
@@ -254,39 +254,52 @@ void execute_bformat(int number){
       // printf("Instruction:Branch if Equal\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Equal";
       execute_val = beq(currentInstruction.rsource1value, currentInstruction.rsource2value);
-      bru[number].cyclesNeeded = 1;
+      if(execute_val == 1)bru[number].cyclesNeeded = 2;
+      else bru[number].cyclesNeeded = 1;
       break;
     case(0b001):
       // printf("Instruction:Branch if Not Equal\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Not Equal";
       execute_val = bne(currentInstruction.rsource1value, currentInstruction.rsource2value);
-      bru[number].cyclesNeeded = 1;
+      if(execute_val == 1)bru[number].cyclesNeeded = 2;
+      else bru[number].cyclesNeeded = 1;
       break;
     case(0b100):
       // printf("Instruction:Branch if Less Than\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Less Than";
       execute_val = blt(currentInstruction.rsource1value, currentInstruction.rsource2value);
-      bru[number].cyclesNeeded = 1;
+      if(execute_val == 1)bru[number].cyclesNeeded = 2;
+      else bru[number].cyclesNeeded = 1;
       break;
     case(0b101):
       // printf("Instruction:Branch if Greater Than\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Greater Than";
       execute_val = bge(currentInstruction.rsource1value, currentInstruction.rsource2value);
-      bru[number].cyclesNeeded = 1;
+      if(execute_val == 1)bru[number].cyclesNeeded = 2;
+      else bru[number].cyclesNeeded = 1;
       break;
     case(0b110):
       // printf("Instruction:Branch if Less Than Unsigned\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Less Than Unsigned";
       execute_val = bltu(currentInstruction.rsource1value, currentInstruction.rsource2value);
-      bru[number].cyclesNeeded = 1;
+      if(execute_val == 1)bru[number].cyclesNeeded = 2;
+      else bru[number].cyclesNeeded = 1;
       break;
     case(0b111):
       // printf("Instruction:Branch if Greater Than Unsigned\n");
       executed_instruction_name[numberOfExecutedInstructions] = "Branch if Greater Than Unsigned";
       execute_val = bgeu(currentInstruction.rsource1value, currentInstruction.rsource2value);
-      bru[number].cyclesNeeded = 1;
+      if(execute_val == 1)bru[number].cyclesNeeded = 2;
+      else bru[number].cyclesNeeded = 1;
       break;
   }
+  if(INORDER_BRANCH){
+    if(bru[number].instruction.branchTaken == 1 && bru[number].valueInside == 1)check_purge_rejected2(currentInstruction.pc);
+    else if(bru[number].instruction.branchTaken == 1 && bru[number].valueInside == 0)check_purge_accepted2(currentInstruction.pc);
+    else if(bru[number].instruction.branchTaken == 0 && bru[number].valueInside == 1)check_purge_accepted2(currentInstruction.pc);
+    else if(bru[number].instruction.branchTaken == 0 && bru[number].valueInside == 0)check_purge_rejected2(currentInstruction.pc);
+  }
+  // bru[number].cyclesNeeded = 1;
   bru[number].valueInside = execute_val;
   bru[number].instruction_name = executed_instruction_name[numberOfExecutedInstructions];
   return;
@@ -337,7 +350,7 @@ void execute_iformat2(int number){
         break;
       }
       execute_val = lw(Dcache, execute_offset);
-      lsu[number].cyclesNeeded = 4;
+      lsu[number].cyclesNeeded = 5;
       break;
     case(0b100):
       // printf("Instruction:Load 8-bit Unsigned\n");
@@ -436,6 +449,11 @@ void increment_units(){
           // printf("%d\n",purgeid);
           // if(bru[i].instruction.instructionid == 88)exit_early();
         }
+        if(bru[i].instruction.branchTaken == 1 && bru[i].valueInside == 1)bru[i].valueInside = 0;
+        else if(bru[i].instruction.branchTaken == 1 && bru[i].valueInside == 0)bru[i].valueInside = 1;
+        else if(bru[i].instruction.branchTaken == 0 && bru[i].valueInside == 1)bru[i].valueInside = 1;
+        else if(bru[i].instruction.branchTaken == 0 && bru[i].valueInside == 0)bru[i].valueInside = 0;
+
         // alu[i].wbValueInside = alu[i].valueInside;
         // alu[i].wbDestinationRegister = alu[i].destinationRegister;
       }
@@ -532,7 +550,7 @@ void send_for_writeback(){
       writebackbru[i].instructionid = bru[i].instruction.instructionid;
       writebackbru[i].instruction_type = bru[i].instruction.instruction_type;
       writebackbru[i].instruction_name = bru[i].instruction_name;
-
+      writebackbru[i].pc = bru[i].instruction.pc;
       // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
     }
   }
@@ -631,39 +649,41 @@ instructionwrapper check_reservation_alu(int numberOfAvailableUnits){
 
 //Fetches instructions from Reservation Stations
 instructionwrapper check_reservation_bru(int numberOfAvailableUnits){
-  // instructionwrapper wrappedListofInstructions;
-  // wrappedListofInstructions.foundInstructions = 0;
-  // if(numberOfAvailableUnits == 0)return wrappedListofInstructions;
-  // for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
-  //   if(reservationbru[i].rsource1ready && reservationbru[i].rsource2ready && reservationbru[i].inuse && reservationbru[i].inExecute){
-  //     if(wrappedListofInstructions.foundInstructions == numberOfAvailableUnits){
-  //       instruction newInstruction;
-  //       newInstruction = reservationbru[i].instruction;
-  //       for(int j = 0; j < numberOfAvailableUnits; j++){
-  //         if(newInstruction.instructionid < wrappedListofInstructions.instruction[j].instructionid){
-  //           int x = wrappedListofInstructions.instruction[j].index;
-  //           newInstruction.index = i;
-  //           wrappedListofInstructions.instruction[j] = newInstruction;
-  //           reservationbru[i].inuse = 0;
-  //           reservationbru[i].inExecute = 0;
-  //           reservationbru[x].inuse = 1;
-  //           reservationbru[x].inExecute = 1;
-  //
-  //         }
-  //       }
-  //     }
-  //     else{
-  //       instruction newInstruction;
-  //       newInstruction = reservationbru[i].instruction;
-  //       newInstruction.index = i;
-  //       wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
-  //       wrappedListofInstructions.foundInstructions++;
-  //       reservationbru[i].inuse = 0;
-  //       reservationbru[i].inExecute = 0;
-  //   }
-  //   }
-  // }
   instructionwrapper wrappedListofInstructions;
+  if(INORDER_BRANCH == 1){
+  wrappedListofInstructions.foundInstructions = 0;
+  if(numberOfAvailableUnits == 0)return wrappedListofInstructions;
+  for(int i = 0; i < BRANCH_RESERVATION_WIDTH; i++){
+    if(reservationbru[i].rsource1ready && reservationbru[i].rsource2ready && reservationbru[i].inuse && reservationbru[i].inExecute){
+      if(wrappedListofInstructions.foundInstructions == numberOfAvailableUnits){
+        instruction newInstruction;
+        newInstruction = reservationbru[i].instruction;
+        for(int j = 0; j < numberOfAvailableUnits; j++){
+          if(newInstruction.instructionid < wrappedListofInstructions.instruction[j].instructionid){
+            int x = wrappedListofInstructions.instruction[j].index;
+            newInstruction.index = i;
+            wrappedListofInstructions.instruction[j] = newInstruction;
+            reservationbru[i].inuse = 0;
+            reservationbru[i].inExecute = 0;
+            reservationbru[x].inuse = 1;
+            reservationbru[x].inExecute = 1;
+
+          }
+        }
+      }
+      else{
+        instruction newInstruction;
+        newInstruction = reservationbru[i].instruction;
+        newInstruction.index = i;
+        wrappedListofInstructions.instruction[wrappedListofInstructions.foundInstructions] = newInstruction;
+        wrappedListofInstructions.foundInstructions++;
+        reservationbru[i].inuse = 0;
+        reservationbru[i].inExecute = 0;
+    }
+    }
+  }
+}
+  else{
   wrappedListofInstructions.foundInstructions = 0;
   if(numberOfAvailableUnits == 0)return wrappedListofInstructions;
   for(int i = 0; i < RESERVATION_WIDTH; i++){
@@ -681,6 +701,7 @@ instructionwrapper check_reservation_bru(int numberOfAvailableUnits){
     }
 
   }
+}
   return wrappedListofInstructions;
 }
 
@@ -832,7 +853,7 @@ void execute(){
 
 
   increment_units();
-  
+
   if(purge == 1){
     block_fetch_to_decode = 0;
     block_decode_to_issue = 0;

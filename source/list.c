@@ -42,7 +42,7 @@ void addafternode(ring *currentRing, tag data){
 }
 
 //adds a node after the last node
-void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, tag tagData, int unit_type, int value, char* instruction_name){
+void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, tag tagData, int unit_type, int value, char* instruction_name, int pc){
   node *newnode = malloc(sizeof(node));
 
   newnode -> name = currentRing -> name;
@@ -53,6 +53,7 @@ void addafternodeinstruction(ring *currentRing, uint32_t instruction, int id, ta
   newnode -> value = value;
   newnode -> unit_type = unit_type;
   newnode -> instruction_name = instruction_name;
+  newnode -> pc = pc;
   currentRing -> last -> forward = newnode;
   newnode -> forward = currentRing -> sentinel;
   newnode -> back = currentRing -> last;
@@ -383,6 +384,7 @@ everything get_everything(ring *currentRing){
   value.ready = currentRing -> selected -> ready;
   value.unit_type = currentRing -> selected -> unit_type;
   value.value = currentRing -> selected -> value;
+  value.pc = currentRing -> selected -> pc;
   return value;
 }
 
