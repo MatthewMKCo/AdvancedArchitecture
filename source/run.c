@@ -336,9 +336,21 @@ void run(){
       exit(1);
     }
 
+    for(int i = 0; i < RESERVATION_WIDTH; i++){
+      if(reservationalu[i].inuse == 0 && reservationalu[i].inExecute == 0){
+        for(int j = i + 1; j < RESERVATION_WIDTH; j++){
+          reservationalu[j - 1] = reservationalu[j];
+          reservationalu[j].inuse = 0;
+          reservationalu[j].inExecute = 0;
+        }
+      }
+      else continue;
+    }
+
     print_reg_summary();
 
     move_next_to_current();
+
 
     current_cycle++;
     separator;
