@@ -51,7 +51,9 @@ void set_register(){
 
   for(int i = 0; i < NWAY; i++){
     fetch_inuse[i] = 0;
+    fetch_branch[i] = 0;
     decode_inuse[i] = 0;
+    decode_branch[i] = 0;
     issue_inuse[i] = 0;
     decode_decoded[i] = 0;
   }
@@ -453,6 +455,9 @@ void purgepipe(){
     decode_inuse[i] = 0;
     issue_inuse[i] = 0;
     decode_decoded[i] = 0;
+    fetch_branch[i] = 0;
+    decode_branch[i] = 0;
+
   }
 
   deletenodeswithgreaterthanid(purgeid);

@@ -350,8 +350,7 @@ void run(){
     print_reg_summary();
 
     move_next_to_current();
-
-
+    // printring(allInOrder);
     current_cycle++;
     separator;
 

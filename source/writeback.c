@@ -12,7 +12,7 @@ void writeintophysreg(int i){
     tag orderTag;
     orderTag.tagNumber = writebackalu[i].tag;
     orderTag.registerNumber = get_register(inuseTags, orderTag.tagNumber);
-    addafternodeinstruction(outOfOrderInstructions, writebackalu[i].instruction, writebackalu[i].instructionid, orderTag, 1, writebackalu[i].value, writebackalu[i].instruction_name, 0);
+    addafternodeinstruction(outOfOrderInstructions, writebackalu[i].instruction, writebackalu[i].instructionid, orderTag, 1, writebackalu[i].value, writebackalu[i].instruction_name, writebackalu[i].pc);
 
 
     return;
@@ -42,7 +42,7 @@ void writebackloadstore(int i){
     orderTag.registerNumber = writebacklsu[i].tag;//do not remove, tag is for destination address
   }
 
-  addafternodeinstruction(outOfOrderInstructions, writebacklsu[i].instruction, writebacklsu[i].instructionid, orderTag, 3, writebacklsu[i].value, writebacklsu[i].instruction_name, 0);
+  addafternodeinstruction(outOfOrderInstructions, writebacklsu[i].instruction, writebacklsu[i].instructionid, orderTag, 3, writebacklsu[i].value, writebacklsu[i].instruction_name, writebacklsu[i].pc);
   return;
 }
 
@@ -51,7 +51,7 @@ void writebackjal(int i){
   orderTag.tagNumber = -2;
   orderTag.registerNumber = 0;
 
-  addafternodeinstruction(outOfOrderInstructions, writebackjlu[i].instruction, writebackjlu[i].instructionid, orderTag, 1, writebackjlu[i].value, writebackjlu[i].instruction_name, 0);
+  addafternodeinstruction(outOfOrderInstructions, writebackjlu[i].instruction, writebackjlu[i].instructionid, orderTag, 1, writebackjlu[i].value, writebackjlu[i].instruction_name, writebacklsu[i].pc);
 
   return;
 }

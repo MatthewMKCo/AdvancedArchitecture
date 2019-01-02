@@ -41,8 +41,6 @@ void decode(){
   if(i != NWAY)print_decode_summary = 1;
   if(i == NWAY)return;
 
-
-
   for(; i < NWAY; i++){
     if(decode_decoded[i] == 1)continue;
     if(decode_inuse[i] == 0)break;
@@ -96,6 +94,7 @@ void decode(){
 
   if(decode_instruction[i] == -1){
     decode_unit_type[i] = 0;
+    decode_inuse[i] = 0;
     break;
   }
 
@@ -181,23 +180,23 @@ void decode(){
   decode_inuse[i] = 1;
   decode_decoded[i] = 1;
   instructionid++;
-
 }
 
   int branch_taken = 0;
   for(int i = 0; i < NWAY; i++){
-    if(branch_taken && decode_instruction_struct[i].instruction_type != 0){
+    if(branch_taken && decode_instruction_struct[i].instruction_type != 0 && decode_inuse[i] == 1){
       decode_instruction_struct[i].instruction_type = 0;
       decode_instruction_struct[i].instructionid = -1;
       decode_inuse[i] = 0;
       decode_decoded[i] = 0;
       instructionid--;
+      // printf("%d\n");
       continue;
     }
     if(decode_instruction_struct[i].instruction_type == 5 && branch_taken == 0 && decode_instruction_struct[i].branchTaken == 0){
-
       branch_taken = branch_predictor(decode_instruction_struct[i].pc, 1, decode_instruction_struct[i].imm);
       if(branch_taken){
+        decode_instruction_struct[i].branchTaken = 1;
         for(int j = 0; j < NWAY; j++){
           fetch_instruction[j] = -1;
           fetch_inuse[j] = 0;
@@ -205,4 +204,6 @@ void decode(){
       }
     }
   }
+
+
 }

@@ -29,7 +29,7 @@
 
 #define NUM_STAGES 10
 
-#define NWAY 4
+#define NWAY 6
 #define ALU_NUM 4
 
 #define BRU_NUM 1
@@ -44,7 +44,7 @@
 
 #define sizeOfBranchCache 100
 
-#define NOTPRINT 0
+#define NOTPRINT 1
 
 #define INORDER_BRANCH 0
 

@@ -446,56 +446,13 @@ int check_purge_accepted(int pc, int offset, int accepted){
     else return 1;
   }
   if(BRANCH_PREDICTOR == 3){
-    for(int i = 0; i < sizeOfBranchCache; i++){
-      if(branchCache[i].pc == pc){
-        if(branchCache[i].accepted_before != 3)branchCache[i].accepted_before++;
         if(accepted)return 0;
         else return 1;
-      }
-    }
-    printf("ERROR IN BRANCH PREDICTOR 3 ON ACCEPTED\n");
-    exit_early();
-    return 0;
   }
   if(BRANCH_PREDICTOR == 4){
-    for(int i = 0; i < sizeOfBranchCache; i ++){
-      if(branchCache[i].pc == pc){
-        if(branchCache[i].bit == 2){
-            if(branchCache[i].history[0] == 1 && branchCache[i].history[1] == 1){
-              if(branchCache[i].accepted_twolevel[3][0] != 3)branchCache[i].accepted_twolevel[3][0]++;
-            }
-            else if(branchCache[i].history[0] == 0 && branchCache[i].history[1] == 0){
-              if(branchCache[i].accepted_twolevel[0][0] != 3)branchCache[i].accepted_twolevel[0][0]++;
-            }
-            else if(branchCache[i].history[0] == 1 && branchCache[i].history[1] == 0){
-              if(branchCache[i].accepted_twolevel[2][0] != 3)branchCache[i].accepted_twolevel[2][0]++;
-            }
-            else if(branchCache[i].history[0] == 0 && branchCache[i].history[1] == 1){
-              if(branchCache[i].accepted_twolevel[1][0] != 3)branchCache[i].accepted_twolevel[1][0]++;
-            }
-            else{
-              printf("%d\n",branchCache[i].history[1]);
-              printf("%d\n",branchCache[i].history[0]);
-
-              printf("ERROR IN BRANCH PREDICTOR 4 ON ACCEPTED\n");
-              exit_early();
-            }
-        }
-        if(branchCache[i].bit == 1 || branchCache[i].bit == 2){
-          branchCache[i].history[0] = branchCache[i].history[1];
-        }
-        branchCache[i].history[1] = 1;
-        if(branchCache[i].bit == 1)branchCache[i].bit = 2;
-        if(branchCache[i].bit == 0)branchCache[i].bit = 1;
-
         if(accepted)return 0;
         else return 1;
       }
-    }
-    printf("ERROR IN BRANCH PREDICTOR 4 ON ACCEPTED\n");
-    exit_early();
-    return 0;
-  }
 
 }
 

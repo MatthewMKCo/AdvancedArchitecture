@@ -344,7 +344,7 @@ void printring(ring *currentRing){
       printf("Id:%d\tTag:%d\tRegister:%d\tReady:%d\tName:%s\tInstruction:%s\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber, currentRing -> selected -> ready,currentRing -> selected -> name, currentRing -> selected -> instruction_name);
       break;
     }
-    printf("Id:%d\tTag:%d\tRegister:%d\tReady:%d\tName:%s\tInstruction:%*s\tValue:%d\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber, currentRing -> selected -> ready,currentRing -> selected -> name, 20, currentRing -> selected -> instruction_name, currentRing -> selected -> value);
+    printf("Id:%d\tTag:%d\tRegister:%d\tReady:%d\tName:%s\tInstruction:%*s\tValue:%d\tpc:%d\n", currentRing -> selected -> id, currentRing -> selected -> data.tagNumber, currentRing -> selected -> data.registerNumber, currentRing -> selected -> ready,currentRing -> selected -> name, 20, currentRing -> selected -> instruction_name, currentRing -> selected -> value, currentRing -> selected -> pc);
     next(currentRing);
   }
   printf("Id of first:%d\n", currentRing -> first -> id);

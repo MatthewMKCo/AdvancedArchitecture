@@ -445,9 +445,6 @@ void increment_units(){
           purgeid = bru[i].instruction.instructionid;
           instructionid = bru[i].instruction.instructionid + 1;
           pc[0] = change_pc_execute(bru[i].instruction.pc, bru[i].instruction.imm, bru[i].instruction.branchTaken);
-          // exit_early();
-          // printf("%d\n",purgeid);
-          // if(bru[i].instruction.instructionid == 88)exit_early();
         }
         if(bru[i].instruction.branchTaken == 1 && bru[i].valueInside == 1)bru[i].valueInside = 0;
         else if(bru[i].instruction.branchTaken == 1 && bru[i].valueInside == 0)bru[i].valueInside = 1;
@@ -536,6 +533,8 @@ void send_for_writeback(){
       writebackalu[i].instructionid = alu[i].instruction.instructionid;
       writebackalu[i].instruction_type = alu[i].instruction.instruction_type;
       writebackalu[i].instruction_name = alu[i].instruction_name;
+      writebackalu[i].pc = alu[i].instruction.pc;
+
       // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
     }
   }
@@ -566,6 +565,8 @@ void send_for_writeback(){
       writebacklsu[i].instructionid = lsu[i].instruction.instructionid;
       writebacklsu[i].instruction_type = lsu[i].instruction.instruction_type;
       writebacklsu[i].instruction_name = lsu[i].instruction_name;
+      writebacklsu[i].pc = lsu[i].instruction.pc;
+
 
 
       // forward_reservation_stations(alu[i].destinationRegister, alu[i].valueInside, 1);
@@ -581,6 +582,8 @@ void send_for_writeback(){
       writebackjlu[i].instructionid = jlu[i].instruction.instructionid;
       writebackjlu[i].instruction_type = jlu[i].instruction.instruction_type;
       writebackjlu[i].instruction_name = jlu[i].instruction_name;
+      writebackjlu[i].pc = jlu[i].instruction.pc;
+
 
     }
   }
